@@ -19,7 +19,6 @@ class TvSeriesResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'year' => $this->year,
-            'duration' => $this->duration,
             'imdb_rating' => $this->imdb_rating,
             'total_seasons' => $this->total_seasons,
             'status' => $this->status,

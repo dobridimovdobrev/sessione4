@@ -2,7 +2,11 @@
 
 namespace Database\Seeders;
 
+
 use Illuminate\Database\Seeder;
+use Database\Seeders\ImageFileSeeder;
+
+
 
 
 class DatabaseSeeder extends Seeder
@@ -25,7 +29,12 @@ class DatabaseSeeder extends Seeder
             EpisodeSeeder::class,
             LikeSeeder::class, 
             PersonSeeder::class,
-            CreditSeeder::class,*/
+            CreditSeeder::class,
+             TrailerSeeder::class,
+            ImageFileSeeder::class
+            VideoFileSeeder::class */
+            CreateDataSeeder::class
+
         ]);
     }
 }

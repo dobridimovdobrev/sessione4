@@ -11,17 +11,26 @@ use App\Http\Requests\api\v1\ContentPersonUpdateRequest;
 use App\Http\Resources\api\v1\ContentPersonResource;
 use App\Http\Resources\api\v1\ContentPersonCollection;
 
+
 class ContentPersonController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', ContentPerson::class);
+        $filterData = $request->all();
+        $query = ContentPerson::query();
+        foreach($filterData as $key=>$value){
+            if(in_array($key,['person_id', 'content_id', 'content_type'])){
+                 $query->where($key, $value);
+            }
 
-        $contentPersons = ContentPerson::paginate(100);
-        return new ContentPersonCollection($contentPersons);
+        }
+        
+        $contentPersons = $query->get();
+        return new ContentPersonCollection($contentPersons);        
     }
 
     /**

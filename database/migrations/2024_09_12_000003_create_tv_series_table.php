@@ -17,10 +17,8 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description');
             $table->unsignedSmallInteger('year')->index();
-            $table->unsignedSmallInteger('duration')->nullable();
             $table->decimal('imdb_rating', 3, 1)->nullable()->index();  
             $table->unsignedTinyInteger('total_seasons')->nullable();
-            $table->date('premiere_date')->nullable();
             $table->enum('status', ['published', 'draft', 'scheduled', 'coming soon'])->default('published');
             $table->timestamps();
             $table->softDeletes();

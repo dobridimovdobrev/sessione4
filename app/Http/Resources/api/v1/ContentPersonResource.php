@@ -15,7 +15,6 @@ class ContentPersonResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'content_persons_id' => $this->content_persons_id,
             'content_id' => $this->content_id,
             'content_type' => $this->content_type,
             'person_id' => $this->person_id,

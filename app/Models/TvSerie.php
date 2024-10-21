@@ -17,12 +17,10 @@ class TvSerie extends Model
     protected $fillable = [
         'title',
         'slug',
-        'description',
         'year',
         'duration',
         'imdb_rating',
         'total_seasons',
-        'premiere_date',
         'status',
         'category_id',
     ];

@@ -25,10 +25,8 @@ class TvSeriesStoreRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'year' => ['required', 'integer'],
-            'duration' => ['nullable', 'integer'],
             'imdb_rating' => ['nullable', 'numeric', 'between:0,10'],
             'total_seasons' => ['nullable', 'integer'],
-            'premiere_date' => ['nullable', 'date'],
             'status' => ['required', 'in:published,draft,coming soon'],
             'category_id' => ['required', 'exists:categories,category_id'],
         ];

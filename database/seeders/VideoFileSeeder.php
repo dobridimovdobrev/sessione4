@@ -14,8 +14,6 @@ class VideoFileSeeder extends Seeder
     public function run(): void
     {
         VideoFile::create([
-            'title' => 'Breaking Bad Trailer',
-            'description' => 'Official trailer for Breaking Bad season 1.',
             'url' => 'https://example.com/breakingbad-trailer.mp4',
             'content_id' => 1,
             'content_type' => 'tvseries',
