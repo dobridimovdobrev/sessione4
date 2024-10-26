@@ -5,7 +5,7 @@ namespace App\Http\Requests\api\v1;
 use App\Helpers\ValidationHelpers;
 
 
-class PersonUpdateRequest extends PersonUpdateRequest
+class PersonUpdateRequest extends PersonStoreRequest
 {
     /**
      * Determine if the user is authorized to make this request.

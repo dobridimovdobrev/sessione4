@@ -34,10 +34,7 @@ class Movie extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function imageFile()
-    {
-        return $this->morphMany(ImageFile::class, 'content');
-    }
+   
 
     public function likes()
     {
@@ -59,13 +56,27 @@ class Movie extends Model
         return $this->morphMany(History::class, 'content');
     }
 
-    public function trailers()
+    public function persons()
     {
-        return $this->morphMany(Trailer::class, 'content');
+        return $this->belongsToMany(Person::class, 'movie_person', 'movie_id', 'person_id');
     }
 
-    public function contentPersons()
+    // Relationship with images
+    public function imageFiles()
     {
-        return $this->morphMany(ContentPerson::class, 'content');
+        return $this->belongsToMany(ImageFile::class, 'movie_image', 'movie_id', 'image_file_id');
     }
+
+    // Relationship with trailers
+    public function trailers()
+    {
+        return $this->belongsToMany(Trailer::class, 'movie_trailer', 'movie_id', 'trailer_id');
+    }
+
+    // Relationship with video files
+    public function videoFiles()
+    {
+        return $this->belongsToMany(VideoFile::class, 'movie_video_file', 'movie_id', 'video_file_id');
+    }
+
 }

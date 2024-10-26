@@ -17,18 +17,34 @@ class VideoFile extends Model
 
     protected $fillable = [
         'url',
-        'content_id',
-        'content_type',
         'format',
         'size',
         'resolution',
         'duration',
     ];
 
-    //Polymorphic relationship
+    //Pivot relationship
 
-    public function content()
+    public function movies()
     {
-        return $this->morphTo();
+        return $this->belongsToMany(Movie::class, 'movie_video_file', 'video_file_id', 'movie_id');
     }
+
+     // Relationship with TV Series
+     public function tvSeries()
+     {
+         return $this->belongsToMany(TvSerie::class, 'tv_series_video_file', 'video_file_id', 'tv_series_id');
+     }
+ 
+     // Relationship with Seasons
+     public function seasons()
+     {
+         return $this->belongsToMany(Season::class, 'season_video_file', 'video_file_id', 'season_id');
+     }
+ 
+     // Relationship with Episodes
+     public function episodes()
+     {
+         return $this->belongsToMany(Episode::class, 'episode_video_file', 'video_file_id', 'episode_id');
+     }
 }

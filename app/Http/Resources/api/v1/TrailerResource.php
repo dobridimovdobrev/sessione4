@@ -16,11 +16,7 @@ class TrailerResource extends JsonResource
     {
         return [
             'trailer_id' => $this->trailer_id,
-            'title' => $this->title,
-            'description' => $this->description,
             'url' => $this->url,
-            'content_id' => $this->content_id,
-            'content_type' => $this->content_type,
         ];
     }
 }

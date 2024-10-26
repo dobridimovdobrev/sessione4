@@ -15,13 +15,23 @@ class Trailer extends Model
 
     protected $fillable = [
         'url',
-        'content_id',
-        'content_type',
     ];
 
-    //Polymorphic relationship
-    public function content()
+    //Pivot rel
+    public function movies()
     {
-        return $this->morphTo();
+        return $this->belongsToMany(Movie::class, 'movie_trailer', 'trailer_id', 'movie_id');
     }
+
+     // Relationship with TV Series
+     public function tvSeries()
+     {
+         return $this->belongsToMany(TvSerie::class, 'tv_series_trailer', 'trailer_id', 'tv_series_id');
+     }
+ 
+     // Relationship with Seasons
+     public function seasons()
+     {
+         return $this->belongsToMany(Season::class, 'season_trailer', 'trailer_id', 'season_id');
+     }
 }

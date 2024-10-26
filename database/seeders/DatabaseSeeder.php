@@ -4,10 +4,24 @@ namespace Database\Seeders;
 
 
 use Illuminate\Database\Seeder;
+use Database\Seeders\LikeSeeder;
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\ViewSeeder;
+use Database\Seeders\MovieSeeder;
+use Database\Seeders\CreditSeeder;
+use Database\Seeders\PersonSeeder;
+use Database\Seeders\SeasonSeeder;
+use Database\Seeders\CountrySeeder;
+use Database\Seeders\EpisodeSeeder;
+use Database\Seeders\TrailerSeeder;
+use Database\Seeders\TvSerieSeeder;
+use Database\Seeders\CategorySeeder;
 use Database\Seeders\ImageFileSeeder;
-
-
-
+use Database\Seeders\VideoFileSeeder;
+use MovieSeeder as GlobalMovieSeeder;
+use Database\Seeders\CreateDataSeeder;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\NotificationSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,19 +35,19 @@ class DatabaseSeeder extends Seeder
              RoleSeeder::class, 
              PermissionSeeder::class, 
              CategorySeeder::class, 
-             MovieSeeder::class, 
-            TvSerieSeeder::class,
-            ViewSeeder::class,
-            NotificationSeeder::class,
-            SeasonSeeder::class,
-            EpisodeSeeder::class,
-            LikeSeeder::class, 
-            PersonSeeder::class,
-            CreditSeeder::class,
+             TvSerieSeeder::class,
+             ViewSeeder::class,
+             NotificationSeeder::class,
+             SeasonSeeder::class,
+             EpisodeSeeder::class,
+             LikeSeeder::class, 
+             PersonSeeder::class,
+             CreditSeeder::class,
              TrailerSeeder::class,
-            ImageFileSeeder::class
-            VideoFileSeeder::class */
-            CreateDataSeeder::class
+             ImageFileSeeder::class
+             CreateDataSeeder::class
+             VideoFileSeeder::class */
+             MovieSeeder::class
 
         ]);
     }

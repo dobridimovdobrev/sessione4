@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('trailers', function (Blueprint $table) {
-            $table->id('trailer_id');
-            $table->string('url');
+        Schema::create('episode_image', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('episode_id')->constrained('episodes', 'episode_id')->onDelete('cascade');
+            $table->foreignId('image_file_id')->constrained('image_files', 'image_id')->onDelete('cascade');
             $table->timestamps();
-            $table->softDeletes();
-             
         });
     }
 
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('trailers');
+        Schema::dropIfExists('episode_image');
     }
 };

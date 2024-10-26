@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\api\v1;
 
-
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,7 +23,13 @@ class MovieResource extends JsonResource
             "year" => $this->year,
             "duration" => $this->duration,
             "imdb_rating" => $this->imdb_rating,
-            "status" => $this->status
+            "status" => $this->status,
+
+             // Trailers, video files, image files
+             'persons' => PersonResource::collection($this->whenLoaded('persons')),
+            'trailers' => TrailerResource::collection($this->whenLoaded('trailers')),
+            'video_files' => VideoFileResource::collection($this->whenLoaded('videoFiles')),
+            'image_files' => ImageFileResource::collection($this->whenLoaded('imageFiles')),
         ];
     }
 }

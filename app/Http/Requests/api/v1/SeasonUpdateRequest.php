@@ -4,7 +4,7 @@ namespace App\Http\Requests\api\v1;
 
 use App\Helpers\ValidationHelpers;
 
-class SeasonUpdateRequest extends SeasonUpdateRequest
+class SeasonUpdateRequest extends SeasonStoreRequest
 {
     /**
      * Determine if the user is authorized to make this request.

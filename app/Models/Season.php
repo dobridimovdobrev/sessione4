@@ -33,6 +33,21 @@ class Season extends Model
         return $this->hasMany(Episode::class, 'season_id');
     }
 
+    public function trailers()
+    {
+        return $this->belongsToMany(Trailer::class, 'season_trailer', 'season_id', 'trailer_id');
+    }
+
+    public function imageFiles()
+    {
+        return $this->belongsToMany(ImageFile::class, 'season_image', 'season_id', 'image_file_id');
+    }
+
+    public function persons()
+    {
+        return $this->belongsToMany(Person::class, 'season_person', 'season_id', 'person_id');
+    }
+
     // Polymorphic relationship 
 
     public function likes()
@@ -50,19 +65,6 @@ class Season extends Model
         return $this->morphMany(History::class, 'content');
     }
 
-    public function trailers()
-    {
-        return $this->morphMany(Trailer::class, 'content');
-    }
-
-    public function images()
-    {
-        return $this->morphMany(ImageFile::class, 'content');
-    }
-
-     public function contentPersons()
-     {
-         return $this->morphMany(ContentPerson::class, 'content');
-     }
+   
 
 }

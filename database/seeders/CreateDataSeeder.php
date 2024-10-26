@@ -136,13 +136,8 @@ class CreateDataSeeder extends Seeder
             }
 
             // Associate actors with the TV series
-            foreach ($tvData['actors'] as $actorId) {
-                ContentPerson::create([
-                    'content_id' => $tvSerie->tv_series_id,
-                    'content_type' => 'tvseries',
-                    'person_id' => $actorId,
-                ]);
-            }
+           
+            
         }
     }
 }

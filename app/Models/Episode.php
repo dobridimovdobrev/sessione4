@@ -34,17 +34,24 @@ class Episode extends Model
         return $this->belongsTo(Season::class, 'season_id');
     }
 
-    // Polymorphic relationship for image files (posters)
-    public function imageFiles()
-    {
-        return $this->morphMany(ImageFile::class, 'content');
-    }
-
-    // Polymorphic relationship for video files
-    public function videoFiles()
-    {
-        return $this->morphMany(VideoFile::class, 'content');
-    }
+     // Video files for each episode
+     public function videoFiles()
+     {
+         return $this->belongsToMany(VideoFile::class, 'episode_video_file', 'episode_id', 'video_file_id');
+     }
+ 
+     // Images for an episode (optional)
+     public function imageFiles()
+     {
+         return $this->belongsToMany(ImageFile::class, 'episode_image', 'episode_id', 'image_file_id');
+     }
+ 
+     // Actors for each episode 
+     public function persons()
+     {
+         return $this->belongsToMany(Person::class, 'episode_person', 'episode_id', 'person_id');
+     }
+    
 
     // Polymorphic relationship for views
     public function views()
@@ -58,9 +65,4 @@ class Episode extends Model
         return $this->morphMany(History::class, 'content');
     }
 
-    // A episode can have many associated persons (actors)
-    public function contentPersons()
-    {
-        return $this->morphMany(ContentPerson::class, 'content');
-    }
 }

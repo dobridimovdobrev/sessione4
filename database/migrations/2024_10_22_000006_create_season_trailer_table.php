@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('trailers', function (Blueprint $table) {
-            $table->id('trailer_id');
-            $table->string('url');
+        Schema::create('season_trailer', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('season_id')->constrained('seasons', 'season_id')->onDelete('cascade');
+            $table->foreignId('trailer_id')->constrained('trailers', 'trailer_id')->onDelete('cascade');
             $table->timestamps();
-            $table->softDeletes();
-             
         });
     }
 
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('trailers');
+        Schema::dropIfExists('season_trailer');
     }
 };

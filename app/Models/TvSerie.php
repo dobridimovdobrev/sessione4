@@ -62,24 +62,24 @@ class TvSerie extends Model
      {
          return $this->morphMany(History::class, 'content');
      }
-     //Trailers
-     public function trailers()
-     {
-         return $this->morphMany(Trailer::class, 'content');
-        }
-        //Video files
-        public function videoFiles()
-        {
-            return $this->morphMany(VideoFile::class, 'content');
-        }
-        //Images
-        public function images()
-        {
-            return $this->morphMany(ImageFile::class, 'content');
-        }
-        // Actors
-       public function contentPersons()
-       {
-           return $this->morphMany(ContentPerson::class, 'content');
-       }
+
+     // Pivot Relations
+      // Trailers for the entire TV series
+    public function trailers()
+    {
+        return $this->belongsToMany(Trailer::class, 'tv_series_trailer', 'tv_series_id', 'trailer_id');
+    }
+
+    // Images for the TV series
+    public function imageFiles()
+    {
+        return $this->belongsToMany(ImageFile::class, 'tv_series_image', 'tv_series_id', 'image_file_id');
+    }
+
+    // Actors associated with the entire series
+    public function persons()
+    {
+        return $this->belongsToMany(Person::class, 'tv_series_person', 'tv_series_id', 'person_id');
+    }
+
 }

@@ -18,8 +18,12 @@ use App\Http\Controllers\api\v1\TvSerieController;
 use App\Http\Controllers\api\v1\CategoryController;
 use App\Http\Controllers\api\v1\ImageFileController;
 use App\Http\Controllers\api\v1\VideoFileController;
+use App\Http\Controllers\api\v1\ImageMovieController;
+use App\Http\Controllers\api\v1\VideoMovieController;
+use App\Http\Controllers\api\v1\PersonMovieController;
 use App\Http\Controllers\api\v1\NotificationController;
-use App\Http\Controllers\api\v1\ContentPersonController;
+use App\Http\Controllers\api\v1\TrailerMovieController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -67,11 +71,21 @@ Route::prefix('v1')->group(function () {
         Route::post('/persons', [PersonController::class, 'store']);
         Route::put('/persons/{person}', [PersonController::class, 'update']);
         Route::delete('/persons/{person}', [PersonController::class, 'destroy']);
-        //Content Persons
-        Route::post('/content-persons', [ContentPersonController::class, 'store']);
-        Route::put('/content-persons/{contentPerson}', [ContentPersonController::class, 'update']);
-        Route::delete('/content-persons/{contentPerson}', [ContentPersonController::class, 'destroy']);
-        //Movies
+
+        //Person-Movie Pivot
+        Route::post('/movies/{movie}/persons', [PersonMovieController::class, 'store']); // Attach persons to movie
+        Route::delete('/movies/{movie}/persons/{person}', [PersonMovieController::class, 'destroy']); // Detach a person 
+        //Image-Movie Pivot
+        Route::post('/movies/{movie}/images', [ImageMovieController::class, 'store']); // Attach images to a movie
+        Route::delete('/movies/{movie}/images/{image}', [ImageMovieController::class, 'destroy']); // Detach image from a movie 
+        //Video-Movie Pivot
+        Route::post('/movies/{movie}/videos', [VideoMovieController::class, 'store']); // Attach videos to a movie
+        Route::delete('/movies/{movie}/videos/{video}', [VideoMovieController::class, 'destroy']); // Detach video from a movie 
+        //Trailer-Movie Pivot
+        Route::post('/movies/{movie}/trailers', [TrailerMovieController::class, 'store']); // Attach trailers to a movie
+        Route::delete('/movies/{movie}/trailers/{trailer}', [TrailerMovieController::class, 'destroy']); // Detach trailer from a movie
+
+        // Movies 
         Route::post('/movies', [MovieController::class, 'store']);
         Route::put('/movies/{movie}', [MovieController::class, 'update']);
         Route::delete('/movies/{movie}', [MovieController::class, 'destroy']);
@@ -95,11 +109,11 @@ Route::prefix('v1')->group(function () {
         Route::put('/trailers/{trailer}', [TrailerController::class, 'update']);
         Route::delete('/trailers/{trailer}', [TrailerController::class, 'destroy']);
         //Video Files
-         Route::post('/videos', [VideoFileController::class, 'store']);
+        Route::post('/videos', [VideoFileController::class, 'store']);
         Route::put('/videos/{video}', [VideoFileController::class, 'update']);
         Route::delete('/videos/{video}', [VideoFileController::class, 'destroy']);
         //Image Files
-         Route::post('/images', [ImageFileController::class, 'store']);
+        Route::post('/images', [ImageFileController::class, 'store']);
         Route::put('/images/{image}', [ImageFileController::class, 'update']);
         Route::delete('/images/{image}', [ImageFileController::class, 'destroy']);
         //Notifications
@@ -132,9 +146,16 @@ Route::prefix('v1')->group(function () {
         //Persons/Actors
         Route::get('/persons', [PersonController::class, 'index']);
         Route::get('/persons/{person}', [PersonController::class, 'show']);
-        // Content Persons
-        Route::get('/content-persons', [ContentPersonController::class, 'index']);
-        Route::get('/content-persons/{contentPerson}', [ContentPersonController::class, 'show']);
+
+        //Person-Movie Pivot
+        Route::get('/persons/{person}/movies', [PersonMovieController::class, 'show']); // Get all movies for a person
+        //Image-Movie Pivot
+        Route::get('images/{image}/movies', [ImageMovieController::class, 'show']); // Show all movies for an image
+        //Video-Movie Pivot
+        Route::get('videos/{video}/movies', [VideoMovieController::class, 'show']); // Show all movies for a video
+        //Trailer-Movie Pivot
+        Route::get('trailers/{trailer}/movies', [TrailerMovieController::class, 'show']); // Show all movies for a trailer
+
         //Movies
         Route::get('/movies', [MovieController::class, 'index']);
         Route::get('/movies/{movie}', [MovieController::class, 'show']);
@@ -156,7 +177,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/videos', [VideoFileController::class, 'index']);
         Route::get('/videos/{video}', [VideoFileController::class, 'show']);
         //Image Files
-         Route::get('/images', [ImageFileController::class, 'index']);
+        Route::get('/images', [ImageFileController::class, 'index']);
         Route::get('/images/{image}', [ImageFileController::class, 'show']);
         //Notifications
         Route::get('/notifications/{notification}', [NotificationController::class, 'show']);

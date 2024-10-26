@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('url');  // URL to the image file
             $table->string('title')->nullable();  //  title for the image
             $table->text('description')->nullable();  //  description for accessibility/SEO
-            $table->unsignedBigInteger('content_id');  //  ID (Movies, TV series, Episodes, Users, etc.)
-            $table->string('content_type');  //  movie, tv_series, user, episode
             $table->string('format');  // jpg, png, webp
             $table->unsignedBigInteger('size');  //  size in bytes
             $table->unsignedSmallInteger('width')->nullable();  //  width in pixels
@@ -25,9 +23,6 @@ return new class extends Migration
         
             $table->timestamps();
             $table->softDeletes();
-
-            //Composite index for faster queries
-            $table->index(['content_id', 'content_type']);
         });
     }
 

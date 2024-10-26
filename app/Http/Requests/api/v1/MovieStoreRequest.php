@@ -22,16 +22,31 @@ class MovieStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "title"=>['required','string', 'max:128', 'unique:movies,title'],
+            "title" => ['required', 'string', 'max:128', 'unique:movies,title'],
             "slug" => ['nullable', 'string', 'max:128'],
-            "description"=>['required','string'],
-            "year"=>['required','integer'],
-            "duration"=>['nullable','integer'],
-            "imdb_rating"=>['nullable','numeric', 'between: 0,10'],
-            "premiere_date"=>['nullable','date'],
-            "status"=>['required','in:published,draft,sheduled,coming soon'],
-            "category_id"=>['required','exists:categories,category_id'],
-            "image_file_id"=>['nullable','image', 'mime:jpeg,jpg,png', 'max:10048']
+            "description" => ['required', 'string'],
+            "year" => ['required', 'integer'],
+            "duration" => ['nullable', 'integer'],
+            "imdb_rating" => ['nullable', 'numeric', 'between: 0,10'],
+            "premiere_date" => ['nullable', 'date'],
+            "status" => ['required', 'in:published,draft,sheduled,coming soon'],
+            "category_id" => ['required', 'exists:categories,category_id'],
+
+            // Persons (conditionally validated if provided)
+            'persons' => 'sometimes|array',
+            'persons.*' => 'exists:persons,person_id',
+
+            // Trailers (only validate if present)
+            'trailers' => 'sometimes|array',
+            'trailers.*.url' => 'sometimes|url',
+
+            // Video files (only validate if present)
+            'video_files' => 'sometimes|array',
+            'video_files.*.url' => 'sometimes|url',
+
+            // Image files (only validate if present)
+            'image_files' => 'sometimes|array',
+            'image_files.*.url' => 'sometimes|url',
 
         ];
     }

@@ -19,8 +19,6 @@ class ImageFileResource extends JsonResource
             'url' => $this->url,
             'title' => $this->title,
             'description' => $this->description,
-            'content_id' => $this->content_id,
-            'content_type' => $this->content_type,
             'format' => $this->format,
             'size' => $this->size,
             'width' => $this->width,
