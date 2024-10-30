@@ -16,14 +16,14 @@ class MovieResource extends JsonResource
     {
         
         return [
-            "movie_id" => $this->movie_id,
-            "category_id" => $this->category_id,
-            "title" => $this->title,
-            "description" => $this->description,
-            "year" => $this->year,
-            "duration" => $this->duration,
-            "imdb_rating" => $this->imdb_rating,
-            "status" => $this->status,
+            'movie_id' => $this->movie_id,
+            'category_id' => $this->category_id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'year' => $this->year,
+            'duration' => $this->duration,
+            'imdb_rating' => $this->imdb_rating,
+            'status' => $this->status,
 
              // Trailers, video files, image files
              'persons' => PersonResource::collection($this->whenLoaded('persons')),

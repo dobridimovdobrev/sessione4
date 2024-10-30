@@ -2,17 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\v1\AuthController;
-use App\Http\Controllers\api\v1\LikeController;
 use App\Http\Controllers\api\v1\UserController;
-use App\Http\Controllers\api\v1\ViewController;
 use App\Http\Controllers\api\v1\MovieController;
 use App\Http\Controllers\api\v1\CreditController;
-use App\Http\Controllers\api\v1\MyListController;
 use App\Http\Controllers\api\v1\PersonController;
 use App\Http\Controllers\api\v1\SeasonController;
 use App\Http\Controllers\api\v1\CountryController;
 use App\Http\Controllers\api\v1\EpisodeController;
-use App\Http\Controllers\api\v1\HistoryController;
 use App\Http\Controllers\api\v1\TrailerController;
 use App\Http\Controllers\api\v1\TvSerieController;
 use App\Http\Controllers\api\v1\CategoryController;
@@ -166,16 +162,6 @@ Route::prefix('v1')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::post('/notifications', [NotificationController::class, 'store']);
         Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
-        //Histories
-        Route::get('/histories', [HistoryController::class, 'index']);
-        //My List
-        Route::get('/mylist', [MyListController::class, 'index']);
-        Route::post('/mylist', [MyListController::class, 'store']);
-        Route::delete('/mylist/{myList}', [MyListController::class, 'destroy']);
-        //Views
-        Route::get('/views', [ViewController::class, 'index']);
-        //Likes
-        Route::get('/likes', [LikeController::class, 'index']);
     });
 
 
@@ -220,7 +206,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/episodes/{episode}/persons', [PersonEpisodeController::class, 'index']); // Get all persons for an episode
         //Image-Episode Pivot
         Route::get('/episodes/{episode}/images', [ImageEpisodeController::class, 'index']); // Get all images for episode
-
+        
         //Image-Person Pivot
         Route::get('/persons/{person}/images', [ImagePersonController::class, 'index']); // Get all images for a person
 
@@ -249,18 +235,6 @@ Route::prefix('v1')->group(function () {
         Route::get('/images/{image}', [ImageFileController::class, 'show']);
         //Notifications
         Route::get('/notifications/{notification}', [NotificationController::class, 'show']);
-        //Histories
-        Route::get('/histories/{history}', [HistoryController::class, 'show']);
-        Route::post('/histories', [HistoryController::class, 'store']);
-        Route::put('/histories/{history}', [HistoryController::class, 'update']);
-        Route::delete('/histories/{history}', [HistoryController::class, 'destroy']);
-        //My List
-        Route::get('/mylist/{myList}', [MyListController::class, 'show']);
-        //Views
-        Route::post('/views', [ViewController::class, 'store']);
-        Route::delete('/views/{view}', [ViewController::class, 'destroy']);
-        //Likes
-        Route::post('/likes', [LikeController::class, 'store']);
-        Route::delete('/likes/{like}', [LikeController::class, 'destroy']);
+        
     });
 });

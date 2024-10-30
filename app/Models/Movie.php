@@ -21,10 +21,12 @@ class Movie extends Model
         'year',
         'duration',
         'imdb_rating',
-        'premiere_date',
         'status',
         'category_id',
     ];
+
+    protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
+
 
 
     // Relationships
@@ -33,28 +35,7 @@ class Movie extends Model
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
-
-   
-
-    public function likes()
-    {
-        return $this->morphMany(Like::class, 'content');
-    }
-
-    public function myLists()
-    {
-        return $this->morphMany(MyList::class, 'content');
-    }
-
-    public function views()
-    {
-        return $this->morphMany(View::class, 'content');
-    }
-
-    public function histories()
-    {
-        return $this->morphMany(History::class, 'content');
-    }
+ 
 
     public function persons()
     {

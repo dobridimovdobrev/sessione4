@@ -16,10 +16,17 @@ class EpisodeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Episode::class);
-        $episodes = Episode::paginate(20);
+        $filterData = $request->all();
+        $query = Episode::query();
+        foreach($filterData as $key => $value){
+            if(in_array($key,['season_id', 'episode_id', 'title', 'episode_number', 'status'])){
+               $query = $query->where($key,$value);
+            }
+        }
+        $episodes = $query->paginate(20);
         return new EpisodeCollection($episodes);
     }
 

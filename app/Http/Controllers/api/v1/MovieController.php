@@ -26,28 +26,29 @@ class MovieController extends Controller
     {
         // Authorization for viewing movies
         $this->authorize('viewAny', Movie::class);
-
+    
         // Apply filters if any
         $filterData = $request->all();
         $query = Movie::query();
-
-        //user can see only published and coming soon movies but not draft
-        if(Auth::user()->role->role_name === 'user'){
-            $query->whereIn('status',['published', 'coming soon']);
+    
+        // User can see only published and coming soon movies but not draft
+        if (Auth::user()->role->role_name === 'user') {
+            $query->whereIn('status', ['published', 'coming soon']);
         }
-        //filter movies by different parameters/keys
+    
+        // Filter movies by different parameters/keys
         foreach ($filterData as $key => $value) {
             if (in_array($key, ['movie_id', 'title', 'description', 'year', 'duration', 'imdb_rating', 'status', 'category_id'])) {
                 $query->where($key, $value);
             }
         }
-
-        // Fetch all movies or filtered ones
-        $movies = $query->paginate(20);
-
-        // Return the full collection
-        return new MovieCollection($movies);
+    
+        // Execute the query and get the results
+        $movies = $query->get();
+    
+        return response()->json($movies);
     }
+    
 
     /**
      * Store a newly created resource in storage.

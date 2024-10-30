@@ -17,10 +17,6 @@ class VideoFileResource extends JsonResource
         return [
             'video_file_id' => $this->video_file_id,
             'url' => $this->url,
-            'format' => $this->format,
-            'size' => $this->size,
-            'resolution' => $this->resolution,
-            'duration' => $this->duration,
         ];
     }
 }

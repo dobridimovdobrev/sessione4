@@ -5,7 +5,7 @@ namespace App\Http\Controllers\api\v1;
 use App\Helpers\ResponseMessages;
 use App\Models\Category;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\CategoryCollection;
+use App\Http\Resources\api\v1\CategoryCollection;
 use App\Http\Requests\api\v1\CategoryStoreRequest;
 use App\Http\Requests\api\v1\CategoryUpdateRequest;
 use App\Http\Resources\api\v1\CategoryResource;
