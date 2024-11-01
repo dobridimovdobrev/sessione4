@@ -53,16 +53,4 @@ class Episode extends Model
      }
     
 
-    // Polymorphic relationship for views
-    public function views()
-    {
-        return $this->morphMany(View::class, 'content');
-    }
-
-    // Polymorphic relationship for histories
-    public function histories()
-    {
-        return $this->morphMany(History::class, 'content');
-    }
-
 }

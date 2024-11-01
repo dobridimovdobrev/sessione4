@@ -37,31 +37,6 @@ class TvSerie extends Model
         return $this->hasMany(Season::class, 'tv_series_id');
     }
 
-    //Polymorphic relationships
-
-     // A TV series can have many likes
-     public function likes()
-     {
-         return $this->morphMany(Like::class, 'content');
-     }
- 
-     // A TV series can be in many lists
-     public function myLists()
-     {
-         return $this->morphMany(MyList::class, 'content');
-     }
- 
-     // A TV series can have many views
-     public function views()
-     {
-         return $this->morphMany(View::class, 'content');
-     }
- 
-     // A TV series can have many histories
-     public function histories()
-     {
-         return $this->morphMany(History::class, 'content');
-     }
 
      // Pivot Relations
       // Trailers for the entire TV series
@@ -82,4 +57,9 @@ class TvSerie extends Model
         return $this->belongsToMany(Person::class, 'tv_series_person', 'tv_series_id', 'person_id');
     }
 
+    // Relationship with video files
+    public function videoFiles()
+    {
+        return $this->belongsToMany(VideoFile::class, 'movie_video_file', 'movie_id', 'video_file_id');
+    }
 }

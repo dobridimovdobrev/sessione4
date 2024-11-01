@@ -22,7 +22,11 @@ class TvSeriesResource extends JsonResource
             'imdb_rating' => $this->imdb_rating,
             'total_seasons' => $this->total_seasons,
             'status' => $this->status,
-            'category_id' => $this->category_id
+            'category_id' => $this->category_id,
+
+            // Persons, Trailers, video files, image files
+            'persons' => PersonResource::collection($this->whenLoaded('persons')),
+            'image_files' => ImageFileResource::collection($this->whenLoaded('imageFiles')),
         ];
     }
 }

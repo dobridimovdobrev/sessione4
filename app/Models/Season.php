@@ -48,23 +48,4 @@ class Season extends Model
         return $this->belongsToMany(Person::class, 'season_person', 'season_id', 'person_id');
     }
 
-    // Polymorphic relationship 
-
-    public function likes()
-    {
-        return $this->morphMany(Like::class, 'content');
-    }
-
-    public function views()
-    {
-        return $this->morphMany(View::class, 'content');
-    }
-
-    public function histories()
-    {
-        return $this->morphMany(History::class, 'content');
-    }
-
-   
-
 }

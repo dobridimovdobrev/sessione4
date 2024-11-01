@@ -36,11 +36,11 @@ class UserController extends Controller
         if (!empty($validatedData['password'])) {
             $validatedData['password'] = Hash::make($validatedData['password']);
         }
-        
+
 
         //update
         $profileOwner->update($validatedData);
-        
+
         // Revoke all tokens (logout from all devices)
         $profileOwner->tokens()->delete();
 
@@ -122,29 +122,24 @@ class UserController extends Controller
     {
         $validatedData = $request->validated();
 
+        // Retrieve the user by user_id or username
         $user = User::where('user_id', $id)->orWhere('username', $id)->findOrFail();
 
-        //policy authorization to perform an action
+        // Policy authorization to perform an action
         $this->authorize('update', $user);
 
-        // Hash the password before saving
+        // Check if the password is being updated
         if (!empty($validatedData['password'])) {
+            // Hash the password before saving
             $validatedData['password'] = Hash::make($validatedData['password']);
         }
-        
 
+        // Update the user with the validated data
         $user->update($validatedData);
-
-          // Revoke all tokens if the password is updated
-    if (isset($validatedData['password'])) {
-        $user->tokens()->delete();
-
-        // Clear user sessions if they are stored
-        Session::where('user_id', $user->user_id)->delete();
-    }
 
         return ResponseMessages::success(['message' => 'User profile updated successfully.', 'user' => new UserResource($user)], 200);
     }
+
 
     /**
      * Remove the specified resource from storage.

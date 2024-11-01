@@ -54,7 +54,7 @@ Route::prefix('v1')->group(function () {
     // Routes  ONLY BY USER ROLE
     Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
         Route::put('/update-profile', [UserController::class, 'updateOwnProfile']);
-        Route::post('/add-credits', [UserController::class, 'addCredits']);
+        Route::post('/credits', [UserController::class, 'addCredits']);
     });
 
 
@@ -206,7 +206,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/episodes/{episode}/persons', [PersonEpisodeController::class, 'index']); // Get all persons for an episode
         //Image-Episode Pivot
         Route::get('/episodes/{episode}/images', [ImageEpisodeController::class, 'index']); // Get all images for episode
-        
+
         //Image-Person Pivot
         Route::get('/persons/{person}/images', [ImagePersonController::class, 'index']); // Get all images for a person
 

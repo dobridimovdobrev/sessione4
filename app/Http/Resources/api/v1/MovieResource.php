@@ -25,7 +25,7 @@ class MovieResource extends JsonResource
             'imdb_rating' => $this->imdb_rating,
             'status' => $this->status,
 
-             // Trailers, video files, image files
+             // Persons, Trailers, video files, image files
              'persons' => PersonResource::collection($this->whenLoaded('persons')),
             'trailers' => TrailerResource::collection($this->whenLoaded('trailers')),
             'video_files' => VideoFileResource::collection($this->whenLoaded('videoFiles')),
