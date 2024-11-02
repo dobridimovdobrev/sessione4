@@ -22,6 +22,10 @@ class EpisodeResource extends JsonResource
             'episode_number' => $this->episode_number,
             'duration' => $this->duration,
             'status' => $this->status,
+            // Show persons, video file, image file of the episode
+            'persons' => PersonResource::collection($this->whenLoaded('persons')),
+            'video_file' => VideoFileResource::collection($this->whenLoaded('videoFiles')),
+            'image_file' => ImageFileResource::collection($this->whenLoaded('imageFiles'))
         ];
     }
 }

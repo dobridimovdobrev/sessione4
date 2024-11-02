@@ -54,7 +54,7 @@ Route::prefix('v1')->group(function () {
     // Routes  ONLY BY USER ROLE
     Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
         Route::put('/update-profile', [UserController::class, 'updateOwnProfile']);
-        Route::post('/credits', [UserController::class, 'addCredits']);
+        Route::post('/add-credits', [UserController::class, 'addCredits']);
     });
 
 
@@ -158,10 +158,6 @@ Route::prefix('v1')->group(function () {
         Route::post('/images', [ImageFileController::class, 'store']);
         Route::put('/images/{image}', [ImageFileController::class, 'update']);
         Route::delete('/images/{image}', [ImageFileController::class, 'destroy']);
-        //Notifications
-        Route::get('/notifications', [NotificationController::class, 'index']);
-        Route::post('/notifications', [NotificationController::class, 'store']);
-        Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
     });
 
 
@@ -233,8 +229,6 @@ Route::prefix('v1')->group(function () {
         //Image Files
         Route::get('/images', [ImageFileController::class, 'index']);
         Route::get('/images/{image}', [ImageFileController::class, 'show']);
-        //Notifications
-        Route::get('/notifications/{notification}', [NotificationController::class, 'show']);
         
     });
 });

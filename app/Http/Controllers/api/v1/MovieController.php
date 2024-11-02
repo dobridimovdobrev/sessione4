@@ -106,8 +106,8 @@ class MovieController extends Controller
         if(Auth::user()->role->role_name === 'user' && !in_array($movie->status,['published','coming soon'])){
             ResponseMessages::error('You are not authorized', 403);
         }
-         // Eager load the related data (persons, trailers, videos, images)
-        $movieData = Movie::with(['persons', 'trailers', 'videoFiles', 'imageFiles'])->findOrFail($movie->movie_id);
+         // Eager load the related data (category, persons, trailers, videos, images)
+        $movieData = Movie::with(['category','persons', 'trailers', 'videoFiles', 'imageFiles'])->findOrFail($movie->movie_id);
         return new MovieResource($movieData);
     }
 

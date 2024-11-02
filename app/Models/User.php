@@ -49,13 +49,7 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class, 'role_id');
     }
-    //Permission
-        
-    //Notification
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class, 'user_id');
-    }
+    
     //Credits
     public function credits()
     {
@@ -68,26 +62,6 @@ class User extends Authenticatable
     public function profileImage()
     {
         return $this->morphOne(ImageFile::class, 'content'); // A user can have one profile image
-    }
-    //My list
-    public function lists()
-    {
-        return $this->morphMany(MyList::class, 'content');
-    }
-    // Likes
-    public function likes()
-    {
-        return $this->morphMany(Like::class, 'content');
-    }
-    //Views
-    public function views()
-    {
-        return $this->morphMany(View::class, 'content');
-    }
-    //History
-    public function history()
-    {
-        return $this->morphMany(History::class, 'content');
     }
 
 }

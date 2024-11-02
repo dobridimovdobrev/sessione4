@@ -16,10 +16,21 @@ class SeasonController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Season::class);
-        $seasons = Season::paginate(100);
+
+        //filter data
+        $filterData = $request->all();
+        $query = Season::query();
+
+        foreach($filterData as $key=>$value){
+            if(in_array($key,['tv_series_id', 'season_id', 'season_number', 'total_episodes', 'year'])){
+                $query= $query->where($key, $value);
+            }   
+        }
+        // Pagination
+        $seasons = $query->paginate(100);
         return new SeasonCollection($seasons);
     }
 
@@ -42,7 +53,8 @@ class SeasonController extends Controller
     public function show(Season $season)
     {   
         $this->authorize('view', $season);
-        return new SeasonResource($season);
+        $seasonData = Season::with(['tvSeries'])->findOrFail($season->season_id);
+        return new SeasonResource($seasonData);
     }
 
     /**

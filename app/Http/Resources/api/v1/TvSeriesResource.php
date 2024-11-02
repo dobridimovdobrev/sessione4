@@ -22,7 +22,10 @@ class TvSeriesResource extends JsonResource
             'imdb_rating' => $this->imdb_rating,
             'total_seasons' => $this->total_seasons,
             'status' => $this->status,
-            'category_id' => $this->category_id,
+            'category' => [
+                'id' => $this->category_id,
+                'name' => $this->category->name, 
+            ],
 
             // Persons, Trailers, video files, image files
             'persons' => PersonResource::collection($this->whenLoaded('persons')),

@@ -52,7 +52,8 @@ class EpisodeController extends Controller
     public function show(Episode $episode)
     {
         $this->authorize('view', $episode);
-        return new EpisodeResource($episode);
+        $episodeData = Episode::with(['persons', 'videoFiles', 'imageFiles'])->findOrFail($episode->episode_id);
+        return new EpisodeResource($episodeData);
     }
 
     /**

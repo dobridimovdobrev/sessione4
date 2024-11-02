@@ -15,7 +15,10 @@ class SeasonResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'tv_series_id' => $this->tv_series_id,
+            'tv_series' => [
+              'id' => $this->tv_series_id,
+              'title' =>$this->tvSeries->title
+            ],
             'season_id' => $this->season_id,
             'season_number' => $this->season_number,
             'total_episodes' => $this->total_episodes,

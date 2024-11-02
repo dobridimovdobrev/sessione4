@@ -33,7 +33,7 @@ class TvSerieSeeder extends Seeder
             'total_episodes' => 7,
             'year' => 2008,
             'premiere_date' => '2008-01-20',
-            'tv_series_id' => $breakingBad->tv_series_id  // Use the ID of the created TV series
+            'tv_series_id' => $breakingBad->tv_series_id  
         ]);
 
            // Create Episodes for Season 1
