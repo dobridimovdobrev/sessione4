@@ -22,10 +22,7 @@ class CreditStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,user_id',
-            'total_credits' => 'required|integer',
-            'spent_credits' => 'required|integer',
-            'remaining_credits' => 'required|integer',
+            'total_credits' => 'required|integer|min:1',
         ];
     }
 }

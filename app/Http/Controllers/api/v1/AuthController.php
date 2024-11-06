@@ -56,7 +56,7 @@ class AuthController extends Controller
     if ($user->role->role_name === 'admin') {
         $abilities = ['*']; // Full access
     } elseif ($user->role->role_name === 'user') {
-        $abilities = ['read', 'update-profile', 'add-credits']; // Read most data and update and add credits to their own profile
+        $abilities = ['read', 'update-profile', 'credits']; // Read most data and update and add credits to their own profile
     }
 
     // Create token with  abilities

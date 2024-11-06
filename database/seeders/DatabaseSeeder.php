@@ -18,10 +18,9 @@ use Database\Seeders\TvSerieSeeder;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\ImageFileSeeder;
 use Database\Seeders\VideoFileSeeder;
-use MovieSeeder as GlobalMovieSeeder;
 use Database\Seeders\CreateDataSeeder;
 use Database\Seeders\PermissionSeeder;
-use Database\Seeders\NotificationSeeder;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -36,14 +35,12 @@ class DatabaseSeeder extends Seeder
              PermissionSeeder::class, 
              CategorySeeder::class, 
              TvSerieSeeder::class,
-             NotificationSeeder::class,
              SeasonSeeder::class,
              EpisodeSeeder::class,
              PersonSeeder::class,
              CreditSeeder::class,
              TrailerSeeder::class,
              ImageFileSeeder::class
-             CreateDataSeeder::class
              VideoFileSeeder::class */
              MovieSeeder::class
 

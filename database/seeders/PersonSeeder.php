@@ -14,7 +14,7 @@ class PersonSeeder extends Seeder
     public function run(): void
     {
         $persons = [
-            ['name' => "Silverster Stallone"],
+            ['name' => "Sylvester Stallone"],
             ['name' => "Bruce Lee"],
             ['name' => "Mike Tyson"],
             ['name' => "Steven Segal"],

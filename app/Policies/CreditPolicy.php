@@ -13,7 +13,7 @@ class CreditPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role->role_name === 'admin';
+        return $user->role->role_name === 'admin' || $user->role->role_name === 'user';
     }
 
     /**
@@ -27,9 +27,9 @@ class CreditPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user, Credit $credit): bool
+    public function create(User $user): bool
     {
-        return $user->role->role_name === 'admin' || $user->user_id === $credit->user_id;
+        return $user->role->role_name === 'admin' || $user->role->role_name === 'user';
     }
 
     /**
@@ -37,7 +37,7 @@ class CreditPolicy
      */
     public function update(User $user, Credit $credit)
     {
-        //
+        
     }
 
     /**

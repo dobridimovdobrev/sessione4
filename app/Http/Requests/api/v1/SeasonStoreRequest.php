@@ -25,7 +25,7 @@ class SeasonStoreRequest extends FormRequest
            'season_number' => 'required|integer',
             'total_episodes' => 'required|integer',
             'year' => 'required|integer',
-            'premiere_date' => 'required|date',
+            'premiere_date' => 'nullable|date',
             'tv_series_id' => 'required|exists:tv_series,tv_series_id',
         ];
     }

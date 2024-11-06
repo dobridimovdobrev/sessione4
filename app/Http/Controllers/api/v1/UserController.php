@@ -4,7 +4,6 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Models\User;
 
-use App\Models\Session;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseMessages;
 use App\Http\Controllers\Controller;
@@ -37,15 +36,8 @@ class UserController extends Controller
             $validatedData['password'] = Hash::make($validatedData['password']);
         }
 
-
         //update
         $profileOwner->update($validatedData);
-
-        // Revoke all tokens (logout from all devices)
-        $profileOwner->tokens()->delete();
-
-        // Clear user sessions (if sessions are stored)
-        Session::where('user_id', $profileOwner->user_id)->delete();
 
         //success message
         return ResponseMessages::success(['message' => 'Profile updated successfully.', 'user' => new UserResource($profileOwner)], 200);

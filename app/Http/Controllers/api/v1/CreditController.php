@@ -3,42 +3,64 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Models\Credit;
+use Illuminate\Http\Request;
 use App\Helpers\ResponseMessages;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\api\v1\CreditResource;
-use App\Http\Resources\api\v1\CreditCollection;
 use App\Http\Requests\api\v1\CreditStoreRequest;
 
 class CreditController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display the credits for the authenticated user.
      */
     public function index()
     {
         $this->authorize('viewAny', Credit::class);
-        $credits = Credit::paginate(100);
-        return new CreditCollection($credits);
+
+        // Retrieve credits belonging only to the authenticated user
+        $credits = Credit::where('user_id', Auth::id())->get();
+
+        return CreditResource::collection($credits);
     }
 
+    /**
+     * Add credits to the authenticated user's account.
+     */
     public function store(CreditStoreRequest $request)
     {
         $this->authorize('create', Credit::class);
+
         $validatedData = $request->validated();
+        $validatedData['user_id'] = Auth::id(); // Automatically associate with the authenticated user
+        $validatedData['spent_credits'] = 0; // Initialize spent credits to zero
+        $validatedData['remaining_credits'] = $validatedData['total_credits']; // Set remaining credits equal to total credits
         $credit = Credit::create($validatedData);
 
-        return ResponseMessages::success(['message' => 'Credits added successfully', 'credit' => new CreditResource($credit)], 201);
+        return ResponseMessages::success([
+            'message' => 'Credits added successfully',
+            'credit' => new CreditResource($credit)
+        ], 201);
     }
 
+    /**
+     * Show the details of a specific credit record.
+     */
     public function show(Credit $credit)
     {
         $this->authorize('view', $credit);
+
         return new CreditResource($credit);
     }
 
+    /**
+     * Delete a specific credit record.
+     */
     public function destroy(Credit $credit)
     {
         $this->authorize('delete', $credit);
+
         $credit->delete();
 
         return ResponseMessages::success('Credits record deleted successfully', 204);

@@ -16,6 +16,7 @@ class TvSerie extends Model
 
     protected $fillable = [
         'title',
+        'description',
         'slug',
         'year',
         'duration',

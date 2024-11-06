@@ -6,6 +6,7 @@ use App\Models\Movie;
 use App\Models\Person;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\api\v1\PersonMovieCollection;
 
 class PersonMovieController extends Controller
 {
@@ -20,8 +21,16 @@ class PersonMovieController extends Controller
            'person_ids.*' => 'exists:persons,person_id'
        ]);
 
-       // Attach persons to the movie
-       $movie->persons()->syncWithoutDetaching($request->person_ids);
+       $personIds = [];
+
+        // Loop through each person name, find or create the person, and store their ID
+        foreach ($request->input('names') as $name) {
+            $person = Person::firstOrCreate(['name' => $name]);
+            $personIds[] = $person->person_id;
+        }
+
+        // Attach the found or created persons to movie
+        $movie->persons()->syncWithoutDetaching($personIds);
 
        return response()->json(['message' => 'Persons associated successfully.'], 200);
    }
@@ -38,12 +47,12 @@ class PersonMovieController extends Controller
    
 
    // Show all movies for a person
-   public function show($personId)
+   public function index($personId)
    {
        $person = Person::findOrFail($personId);
        $movies = $person->movies()->get(); // Retrieve all movies for the person
 
-       return response()->json($movies, 200);
+       return new PersonMovieCollection($movies);
    }
 
 }

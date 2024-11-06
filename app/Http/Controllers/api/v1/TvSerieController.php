@@ -23,7 +23,7 @@ class TvSerieController extends Controller
         $query = TvSerie::query();
 
         foreach ($filterData as $key => $value) {
-            if (in_array($key, ['title', 'year', 'status', 'description', 'year', 'duration', 'imdb_rating', 'category_id'])) {
+            if (in_array($key, ['title', 'year', 'status', 'description', 'year', 'imdb_rating', 'category_id'])) {
                 $query->where($key, $value);
             }
         }

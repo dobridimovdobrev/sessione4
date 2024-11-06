@@ -28,6 +28,16 @@ class PersonController extends Controller
         $this->authorize('create', Person::class);
 
         $validatedData = $request->validated();
+        // Check for an existing person with the same name
+        $existingPerson = Person::where(['name' => $validatedData['name']])->first();
+
+        if ($existingPerson) {
+            return ResponseMessages::success(
+                ['message' => 'Person already exists', 'person' => new PersonResource($existingPerson)],
+                200
+            );
+        }
+        //create a person if not exist in the database
         $person = Person::create($validatedData);
 
         return ResponseMessages::success(

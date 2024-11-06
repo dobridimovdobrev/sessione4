@@ -20,7 +20,6 @@ use App\Http\Controllers\api\v1\ImagePersonController;
 use App\Http\Controllers\api\v1\ImageSeasonController;
 use App\Http\Controllers\api\v1\PersonMovieController;
 use App\Http\Controllers\api\v1\ImageEpisodeController;
-use App\Http\Controllers\api\v1\NotificationController;
 use App\Http\Controllers\api\v1\PersonSeasonController;
 use App\Http\Controllers\api\v1\TrailerMovieController;
 use App\Http\Controllers\api\v1\ImageTvSeriesController;
@@ -54,7 +53,7 @@ Route::prefix('v1')->group(function () {
     // Routes  ONLY BY USER ROLE
     Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
         Route::put('/update-profile', [UserController::class, 'updateOwnProfile']);
-        Route::post('/add-credits', [UserController::class, 'addCredits']);
+        Route::post('/credits', [CreditController::class, 'store']);
     });
 
 
@@ -100,10 +99,7 @@ Route::prefix('v1')->group(function () {
         // Trailer - TV Series Pivot
         Route::post('/tvseries/{tvSeries}/trailers', [TrailerTvSeriesController::class, 'store']); // Attach trailer to TV series
         Route::delete('/tvseries/{tvSeries}/trailers/{trailer}', [TrailerTvSeriesController::class, 'destroy']); // Detach trailer
-
-        // Person - Season Pivot
-        Route::post('/seasons/{season}/persons', [PersonSeasonController::class, 'store']); // Attach persons to season
-        Route::delete('/seasons/{season}/persons/{person}', [PersonSeasonController::class, 'destroy']); // Detach person from season
+       
         // Image - Season Pivot
         Route::post('/seasons/{season}/images', [ImageSeasonController::class, 'store']); // Attach images to season
         Route::delete('/seasons/{season}/images/{image}', [ImageSeasonController::class, 'destroy']); // Detach image
@@ -111,9 +107,6 @@ Route::prefix('v1')->group(function () {
         Route::post('/seasons/{season}/trailers', [TrailerSeasonController::class, 'store']); // Attach trailers to season
         Route::delete('/seasons/{season}/trailers/{trailer}', [TrailerSeasonController::class, 'destroy']); // Detach trailer from season
 
-        // Person - Episode Pivot
-        Route::post('/episodes/{episode}/persons', [PersonEpisodeController::class, 'store']); // Attach persons to episode
-        Route::delete('/episodes/{episode}/persons/{person}', [PersonEpisodeController::class, 'destroy']); // Detach person from episode
         // Image - Episode Pivot
         Route::post('/episodes/{episode}/images', [ImageEpisodeController::class, 'store']); // Attach images to episode
         Route::delete('/episodes/{episode}/images/{image}', [ImageEpisodeController::class, 'destroy']); // Detach image
@@ -144,7 +137,7 @@ Route::prefix('v1')->group(function () {
         Route::put('/episodes/{episode}', [EpisodeController::class, 'update']);
         Route::delete('/episodes/{episode}', [EpisodeController::class, 'destroy']);
         //Credits
-        Route::post('/credits/{credit}', [CreditController::class, 'store']);
+        Route::get('/credits/{credit}', [CreditController::class, 'show']);
         Route::delete('/credits/{credit}', [CreditController::class, 'destroy']);
         //Trailers
         Route::post('/trailers', [TrailerController::class, 'store']);
@@ -176,7 +169,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/persons/{person}', [PersonController::class, 'show']);
 
         //Person-Movie Pivot
-        Route::get('/persons/{person}/movies', [PersonMovieController::class, 'show']); // Get all movies for a person
+        Route::get('/persons/{person}/movies', [PersonMovieController::class, 'index']); // Get all movies for a person
         //Image-Movie Pivot
         Route::get('images/{image}/movies', [ImageMovieController::class, 'show']); // Show all movies for an image
         //Video-Movie Pivot
@@ -191,15 +184,13 @@ Route::prefix('v1')->group(function () {
         //Image-Tv Series Pivot
         Route::get('/tvseries/{tvSeries}/images', [ImageTvSeriesController::class, 'index']); // Get all images for TV series
 
-        //Person-Season Pivot
-        Route::get('/seasons/{season}/persons', [PersonSeasonController::class, 'index']); // Get all persons for a season
+        
         //Image-Season Pivot
         Route::get('/seasons/{season}/images', [ImageSeasonController::class, 'index']); // Get all images for season
         //Trailer-Season Pivot
         Route::get('/seasons/{season}/trailers', [TrailerSeasonController::class, 'index']); // Get all trailers for a season
 
-        //Person-Episode Pivot
-        Route::get('/episodes/{episode}/persons', [PersonEpisodeController::class, 'index']); // Get all persons for an episode
+        
         //Image-Episode Pivot
         Route::get('/episodes/{episode}/images', [ImageEpisodeController::class, 'index']); // Get all images for episode
 
@@ -219,7 +210,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/episodes', [EpisodeController::class, 'index']);
         Route::get('/episodes/{episode}', [EpisodeController::class, 'show']);
         //Credits
-        Route::get('/credits/{credit}', [CreditController::class, 'show']);
+        Route::get('/credits', [CreditController::class, 'index']);
         //Trailers
         Route::get('/trailers', [TrailerController::class, 'index']);
         Route::get('/trailers/{trailer}', [TrailerController::class, 'show']);

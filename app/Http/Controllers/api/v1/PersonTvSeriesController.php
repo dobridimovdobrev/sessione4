@@ -6,21 +6,36 @@ use App\Models\Person;
 use App\Models\TvSerie;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\api\v1\PersonTvSeriesCollection;
+use App\Http\Resources\api\v1\PersonTvSeriesResource;
+use App\Http\Resources\api\v1\TvSeriesCollection;
 
 class PersonTvSeriesController extends Controller
 {
     public function store(Request $request, $tvSeriesId)
     {
+
         $tvSeries = TvSerie::findOrFail($tvSeriesId);
 
+        // Validate that 'names' is an array of person names
         $request->validate([
-            'person_ids' => 'required|array',
-            'person_ids.*' => 'exists:persons,person_id'
+            'names' => 'required|array',
+            'names.*' => 'string'
         ]);
 
-        $tvSeries->persons()->syncWithoutDetaching($request->person_ids);
+        $personIds = [];
 
-        return response()->json(['message' => 'Persons attached successfully.'], 200);
+        // Loop through each person name, find or create the person, and store their ID
+        foreach ($request->input('names') as $name) {
+            $person = Person::firstOrCreate(['name' => $name]);
+            $personIds[] = $person->person_id;
+        }
+
+        // Attach the found or created persons to the TV series
+        $tvSeries->persons()->syncWithoutDetaching($personIds);
+
+        return response()->json(['message' => 'Persons associated successfully.'], 200);
+
     }
 
     public function destroy($tvSeriesId, $personId)
@@ -36,6 +51,6 @@ class PersonTvSeriesController extends Controller
         $tvSeries = TvSerie::findOrFail($tvSeriesId);
         $persons = $tvSeries->persons()->get();
 
-        return response()->json($persons, 200);
+        return new PersonTvSeriesCollection($persons);
     }
 }

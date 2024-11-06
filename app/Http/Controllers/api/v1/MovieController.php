@@ -46,7 +46,7 @@ class MovieController extends Controller
         // Execute the query and get the results
         $movies = $query->get();
     
-        return response()->json($movies);
+        return new MovieCollection($movies);
     }
     
 
