@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\v1;
 
+use App\Helpers\ResponseMessages;
 use App\Http\Controllers\Controller;
 use App\Models\Episode;
 use App\Models\VideoFile;
@@ -25,7 +26,7 @@ class VideoFileEpisodeController extends Controller
             $episode->videos()->attach($video->video_file_id);
         }
 
-        return response()->json(['message' => 'Videos attached successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Videos attached successfully.'], 200);
     }
 
     public function destroy($episodeId, $videoId)
@@ -33,7 +34,7 @@ class VideoFileEpisodeController extends Controller
         $episode = Episode::findOrFail($episodeId);
         $episode->videos()->detach($videoId);
 
-        return response()->json(['message' => 'Video detached successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Video detached successfully.'], 200);
     }
 
 }

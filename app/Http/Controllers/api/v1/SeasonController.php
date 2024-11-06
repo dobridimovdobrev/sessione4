@@ -26,7 +26,7 @@ class SeasonController extends Controller
 
         foreach($filterData as $key=>$value){
             if(in_array($key,['tv_series_id', 'season_id', 'season_number', 'total_episodes', 'year'])){
-                $query= $query->where($key, $value);
+                $query= $query->where($key,'LIKE', "%$value%");
             }   
         }
         // Pagination

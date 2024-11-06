@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Models\ImageFile;
+use Illuminate\Http\Request;
 use App\Helpers\ResponseMessages;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\v1\ImageFileStoreRequest;
@@ -15,11 +16,20 @@ class ImageFileController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', ImageFile::class);
 
-        $imageFiles = ImageFile::paginate(10);
+        $filterData = $request->all();
+        $query = ImageFile::query();
+
+        foreach($filterData as $key=>$value){
+            if(in_array($key,['image_id', 'url', 'title'])){
+                $query = $query->where($key, 'LIKE', "%$value%");
+            }
+        }
+
+        $imageFiles = $query->paginate(50);
         return new ImageFileCollection($imageFiles);
     }
 
@@ -42,25 +52,25 @@ class ImageFileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ImageFile $imageFile)
+    public function show(ImageFile $image)
     {
-        $this->authorize('view', $imageFile);
+        $this->authorize('view', $image);
 
-        return new ImageFileResource($imageFile);
+        return new ImageFileResource($image);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(ImageFileUpdateRequest $request, ImageFile $imageFile)
+    public function update(ImageFileUpdateRequest $request, ImageFile $image)
     {
-         $this->authorize('update', $imageFile);
+         $this->authorize('update', $image);
 
         $validatedData = $request->validated();
-        $imageFile->update($validatedData);
+        $image->update($validatedData);
 
         return ResponseMessages::success(
-            ['message' => 'ImageFile updated successfully', 'imageFile' => new ImageFileResource($imageFile)], 
+            ['message' => 'ImageFile updated successfully', 'imageFile' => new ImageFileResource($image)], 
             200
         );
     }
@@ -68,11 +78,11 @@ class ImageFileController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ImageFile $imageFile)
+    public function destroy(ImageFile $image)
     {
-        $this->authorize('delete', $imageFile);
+        $this->authorize('delete', $image);
 
-        $imageFile->delete();
+        $image->delete();
         return ResponseMessages::success('ImageFile deleted successfully', 204);
     }
 }

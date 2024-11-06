@@ -1,10 +1,12 @@
 <?php
 namespace App\Http\Controllers\api\v1;
 
+use App\Helpers\ResponseMessages;
 use App\Models\TvSerie;
-use App\Models\ImageFile;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\api\v1\ImageFileCollection;
+
 
 class ImageTvSeriesController extends Controller
 {
@@ -13,33 +15,28 @@ class ImageTvSeriesController extends Controller
         $tvSeries = TvSerie::findOrFail($tvSeriesId);
 
         $request->validate([
-            'images' => 'required|array',
-            'images.*.url' => 'required|url',
-            'images.*.format' => 'nullable|string',
-            'images.*.size' => 'nullable|integer'
+            'image_file_ids' => 'required|array',
+            'image_file_ids.*' => 'exists:image_files,image_id'
         ]);
 
-        foreach ($request->images as $imageData) {
-            $image = ImageFile::create($imageData);
-            $tvSeries->images()->attach($image->image_id);
-        }
+        $tvSeries->imageFiles()->syncWithoutDetaching($request->image_file_ids);
 
-        return response()->json(['message' => 'Images attached successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Images associated successfully.'],200);
     }
 
     public function destroy($tvSeriesId, $imageId)
     {
         $tvSeries = TvSerie::findOrFail($tvSeriesId);
-        $tvSeries->images()->detach($imageId);
+        $tvSeries->imageFiles()->detach($imageId);
 
-        return response()->json(['message' => 'Image detached successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Image detached successfully.'], 200);
     }
 
     public function index($tvSeriesId)
     {
         $tvSeries = TvSerie::findOrFail($tvSeriesId);
-        $images = $tvSeries->images()->get();
+        $images = $tvSeries->imageFiles()->get();
 
-        return response()->json($images, 200);
+        return new ImageFileCollection($images);
     }
 }

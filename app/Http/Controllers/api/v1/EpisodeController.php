@@ -23,7 +23,7 @@ class EpisodeController extends Controller
         $query = Episode::query();
         foreach($filterData as $key => $value){
             if(in_array($key,['season_id', 'episode_id', 'title', 'episode_number', 'status'])){
-               $query = $query->where($key,$value);
+               $query = $query->where($key,'LIKE', "%$value%");
             }
         }
         $episodes = $query->paginate(20);

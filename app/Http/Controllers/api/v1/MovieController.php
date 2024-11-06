@@ -39,7 +39,7 @@ class MovieController extends Controller
         // Filter movies by different parameters/keys
         foreach ($filterData as $key => $value) {
             if (in_array($key, ['movie_id', 'title', 'description', 'year', 'duration', 'imdb_rating', 'status', 'category_id'])) {
-                $query->where($key, $value);
+                $query->where($key, 'LIKE', "%$value%");
             }
         }
     
@@ -149,7 +149,7 @@ class MovieController extends Controller
         // Attach persons to the movie
         $movie->persons()->syncWithoutDetaching($request->person_ids);
 
-        return response()->json(['message' => 'Persons associated successfully.'], 200);
+        return ResponseMessages::success (['message' => 'Persons associated successfully.'], 200);
     }
 
     // Method to associate trailers to a movie
@@ -169,7 +169,7 @@ class MovieController extends Controller
             $movie->trailers()->attach($trailer->id);
         }
 
-        return response()->json(['message' => 'Trailers associated successfully.'], 200);
+        return ResponseMessages::success (['message' => 'Trailers associated successfully.'], 200);
     }
 
     // Method to associate video files to a movie
@@ -191,7 +191,7 @@ class MovieController extends Controller
             $movie->videoFiles()->attach($video->id);
         }
 
-        return response()->json(['message' => 'Videos associated successfully.'], 200);
+        return ResponseMessages::success (['message' => 'Videos associated successfully.'], 200);
     }
 
     // Method to associate image files to a movie
@@ -213,6 +213,6 @@ class MovieController extends Controller
             $movie->imageFiles()->attach($image->id);
         }
 
-        return response()->json(['message' => 'Images associated successfully.'], 200);
+        return ResponseMessages::success (['message' => 'Images associated successfully.'], 200);
     }
 }

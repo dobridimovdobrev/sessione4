@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\api\v1;
 
+use App\Helpers\ResponseMessages;
 use App\Models\Person;
 use App\Models\TvSerie;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\api\v1\PersonTvSeriesCollection;
-use App\Http\Resources\api\v1\PersonTvSeriesResource;
-use App\Http\Resources\api\v1\TvSeriesCollection;
+use App\Http\Resources\api\v1\PersonCollection;
+
 
 class PersonTvSeriesController extends Controller
 {
@@ -34,7 +34,7 @@ class PersonTvSeriesController extends Controller
         // Attach the found or created persons to the TV series
         $tvSeries->persons()->syncWithoutDetaching($personIds);
 
-        return response()->json(['message' => 'Persons associated successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Persons associated successfully.'], 200);
 
     }
 
@@ -43,14 +43,14 @@ class PersonTvSeriesController extends Controller
         $tvSeries = TvSerie::findOrFail($tvSeriesId);
         $tvSeries->persons()->detach($personId);
 
-        return response()->json(['message' => 'Person detached successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Person detached successfully.'], 200);
     }
 
     public function index($tvSeriesId)
     {
         $tvSeries = TvSerie::findOrFail($tvSeriesId);
-        $persons = $tvSeries->persons()->get();
+        $persons = $tvSeries->persons()->get(); //get all persons for tvseries
 
-        return new PersonTvSeriesCollection($persons);
+        return new PersonCollection($persons);
     }
 }

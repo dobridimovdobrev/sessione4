@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\v1;
 
+use App\Helpers\ResponseMessages;
 use App\Models\Country;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -28,7 +29,7 @@ class CountryController extends Controller
             //check if request = key\
             if(in_array($key,['country_id', 'name', 'continent', 'iso2','iso3', 'phone_prefix'])){
             //if the key exist make the query
-            $query = $query->where($key, $value);
+            $query = $query->where($key,'LIKE', "%$value%");
             // this is for executiong query
             }
             
@@ -73,6 +74,6 @@ class CountryController extends Controller
     public function destroy(Country $country)
     {   $countryName = $country->name;
         $country->deleteOrFail();
-        return response()->json(['message'=>'the country: ' . $countryName . ' is deleted'],200);
+        return ResponseMessages::success(['message'=>'the country: ' . $countryName . ' is deleted'],200);
     }
 }

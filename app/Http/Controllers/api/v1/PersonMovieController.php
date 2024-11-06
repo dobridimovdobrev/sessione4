@@ -1,12 +1,15 @@
 <?php
 
 namespace App\Http\Controllers\api\v1;
+
+use App\Helpers\ResponseMessages;
 use App\Models\Movie;
 
 use App\Models\Person;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\api\v1\PersonMovieCollection;
+use App\Http\Resources\api\v1\MovieCollection;
+
 
 class PersonMovieController extends Controller
 {
@@ -32,7 +35,7 @@ class PersonMovieController extends Controller
         // Attach the found or created persons to movie
         $movie->persons()->syncWithoutDetaching($personIds);
 
-       return response()->json(['message' => 'Persons associated successfully.'], 200);
+       return ResponseMessages::success(['message' => 'Persons associated successfully.'], 200);
    }
 
    // Detach a person from a movie
@@ -41,7 +44,7 @@ class PersonMovieController extends Controller
        $movie = Movie::findOrFail($movieId);
        $movie->persons()->detach($personId);
 
-       return response()->json(['message' => 'Person detached successfully.'], 200);
+       return ResponseMessages::success(['message' => 'Person detached successfully.'], 200);
    }
 
    
@@ -52,7 +55,7 @@ class PersonMovieController extends Controller
        $person = Person::findOrFail($personId);
        $movies = $person->movies()->get(); // Retrieve all movies for the person
 
-       return new PersonMovieCollection($movies);
+       return new MovieCollection($movies);
    }
 
 }

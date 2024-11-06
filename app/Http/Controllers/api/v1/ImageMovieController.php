@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\v1;
 
+use App\Helpers\ResponseMessages;
 use App\Models\Movie;
 use App\Models\ImageFile;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class ImageMovieController extends Controller
          // Attach images to the movie
          $movie->imageFiles()->syncWithoutDetaching($request->image_ids);
  
-         return response()->json(['message' => 'Images associated successfully.'], 200);
+         return ResponseMessages::success(['message' => 'Images associated successfully.'], 200);
      }
  
      // Detach an image from a movie
@@ -32,7 +33,7 @@ class ImageMovieController extends Controller
          $movie = Movie::findOrFail($movieId);
          $movie->imageFiles()->detach($imageId);
  
-         return response()->json(['message' => 'Image detached successfully.'], 200);
+         return ResponseMessages::success(['message' => 'Image detached successfully.'], 200);
      }
  
      // Show all images attached to a movie
@@ -41,7 +42,7 @@ class ImageMovieController extends Controller
          $movie = Movie::findOrFail($movieId);
          $images = $movie->imageFiles()->get();
  
-         return response()->json($images, 200);
+         return ResponseMessages::success($images, 200);
      }
  
      // Show all movies for an image
@@ -50,6 +51,6 @@ class ImageMovieController extends Controller
          $image = ImageFile::findOrFail($imageId);
          $movies = $image->movies()->get();
  
-         return response()->json($movies, 200);
+         return ResponseMessages::success($movies, 200);
      }
 }

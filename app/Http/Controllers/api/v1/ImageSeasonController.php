@@ -1,10 +1,11 @@
 <?php
 namespace App\Http\Controllers\api\v1;
 
-use App\Http\Controllers\Controller;
 use App\Models\Season;
-use App\Models\ImageFile;
 use Illuminate\Http\Request;
+use App\Helpers\ResponseMessages;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\api\v1\ImageFileCollection;
 
 class ImageSeasonController extends Controller
 {
@@ -13,34 +14,29 @@ class ImageSeasonController extends Controller
         $season = Season::findOrFail($seasonId);
 
         $request->validate([
-            'images' => 'required|array',
-            'images.*.url' => 'required|url',
-            'images.*.format' => 'required|string',
-            'images.*.size' => 'required|integer'
+            'image_file_ids' => 'required|array',
+            'image_file_ids.*' => 'exists:image_files,image_id'
         ]);
 
-        foreach ($request->images as $imageData) {
-            $image = ImageFile::create($imageData);
-            $season->images()->attach($image->image_id);
-        }
+        $season->imageFiles()->syncWithoutDetaching($request->image_file_ids);
 
-        return response()->json(['message' => 'Images attached successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Images associated successfully.'],200);
     }
 
     public function destroy($seasonId, $imageId)
     {
         $season = Season::findOrFail($seasonId);
-        $season->images()->detach($imageId);
+        $season->imageFiles()->detach($imageId);
 
-        return response()->json(['message' => 'Image detached successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Image detached successfully.'], 200);
     }
 
     public function index($seasonId)
     {
         $season = Season::findOrFail($seasonId);
-        $images = $season->images()->get();
+        $images = $season->imageFiles()->get();
 
-        return response()->json($images, 200);
+        return new ImageFileCollection($images);
     }
 }
 

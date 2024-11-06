@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\api\v1;
 
-use App\Http\Controllers\Controller;
 use App\Models\Person;
-use App\Models\ImageFile;
 use Illuminate\Http\Request;
+use App\Helpers\ResponseMessages;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\api\v1\ImageFileCollection;
 
 class ImagePersonController extends Controller
 {
@@ -14,34 +15,29 @@ class ImagePersonController extends Controller
         $person = Person::findOrFail($personId);
 
         $request->validate([
-            'images' => 'required|array',
-            'images.*.url' => 'required|url',
-            'images.*.format' => 'required|string',
-            'images.*.size' => 'required|integer',
+            'image_file_ids' => 'required|array',
+            'image_file_ids.*' => 'exists:image_files, image_id'
         ]);
 
-        foreach ($request->images as $imageData) {
-            $image = ImageFile::create($imageData);
-            $person->images()->attach($image->image_id);
-        }
+        $person->imageFiles()->syncWithoutDetaching($request->image_file_ids);
 
-        return response()->json(['message' => 'Images attached to person successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Images associated successfully.'],200);
     }
 
     public function destroy($personId, $imageId)
     {
         $person = Person::findOrFail($personId);
-        $person->images()->detach($imageId);
+        $person->imageFiles()->detach($imageId);
 
-        return response()->json(['message' => 'Image detached from person successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Image detached successfully.'], 200);
     }
 
     public function index($personId)
     {
         $person = Person::findOrFail($personId);
-        $images = $person->images()->get();
+        $images = $person->imageFiles()->get();
 
-        return response()->json($images, 200);
+        return new ImageFileCollection($images);
     }
 }
 

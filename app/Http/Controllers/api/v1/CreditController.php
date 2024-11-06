@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Models\Credit;
-use Illuminate\Http\Request;
 use App\Helpers\ResponseMessages;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\api\v1\CreditResource;
 use App\Http\Requests\api\v1\CreditStoreRequest;
+use App\Http\Resources\api\v1\CreditCollection;
 
 class CreditController extends Controller
 {
@@ -22,7 +22,7 @@ class CreditController extends Controller
         // Retrieve credits belonging only to the authenticated user
         $credits = Credit::where('user_id', Auth::id())->get();
 
-        return CreditResource::collection($credits);
+        return new CreditCollection($credits);
     }
 
     /**

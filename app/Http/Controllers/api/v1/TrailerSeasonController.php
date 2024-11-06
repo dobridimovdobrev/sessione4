@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\v1;
 
+use App\Helpers\ResponseMessages;
 use App\Http\Controllers\Controller;
 use App\Models\Season;
 use App\Models\Trailer;
@@ -23,7 +24,7 @@ class TrailerSeasonController extends Controller
             $season->trailers()->attach($trailer->trailer_id);
         }
 
-        return response()->json(['message' => 'Trailers attached to season successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Trailers attached to season successfully.'], 200);
     }
 
     public function destroy($seasonId, $trailerId)
@@ -31,7 +32,7 @@ class TrailerSeasonController extends Controller
         $season = Season::findOrFail($seasonId);
         $season->trailers()->detach($trailerId);
 
-        return response()->json(['message' => 'Trailer detached from season successfully.'], 200);
+        return ResponseMessages::success(['message' => 'Trailer detached from season successfully.'], 200);
     }
 
     public function index($seasonId)
@@ -39,7 +40,7 @@ class TrailerSeasonController extends Controller
         $season = Season::findOrFail($seasonId);
         $trailers = $season->trailers()->get();
 
-        return response()->json($trailers, 200);
+        return ResponseMessages::success($trailers, 200);
     }
 }
 

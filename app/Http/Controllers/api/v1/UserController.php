@@ -60,7 +60,7 @@ class UserController extends Controller
 
         //foreach loop with all specified values for making filtering requests
         foreach ($filterUsers as $key => $value) {
-            if (in_array($key, ['user_id', 'username', 'email', 'first_name', 'last_name', 'birthday', 'gender', 'user_status'])) {
+            if (in_array($key, ['user_id', 'username', 'email', 'first_name', 'last_name', 'birthday', 'gender', 'user_status','role_id'])) {
                 $query = $query->where($key, $value);
             }
         }

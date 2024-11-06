@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\v1;
 
+use App\Helpers\ResponseMessages;
 use App\Models\Movie;
 use App\Models\Trailer;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class TrailerMovieController extends Controller
          // Attach trailers to the movie
          $movie->trailers()->syncWithoutDetaching($request->trailer_ids);
  
-         return response()->json(['message' => 'Trailers associated successfully.'], 200);
+         return ResponseMessages::success(['message' => 'Trailers associated successfully.'], 200);
      }
  
      // Detach a trailer from a movie
@@ -32,7 +33,7 @@ class TrailerMovieController extends Controller
          $movie = Movie::findOrFail($movieId);
          $movie->trailers()->detach($trailerId);
  
-         return response()->json(['message' => 'Trailer detached successfully.'], 200);
+         return ResponseMessages::success(['message' => 'Trailer detached successfully.'], 200);
      }
  
      // Show all trailers attached to a movie
@@ -41,7 +42,7 @@ class TrailerMovieController extends Controller
          $movie = Movie::findOrFail($movieId);
          $trailers = $movie->trailers()->get();
  
-         return response()->json($trailers, 200);
+         return ResponseMessages::success($trailers, 200);
      }
  
      // Show all movies for a trailer

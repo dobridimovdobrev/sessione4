@@ -4,9 +4,9 @@ namespace App\Policies;
 
 use App\Models\ImageFile;
 use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
-
-class ImagFilePolicy
+class ImageFilePolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,7 +19,7 @@ class ImagFilePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, ImageFile $imageFile): bool
+    public function view(User $user, ImageFile $image): bool
     {
         return $user->role->role_name === 'admin' || $user->role->role_name === 'user';
     }
@@ -35,7 +35,7 @@ class ImagFilePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, ImageFile $imageFile): bool
+    public function update(User $user, ImageFile $image): bool
     {
         return $user->role->role_name === 'admin';
     }
@@ -43,7 +43,7 @@ class ImagFilePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, ImageFile $imageFile): bool
+    public function delete(User $user, ImageFile $image): bool
     {
         return $user->role->role_name === 'admin';
     }
