@@ -16,11 +16,11 @@ class VideoFile extends Model
     protected $primaryKey = 'video_file_id';
 
     protected $fillable = [
+        'title',
         'url',
         'format',
-        'size',
         'resolution',
-        'duration',
+        
     ];
 
     //Pivot relationship

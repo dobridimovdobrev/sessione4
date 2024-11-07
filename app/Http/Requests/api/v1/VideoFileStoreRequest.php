@@ -11,7 +11,7 @@ class VideoFileStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,15 +22,11 @@ class VideoFileStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
+            'title' => 'required|string|max:255',
             'url' => 'required|url',
-            'content_id' => 'required|integer',
-            'content_type' => 'required|string|max:64',
             'format' => 'required|string|max:10',
-            'size' => 'required|integer',
             'resolution' => 'nullable|string|max:10',
-            'duration' => 'nullable|string',
+            
         ];
     }
 }

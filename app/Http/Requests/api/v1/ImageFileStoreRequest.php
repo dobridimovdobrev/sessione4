@@ -11,7 +11,7 @@ class ImageFileStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,14 +23,10 @@ class ImageFileStoreRequest extends FormRequest
     {
         return [
             'url' => 'required|url',
-            'title' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'content_id' => 'required|integer',
-            'content_type' => 'required|string|max:64',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
             'format' => 'required|string|max:10',
-            'size' => 'required|integer',
-            'width' => 'nullable|integer',
-            'height' => 'nullable|integer',
+            
         ];
     }
 }

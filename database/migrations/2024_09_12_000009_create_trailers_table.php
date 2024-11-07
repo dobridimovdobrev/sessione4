@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('trailers', function (Blueprint $table) {
             $table->id('trailer_id');
+            $table->string('title', 128)->index();
             $table->string('url');
             $table->timestamps();
             $table->softDeletes();

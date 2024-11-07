@@ -20,9 +20,6 @@ class ImageFileResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'format' => $this->format,
-            'size' => $this->size,
-            'width' => $this->width,
-            'height' => $this->height,
         ];
     }
 }

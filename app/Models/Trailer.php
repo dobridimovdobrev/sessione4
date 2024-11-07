@@ -14,7 +14,8 @@ class Trailer extends Model
     protected $primaryKey = 'trailer_id';
 
     protected $fillable = [
-        'url',
+        'title',
+        'url'
     ];
 
     //Pivot rel

@@ -9,22 +9,29 @@ trait HasSlug
     {
         static::creating(function ($model) {
             if (empty($model->slug)) {
-                $model->slug = self::generateUniqueSlug($model, $model->title);
+                $model->slug = self::generateUniqueSlug($model, $model->getSlugSource());
             }
         });
 
         static::updating(function ($model) {
-            if ($model->isDirty('title')) {
-                $model->slug = self::generateUniqueSlug($model, $model->title);
+            if ($model->isDirty($model->getSlugSource())) {
+                $model->slug = self::generateUniqueSlug($model, $model->getSlugSource());
             }
         });
     }
 
     // Function to generate unique slug
-    public static function generateUniqueSlug($model, $title)
+    public static function generateUniqueSlug($model, $source)
     {
-        $slug = Str::slug($title);
-        $count = $model::where('slug', 'LIKE', "$slug%")->count(); // Using $model instead of static
+        $slug = Str::slug($source);
+        $count = $model::where('slug', 'LIKE', "$slug%")->count();
         return $count ? "{$slug}-{$count}" : $slug;
     }
+
+    // Function to determine the source field for slug generation
+    public function getSlugSource()
+    {
+        return $this->title ?? $this->name ?? '';
+    }
 }
+

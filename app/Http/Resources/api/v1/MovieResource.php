@@ -17,10 +17,10 @@ class MovieResource extends JsonResource
         
         return [
             'movie_id' => $this->movie_id,
-            'category' => [
-                'id' => $this->category_id,
-                'name' => $this->category->name, 
-            ],
+            'category' => $this->category ? [
+                'id' => $this->category->category_id,
+                'name' => $this->category->name,
+            ] : null, // Safely handle missing category,
             'title' => $this->title,
             'description' => $this->description,
             'year' => $this->year,

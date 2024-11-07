@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('video_files', function (Blueprint $table) {
             $table->id('video_file_id');
+            $table->string('title', 128)->index();
             $table->string('url');
             $table->string('format');  //  mp4, mkv, avi
-            $table->unsignedBigInteger('size');  // File size in bytes
             $table->string('resolution')->nullable();  //  1080p, 720p
-            $table->time('duration')->nullable();  // Duration
             $table->timestamps();
             $table->softDeletes();   
         });

@@ -3,23 +3,34 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Models\VideoFile;
+use Illuminate\Http\Request;
 use App\Helpers\ResponseMessages;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\v1\VideoFileStoreRequest;
-use App\Http\Requests\api\v1\VideoFileUpdateRequest;
 use App\Http\Resources\api\v1\VideoFileResource;
 use App\Http\Resources\api\v1\VideoFileCollection;
+use App\Http\Requests\api\v1\VideoFileStoreRequest;
+use App\Http\Requests\api\v1\VideoFileUpdateRequest;
 
 class VideoFileController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', VideoFile::class);
 
-        $videoFiles = VideoFile::paginate(10);
+        // Apply filters if any
+        $filterData = $request->all();
+        $query = VideoFile::query();
+ // Filter movies by different parameters/keys
+        foreach ($filterData as $key => $value) {
+            if (in_array($key, ['video_file_id', 'title'])) {
+                $query->where($key, 'LIKE', "%$value%");
+            }
+        }
+
+        $videoFiles = $query->paginate(50);
         return new VideoFileCollection($videoFiles);
     }
 

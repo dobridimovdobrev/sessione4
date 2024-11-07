@@ -17,9 +17,6 @@ class ImageFile extends Model
         'title',
         'description',
         'format',
-        'size',
-        'width',
-        'height'
     ];
 
     //Pivot RELATIONSHIP

@@ -9,17 +9,28 @@ use App\Http\Requests\api\v1\TrailerStoreRequest;
 use App\Http\Requests\api\v1\TrailerUpdateRequest;
 use App\Http\Resources\api\v1\TrailerResource;
 use App\Http\Resources\api\v1\TrailerCollection;
+use Illuminate\Http\Request;
 
 class TrailerController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Trailer::class);
 
-        $trailers = Trailer::paginate(10);
+        // Apply filters if any
+        $filterData = $request->all();
+        $query = Trailer::query();
+        // Filter movies by different parameters/keys
+        foreach ($filterData as $key => $value) {
+            if (in_array($key, ['trailer_id', 'title'])) {
+                $query->where($key, 'LIKE', "%$value%");
+            }
+        }
+
+        $trailers = $query->paginate(50);
         return new TrailerCollection($trailers);
     }
 

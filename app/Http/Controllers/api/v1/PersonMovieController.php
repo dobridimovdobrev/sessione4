@@ -20,8 +20,8 @@ class PersonMovieController extends Controller
 
        // Validate person ids
        $request->validate([
-           'person_ids' => 'required|array',
-           'person_ids.*' => 'exists:persons,person_id'
+           'names' => 'required|array',
+            'names.*' => 'string'
        ]);
 
        $personIds = [];

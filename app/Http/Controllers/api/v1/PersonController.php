@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Models\Person;
+use Illuminate\Http\Request;
 use App\Helpers\ResponseMessages;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\api\v1\PersonResource;
@@ -15,11 +16,22 @@ class PersonController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Person::class);
 
-        $people = Person::paginate(100);
+          // Apply filters if any
+          $filterData = $request->all();
+          $query = Person::query();
+      
+          // Filter Persons by different parameters/keys
+          foreach ($filterData as $key => $value) {
+              if (in_array($key, ['person_id', 'name'])) {
+                  $query->where($key, 'LIKE', "%$value%");
+              }
+          }
+
+        $people = $query->paginate(100);
         return new PersonCollection($people);
     }
     //create
