@@ -15,8 +15,8 @@ class TrailerSeasonController extends Controller
         $season = Season::findOrFail($seasonId);
 
         $request->validate([
-            'trailers' => 'required|array',
-            'trailers.*.url' => 'required|url'
+            'trailer_ids' => 'required|array',
+             'trailer_ids.*' => 'exists:trailers,trailer_id'
         ]);
 
         foreach ($request->trailers as $trailerData) {

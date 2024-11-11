@@ -27,8 +27,9 @@ class TvSeriesResource extends JsonResource
                 'name' => $this->category->name, 
             ],
 
-            // Persons, Trailers, video files, image files
+            // Persons, Trailers, image files
             'persons' => PersonResource::collection($this->whenLoaded('persons')),
+            'trailers' => TrailerResource::collection($this->whenLoaded('trailers')),
             'image_files' => ImageFileResource::collection($this->whenLoaded('imageFiles')),
         ];
     }

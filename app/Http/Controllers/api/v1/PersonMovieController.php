@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\api\v1;
 
-use App\Helpers\ResponseMessages;
 use App\Models\Movie;
-
 use App\Models\Person;
+
 use Illuminate\Http\Request;
+use App\Helpers\ResponseMessages;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\api\v1\MovieCollection;
 
 
@@ -53,9 +54,23 @@ class PersonMovieController extends Controller
    public function index($personId)
    {
        $person = Person::findOrFail($personId);
-       $movies = $person->movies()->get(); // Retrieve all movies for the person
+       // Get the role of the authenticated user
+    $userRole = Auth::user()->role->role_name;
 
-       return new MovieCollection($movies);
+    // Retrieve all movies for the person with filtering
+    $moviesQuery = $person->movies();
+
+    // Apply filtering to exclude draft movies for regular users
+    if ($userRole === 'user') {
+        $moviesQuery->whereIn('status', ['published', 'coming soon']);
+    }
+
+    // Execute the query and get the movies
+    $movies = $moviesQuery->get();
+
+    return new MovieCollection($movies);
+
+      
    }
 
 }

@@ -51,7 +51,7 @@ class TvSerieController extends Controller
         $this->authorize('view', $tvSerie);
 
          // Eager load the related data (category,persons, trailers, , images)
-         $tvSerieData = TvSerie::with(['category','persons', 'imageFiles'])->findOrFail($tvSerie->tv_series_id);
+         $tvSerieData = TvSerie::with(['category','trailers', 'persons', 'imageFiles'])->findOrFail($tvSerie->tv_series_id);
          return new TvSeriesResource($tvSerieData);
     }
 

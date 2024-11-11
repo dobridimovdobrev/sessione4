@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Helpers\ResponseMessages;
-use App\Models\Trailer;
 use App\Models\TvSerie;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -16,14 +15,12 @@ class TrailerTvSeriesController extends Controller
         $tvSeries = TvSerie::findOrFail($tvSeriesId);
 
         $request->validate([
-            'trailers' => 'required|array',
-            'trailers.*.url' => 'required|url'
+            'trailer_ids' => 'required|array',
+            'trailer_ids.*' => 'exists:trailers,trailer_id'
         ]);
-
-        foreach ($request->trailers as $trailerData) {
-            $trailer = Trailer::create($trailerData);
-            $tvSeries->trailers()->attach($trailer->trailer_id);
-        }
+    
+        // Attach the trailers directly using the validated IDs
+        $tvSeries->trailers()->attach($request->trailer_ids);
 
         return ResponseMessages::success(['message' => 'Trailers attached successfully.'], 200);
     }

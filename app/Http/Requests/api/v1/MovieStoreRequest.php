@@ -39,6 +39,7 @@ class MovieStoreRequest extends FormRequest
             // Trailers (only validate if present)
             'trailers' => 'sometimes|array',
             'trailers.*.url' => 'sometimes|url',
+            'trailers.*.' => 'sometimes|url',
 
             // Video files (only validate if present)
             'video_files' => 'sometimes|array',

@@ -31,7 +31,7 @@ return new class extends Migration
             $table->softDeletes();
 
             /* foreign id */
-            $table->foreignId('country_id')->constrained('countries', 'country_id');
+            $table->foreignId('country_id')->nullable()->constrained('countries', 'country_id');
             $table->foreignId('role_id')->default(2)->constrained('roles', 'role_id'); //user role assigned by default 
         });
     }

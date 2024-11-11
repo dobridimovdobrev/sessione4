@@ -20,10 +20,8 @@ use App\Http\Controllers\api\v1\ImagePersonController;
 use App\Http\Controllers\api\v1\ImageSeasonController;
 use App\Http\Controllers\api\v1\PersonMovieController;
 use App\Http\Controllers\api\v1\ImageEpisodeController;
-use App\Http\Controllers\api\v1\PersonSeasonController;
 use App\Http\Controllers\api\v1\TrailerMovieController;
 use App\Http\Controllers\api\v1\ImageTvSeriesController;
-use App\Http\Controllers\api\v1\PersonEpisodeController;
 use App\Http\Controllers\api\v1\TrailerSeasonController;
 use App\Http\Controllers\api\v1\PersonTvSeriesController;
 use App\Http\Controllers\api\v1\TrailerTvSeriesController;
@@ -46,12 +44,12 @@ Route::get('/youtube', [YOUTUBEService::class, 'youtubeChannel']); */
 
 //Guests can access only register and login api
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:15,15'); //Login attempts, max 3 time, 15 minutes expiration
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:3,10'); //Login attempts, max 3 time, 15 minutes expiration
 
 //Routes for Version 1 
 Route::prefix('v1')->group(function () {
-    // Routes  ONLY BY USER ROLE
-    Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
+    // Routes  FOR USER  AND ADMIN ROLE
+    Route::middleware(['auth:sanctum', 'role:admin,user'])->group(function () {
         Route::put('/update-profile', [UserController::class, 'updateOwnProfile']);
         Route::post('/credits', [CreditController::class, 'store']);
     });
@@ -145,8 +143,8 @@ Route::prefix('v1')->group(function () {
         Route::delete('/trailers/{trailer}', [TrailerController::class, 'destroy']);
         //Video Files
         Route::post('/videos', [VideoFileController::class, 'store']);
-        Route::put('/videos/{video}', [VideoFileController::class, 'update']);
-        Route::delete('/videos/{video}', [VideoFileController::class, 'destroy']);
+        Route::put('/videos/{videoFile}', [VideoFileController::class, 'update']);
+        Route::delete('/videos/{videoFile}', [VideoFileController::class, 'destroy']);
         //Image Files
         Route::post('/images', [ImageFileController::class, 'store']);
         Route::put('/images/{image}', [ImageFileController::class, 'update']);
@@ -216,7 +214,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/trailers/{trailer}', [TrailerController::class, 'show']);
         //Video Files
         Route::get('/videos', [VideoFileController::class, 'index']);
-        Route::get('/videos/{video}', [VideoFileController::class, 'show']);
+        Route::get('/videos/{videoFile}', [VideoFileController::class, 'show']);
         //Image Files
         Route::get('/images', [ImageFileController::class, 'index']);
         Route::get('/images/{image}', [ImageFileController::class, 'show']);

@@ -25,7 +25,7 @@ class VideoFileStoreRequest extends FormRequest
             'title' => 'required|string|max:255',
             'url' => 'required|url',
             'format' => 'required|string|max:10',
-            'resolution' => 'nullable|string|max:10',
+            'resolution' => 'required|string|max:10',
             
         ];
     }
