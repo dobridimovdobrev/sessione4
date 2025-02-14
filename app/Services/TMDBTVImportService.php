@@ -190,11 +190,11 @@ class TMDBTVImportService
                     $tvSeries->persons()->attach($person->person_id, ['role' => 'actor']);
 
                     // Scarica e salva l'immagine della persona solo se non ne ha già una
-                    if (!$person->images()->exists() && !empty($actor['profile_path'])) {
+                    if (!$person->imageFiles()->exists() && !empty($actor['profile_path'])) {
                         $personImage = $this->downloadAndSaveImage($actor['profile_path'], 'person', $actor['name']);
                         if ($personImage) {
                             $image = ImageFile::create($personImage);
-                            $person->images()->attach($image->image_id);
+                            $person->imageFiles()->attach($image->image_id);
                             Log::info("Immagine salvata per attore: " . $actor['name']);
                         }
                     }
@@ -247,7 +247,7 @@ class TMDBTVImportService
                 $posterImage = $this->downloadAndSaveImage($seasonData['poster_path'], 'poster', "{$tvSeries->title} Season {$seasonNumber}");
                 if ($posterImage) {
                     $image = ImageFile::create($posterImage);
-                    $season->images()->attach($image->image_id, ['type' => 'poster']);
+                    $season->imageFiles()->attach($image->image_id, ['type' => 'poster']);
                     Log::info("Poster salvato per la stagione");
                 }
             }
@@ -287,7 +287,7 @@ class TMDBTVImportService
                 $stillImage = $this->downloadAndSaveImage($episodeData['still_path'], 'still', $episodeData['name']);
                 if ($stillImage) {
                     $image = ImageFile::create($stillImage);
-                    $episode->images()->attach($image->image_id, ['type' => 'still']);
+                    $episode->imageFiles()->attach($image->image_id, ['type' => 'still']);
                     Log::info("Immagine salvata per l'episodio");
                 }
             }
