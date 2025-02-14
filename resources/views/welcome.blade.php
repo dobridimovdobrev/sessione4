@@ -449,7 +449,7 @@
             </tr>
             <!-- Person-Movie Pivot -->
             <tr>
-                <td>public/api/v1/persons/{person}/movies</td>
+                <td>/api/v1/persons/{person}/movies</td>
                 <td>GET</td>
                 <td>Get all movies associated with a person.</td>
                 <td>person (int)</td>
@@ -460,7 +460,7 @@
             </tr>
             <!-- Image-Movie Pivot -->
             <tr>
-                <td>public/api/v1/images/{image}/movies</td>
+                <td>/api/v1/images/{image}/movies</td>
                 <td>GET</td>
                 <td>Get all movies associated with an image.</td>
                 <td>image (int)</td>
@@ -471,7 +471,7 @@
             </tr>
             <!-- Video-Movie Pivot -->
             <tr>
-                <td>public/api/v1/videos/{video}/movies</td>
+                <td>/api/v1/videos/{video}/movies</td>
                 <td>GET</td>
                 <td>Get all movies associated with a video.</td>
                 <td>video (int)</td>
@@ -482,7 +482,7 @@
             </tr>
             <!-- Trailer-Movie Pivot -->
             <tr>
-                <td>public/api/v1/trailers/{trailer}/movies</td>
+                <td>/api/v1/trailers/{trailer}/movies</td>
                 <td>GET</td>
                 <td>Get all movies associated with a trailer.</td>
                 <td>trailer (int)</td>
@@ -493,7 +493,7 @@
             </tr>
             <!-- Person-TvSeries Pivot -->
             <tr>
-                <td>public/api/v1/tvseries/{tvSeries}/persons</td>
+                <td>/api/v1/tvseries/{tvSeries}/persons</td>
                 <td>GET</td>
                 <td>Get all persons associated with a TV series.</td>
                 <td>tvSeries (int)</td>
@@ -504,7 +504,7 @@
             </tr>
             <!-- Trailer-TvSeries Pivot -->
             <tr>
-                <td>public/api/v1/tvseries/{tvSeries}/trailers</td>
+                <td>/api/v1/tvseries/{tvSeries}/trailers</td>
                 <td>GET</td>
                 <td>Get all trailers associated with a TV series.</td>
                 <td>tvSeries (int)</td>
@@ -515,7 +515,7 @@
             </tr>
             <!-- Image-TvSeries Pivot -->
             <tr>
-                <td>public/api/v1/tvseries/{tvSeries}/images</td>
+                <td>/api/v1/tvseries/{tvSeries}/images</td>
                 <td>GET</td>
                 <td>Get all images associated with a TV series.</td>
                 <td>tvSeries (int)</td>
@@ -526,7 +526,7 @@
             </tr>
             <!-- Person-Season Pivot -->
             <tr>
-                <td>public/api/v1/seasons/{season}/persons</td>
+                <td>/api/v1/seasons/{season}/persons</td>
                 <td>GET</td>
                 <td>Get all persons associated with a season.</td>
                 <td>season (int)</td>
@@ -537,7 +537,7 @@
             </tr>
             <!-- Image-Season Pivot -->
             <tr>
-                <td>public/api/v1/seasons/{season}/images</td>
+                <td>/api/v1/seasons/{season}/images</td>
                 <td>GET</td>
                 <td>Get all images associated with a season.</td>
                 <td>season (int)</td>
@@ -548,7 +548,7 @@
             </tr>
             <!-- Trailer-Season Pivot -->
             <tr>
-                <td>public/api/v1/seasons/{season}/trailers</td>
+                <td>/api/v1/seasons/{season}/trailers</td>
                 <td>GET</td>
                 <td>Get all trailers associated with a season.</td>
                 <td>season (int)</td>
@@ -559,7 +559,7 @@
             </tr>
             <!-- Person-Episode Pivot -->
             <tr>
-                <td>public/api/v1/episodes/{episode}/persons</td>
+                <td>/api/v1/episodes/{episode}/persons</td>
                 <td>GET</td>
                 <td>Get all persons associated with an episode.</td>
                 <td>episode (int)</td>
@@ -570,7 +570,7 @@
             </tr>
             <!-- Image-Episode Pivot -->
             <tr>
-                <td>public/api/v1/episodes/{episode}/images</td>
+                <td>/api/v1/episodes/{episode}/images</td>
                 <td>GET</td>
                 <td>Get all images associated with an episode.</td>
                 <td>episode (int)</td>
@@ -581,7 +581,7 @@
             </tr>
             <!-- Image-Person Pivot -->
             <tr>
-                <td>public/api/v1/persons/{person}/images</td>
+                <td>/api/v1/persons/{person}/images</td>
                 <td>GET</td>
                 <td>Get all images associated with a person.</td>
                 <td>person (int)</td>
