@@ -190,11 +190,11 @@ class TMDBTVImportService
                     $tvSeries->persons()->attach($person->person_id, ['role' => 'actor']);
 
                     // Scarica e salva l'immagine della persona solo se non ne ha già una
-                    if (!$person->imageFiles()->exists() && !empty($actor['profile_path'])) {
+                    if (!$person->images()->exists() && !empty($actor['profile_path'])) {
                         $personImage = $this->downloadAndSaveImage($actor['profile_path'], 'person', $actor['name']);
                         if ($personImage) {
                             $image = ImageFile::create($personImage);
-                            $person->imageFiles()->attach($image->image_id);
+                            $person->images()->attach($image->image_id);
                             Log::info("Immagine salvata per attore: " . $actor['name']);
                         }
                     }
