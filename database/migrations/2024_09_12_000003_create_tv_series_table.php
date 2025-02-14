@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('imdb_rating', 3, 1)->nullable()->index();  
             $table->unsignedTinyInteger('total_seasons')->nullable();
             $table->enum('status', ['published', 'draft', 'scheduled', 'coming soon'])->default('published');
+            $table->unsignedBigInteger('tmdb_id')->unique()->nullable();  // Aggiunto ID di TMDB
             $table->timestamps();
             $table->softDeletes();
 

@@ -13,74 +13,25 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        Category::create([
-            'name' => 'action',
-            'slug' => 'action'
-        ]);
+        $categories = [
+            ['category_id' => 1, 'name' => 'action', 'slug' => 'action'],
+            ['category_id' => 2, 'name' => 'comedy', 'slug' => 'comedy'],
+            ['category_id' => 3, 'name' => 'adventure', 'slug' => 'adventure'],
+            ['category_id' => 4, 'name' => 'thriller', 'slug' => 'thriller'],
+            ['category_id' => 5, 'name' => 'crime', 'slug' => 'crime'],
+            ['category_id' => 6, 'name' => 'drama', 'slug' => 'drama'],
+            ['category_id' => 7, 'name' => 'documentary', 'slug' => 'documentary'],
+            ['category_id' => 8, 'name' => 'horror', 'slug' => 'horror'],
+            ['category_id' => 9, 'name' => 'romance', 'slug' => 'romance'],
+            ['category_id' => 10, 'name' => 'war', 'slug' => 'war'],
+            ['category_id' => 11, 'name' => 'western', 'slug' => 'western'],
+            ['category_id' => 12, 'name' => 'fantasy', 'slug' => 'fantasy'],
+            ['category_id' => 13, 'name' => 'family', 'slug' => 'family'],
+            ['category_id' => 14, 'name' => 'animation', 'slug' => 'animation']
+        ];
 
-        Category::create([
-            'name' => 'comedy',
-            'slug' => 'comedy'
-        ]);
-
-        Category::create([
-            'name' => 'adventure',
-            'slug' => 'adventure'
-        ]);
-
-        Category::create([
-            'name' => 'thriller',
-            'slug' => 'thriller'
-        ]);
-
-        Category::create([
-            'name' => 'crime',
-            'slug' => 'crime'
-        ]);
-
-        Category::create([
-            'name' => 'drama',
-            'slug' => 'drama'
-        ]);
-
-        Category::create([
-            'name' => 'documentary',
-            'slug' => 'documentary'
-        ]);
-
-        Category::create([
-            'name' => 'romance',
-            'slug' => 'romance'
-        ]);
-
-        Category::create([
-            'name' => 'war',
-            'slug' => 'war'
-        ]);
-
-        Category::create([
-            'name' => 'western',
-            'slug' => 'western'
-        ]);
-
-        Category::create([
-            'name' => 'fantasy',
-            'slug' => 'fantasy'
-        ]);
-
-        Category::create([
-            'name' => 'family',
-            'slug' => 'family'
-        ]);
-
-        Category::create([
-            'name' => 'horror',
-            'slug' => 'horror'
-        ]);
-
-        Category::create([
-            'name' => 'animation',
-            'slug' => 'animation'
-        ]);
+        foreach ($categories as $category) {
+            Category::create($category);
+        }
     }
 }

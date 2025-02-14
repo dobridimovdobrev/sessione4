@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('trailers', function (Blueprint $table) {
             $table->id('trailer_id');
             $table->string('title', 128)->index();
+            $table->text('description')->nullable();
             $table->string('url');
+            $table->string('format')->default('youtube'); // youtube, vimeo, etc.
             $table->timestamps();
             $table->softDeletes();
-             
         });
     }
 

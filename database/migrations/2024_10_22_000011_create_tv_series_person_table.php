@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tv_series_id')->constrained('tv_series', 'tv_series_id')->onDelete('cascade');
             $table->foreignId('person_id')->constrained('persons', 'person_id')->onDelete('cascade');
+            $table->string('role')->default('actor');  // Aggiunto role per specificare il ruolo (actor, director, etc)
             $table->timestamps();
         });
     }

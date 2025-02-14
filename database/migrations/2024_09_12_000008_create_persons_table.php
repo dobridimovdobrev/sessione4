@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('persons', function (Blueprint $table) {
             $table->id('person_id');
-            $table->string('name', 128)->index();
+            $table->string('name', 64)->index();
+            $table->unsignedBigInteger('tmdb_id')->unique()->nullable();  // Aggiunto ID di TMDB
             $table->timestamps();
             $table->softDeletes();
         });

@@ -23,6 +23,12 @@ class Movie extends Model
         'imdb_rating',
         'status',
         'category_id',
+        'premiere_date'
+    ];
+
+    protected $casts = [
+        'premiere_date' => 'date',
+        'imdb_rating' => 'float'
     ];
 
     protected $hidden = ['created_at', 'updated_at', 'deleted_at'];

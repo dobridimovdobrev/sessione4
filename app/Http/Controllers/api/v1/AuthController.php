@@ -21,7 +21,7 @@ class AuthController extends Controller
         $userData = $request->validated();
 
         //hash the password salt is included by default
-        $hashedPassword =  $hashedPassword = Hash::make($userData['password']);
+        $hashedPassword = Hash::make($userData['password']);
 
         // Set country_id to null if it is not provided in the request
         $countryId = $userData['country_id'] ?? null;
@@ -69,7 +69,7 @@ class AuthController extends Controller
         // Store session information
         Session::create([
             'user_id' => $user->user_id,
-            'ip_address' => $request->ip(), // Correct 'ip_adress' to 'ip_address'
+            'ip_address' => $request->ip(), 
             'last_activity' => now()
         ]);
 

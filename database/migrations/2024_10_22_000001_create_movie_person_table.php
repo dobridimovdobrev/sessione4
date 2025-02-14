@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id(); // Primary key
             $table->foreignId('movie_id')->constrained('movies', 'movie_id')->onDelete('cascade'); // Foreign key to movies
             $table->foreignId('person_id')->constrained('persons', 'person_id')->onDelete('cascade'); // Foreign key to persons (actors)
+            $table->string('role')->default('actor');  // Aggiunto role per specificare il ruolo (actor, director, etc)
             $table->timestamps();
         });
     }
