@@ -348,7 +348,7 @@ class TMDBTVImportService
             $imageSize = getimagesize(storage_path('app/public/' . $fullPath));
             
             // Costruisci l'URL assoluto
-            $absoluteUrl = 'https://api.dobridobrev.com/public/storage/' . $fullPath;
+            $absoluteUrl = 'https://api.dobridobrev.com/storage/' . $fullPath;
             
             Log::info("URL assoluto generato: " . $absoluteUrl);
 
