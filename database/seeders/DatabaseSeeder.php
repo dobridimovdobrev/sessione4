@@ -3,25 +3,33 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Database\Seeders\CleanDatabaseSeeder;
-use Database\Seeders\CountrySeeder;
-use Database\Seeders\RoleSeeder;
-use Database\Seeders\PermissionSeeder;
-use Database\Seeders\CategorySeeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
+        // Disabilita i controlli delle foreign key
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        // Svuota le tabelle se esistono
+        $tables = ['roles', 'permissions', 'categories', 'countries'];
+        foreach ($tables as $table) {
+            if (Schema::hasTable($table)) {
+                DB::table($table)->truncate();
+            }
+        }
+
+        // Popola le tabelle base (senza foreign key)
         $this->call([
-            CleanDatabaseSeeder::class,  // Prima puliamo il database
-            CountrySeeder::class,        // Poi aggiungiamo i dati essenziali
-            RoleSeeder::class,
-            PermissionSeeder::class,
-            CategorySeeder::class
+            RoleSeeder::class,        // Prima i ruoli
+            PermissionSeeder::class,  // Poi i permessi
+            CategorySeeder::class,    // Poi le categorie
+            CountrySeeder::class,     // Infine i paesi
         ]);
+
+        // Riabilita i controlli delle foreign key
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

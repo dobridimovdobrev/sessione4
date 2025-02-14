@@ -90,19 +90,9 @@ class TMDBImportService
             Log::info("Film trovato: " . $movieData['title']);
             
             // Crea il film
-            $baseSlug = Str::slug($movieData['title']);
-            $slug = $baseSlug;
-            $counter = 1;
-            
-            // Verifica se esiste già uno slug simile e aggiungi un numero se necessario
-            while (Movie::where('slug', $slug)->exists()) {
-                $slug = $baseSlug . '-' . $counter;
-                $counter++;
-            }
-            
             $movie = Movie::create([
                 'title' => $movieData['title'],
-                'slug' => $slug,
+                'slug' => Str::slug($movieData['title']),
                 'description' => $movieData['overview'],
                 'year' => substr($movieData['release_date'], 0, 4),
                 'duration' => $movieData['runtime'],

@@ -120,19 +120,9 @@ class TMDBTVImportService
             Log::info("Serie TV trovata: " . $seriesData['name']);
             
             // Crea la serie TV
-            $baseSlug = Str::slug($seriesData['name']);
-            $slug = $baseSlug;
-            $counter = 1;
-            
-            // Verifica se esiste già uno slug simile e aggiungi un numero se necessario
-            while (TvSerie::where('slug', $slug)->exists()) {
-                $slug = $baseSlug . '-' . $counter;
-                $counter++;
-            }
-            
             $tvSeries = TvSerie::create([
                 'title' => $seriesData['name'],
-                'slug' => $slug,
+                'slug' => Str::slug($seriesData['name']),
                 'description' => $seriesData['overview'],
                 'year' => substr($seriesData['first_air_date'], 0, 4),
                 'imdb_rating' => $seriesData['vote_average'],
