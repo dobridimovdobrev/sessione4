@@ -251,7 +251,7 @@ class TMDBTVImportService
                 $posterImage = $this->downloadAndSaveImage($seasonData['poster_path'], 'poster', "{$tvSeries->title} Season {$seasonNumber}");
                 if ($posterImage) {
                     $image = ImageFile::create($posterImage);
-                    $season->imageFiles()->attach($image->image_id, ['type' => 'poster']);
+                    $season->imageFiles()->attach($image->image_id);
                     Log::info("Poster salvato per la stagione");
                 }
             }
@@ -295,7 +295,7 @@ class TMDBTVImportService
                 $stillImage = $this->downloadAndSaveImage($episodeData['still_path'], 'still', $episodeData['name']);
                 if ($stillImage) {
                     $image = ImageFile::create($stillImage);
-                    $episode->imageFiles()->attach($image->image_id, ['type' => 'still']);
+                    $episode->imageFiles()->attach($image->image_id);
                     Log::info("Immagine salvata per l'episodio");
                 }
             }
