@@ -230,6 +230,10 @@ class TMDBTVImportService
             ]);
             
             $seasonData = json_decode($response->getBody(), true);
+            Log::info("Dati stagione ricevuti:", [
+                'poster_path' => $seasonData['poster_path'] ?? 'non presente',
+                'season_number' => $seasonNumber
+            ]);
             
             // Crea la stagione
             $season = Season::create([
@@ -283,6 +287,10 @@ class TMDBTVImportService
             Log::info("Episodio creato con ID: " . $episode->episode_id);
 
             // Gestisci le immagini dell'episodio
+            Log::info("Dati episodio ricevuti:", [
+                'still_path' => $episodeData['still_path'] ?? 'non presente',
+                'episode_number' => $episodeData['episode_number']
+            ]);
             if (!empty($episodeData['still_path'])) {
                 $stillImage = $this->downloadAndSaveImage($episodeData['still_path'], 'still', $episodeData['name']);
                 if ($stillImage) {
