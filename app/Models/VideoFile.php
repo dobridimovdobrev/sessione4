@@ -20,7 +20,7 @@ class VideoFile extends Model
         'url',
         'format',
         'resolution',
-        
+        'size'
     ];
 
     //Pivot relationship

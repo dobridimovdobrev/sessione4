@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasCache;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Movie extends Model
 {
-    use HasFactory, SoftDeletes, HasSlug;
+    use HasFactory, SoftDeletes, HasSlug, HasCache;
 
     protected $table = 'movies';
     protected $primaryKey = 'movie_id';

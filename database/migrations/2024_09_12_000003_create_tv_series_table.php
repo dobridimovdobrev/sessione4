@@ -13,19 +13,19 @@ return new class extends Migration
     {
         Schema::create('tv_series', function (Blueprint $table) {
             $table->id('tv_series_id');
-            $table->string('title', 128)->index();
+            $table->string('title');
             $table->string('slug')->unique();
-            $table->text('description');
-            $table->unsignedSmallInteger('year')->index();
-            $table->decimal('imdb_rating', 3, 1)->nullable()->index();  
-            $table->unsignedTinyInteger('total_seasons')->nullable();
-            $table->enum('status', ['published', 'draft', 'scheduled', 'coming soon'])->default('published');
-            $table->unsignedBigInteger('tmdb_id')->unique()->nullable();  // Aggiunto ID di TMDB
+            $table->text('description')->nullable();
+            $table->year('year')->nullable();
+            $table->integer('total_episodes')->nullable();
+            $table->decimal('imdb_rating', 3, 1)->nullable();
+            $table->integer('total_seasons')->default(1);
+            $table->enum('status', ['ongoing', 'ended', 'canceled', 'unknown'])->default('unknown');
+            $table->foreignId('category_id')->constrained('categories', 'category_id');
+            $table->bigInteger('tmdb_id')->unique();
+            $table->date('premiere_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
-
-            //Foreign id
-            $table->foreignId('category_id')->constrained('categories', 'category_id');
         });
     }
 

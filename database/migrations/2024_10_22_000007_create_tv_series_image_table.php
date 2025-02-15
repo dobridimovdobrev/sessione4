@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tv_series_id')->constrained('tv_series', 'tv_series_id')->onDelete('cascade');
             $table->foreignId('image_file_id')->constrained('image_files', 'image_id')->onDelete('cascade');
-            $table->string('type')->default('poster');  // Aggiunto type per poster/backdrop
+            $table->enum('type', ['poster', 'backdrop'])->default('poster');
             $table->timestamps();
         });
     }

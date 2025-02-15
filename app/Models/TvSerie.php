@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasCache;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TvSerie extends Model
 {
-    use HasFactory,SoftDeletes,HasSlug;
+    use HasFactory,SoftDeletes,HasSlug, HasCache;
 
     protected $table = 'tv_series';
     protected $primaryKey = 'tv_series_id';
@@ -19,11 +20,21 @@ class TvSerie extends Model
         'description',
         'slug',
         'year',
-        'duration',
+        'total_episodes',
         'imdb_rating',
         'total_seasons',
         'status',
         'category_id',
+        'tmdb_id',
+        'premiere_date'
+    ];
+
+    protected $casts = [
+        'premiere_date' => 'date',
+        'imdb_rating' => 'float',
+        'total_episodes' => 'integer',
+        'total_seasons' => 'integer',
+        'year' => 'integer'
     ];
 
     //RELATIONSHIPS
@@ -61,6 +72,6 @@ class TvSerie extends Model
     // Relationship with video files
     public function videoFiles()
     {
-        return $this->belongsToMany(VideoFile::class, 'movie_video_file', 'movie_id', 'video_file_id');
+        return $this->belongsToMany(VideoFile::class, 'tv_series_video_file', 'tv_series_id', 'video_file_id');
     }
 }

@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id('video_file_id');
             $table->string('title', 128)->index();
             $table->string('url');
-            $table->string('format');  //  mp4, mkv, avi
+            $table->string('format');  //  mp4, mkv, avi, youtube
             $table->string('resolution')->nullable();  //  1080p, 720p
+            $table->bigInteger('size')->default(0);  // dimensione in bytes
             $table->timestamps();
             $table->softDeletes();   
         });

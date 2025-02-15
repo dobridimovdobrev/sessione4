@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Helpers\ImageHelper;
 
 class ImageFile extends Model
 {
@@ -16,39 +17,53 @@ class ImageFile extends Model
         'url',
         'title',
         'description',
+        'type',
+        'size_path',
+        'base_path',
         'format',
         'size',
         'width',
         'height'
     ];
 
+    // Accessor per ottenere l'URL completo
+    public function getFullUrlAttribute()
+    {
+        return ImageHelper::getImageUrl($this);
+    }
+
+    // Metodo per ottenere l'URL con una dimensione specifica
+    public function getUrlWithSize($size)
+    {
+        return ImageHelper::getImageUrl($this, $size);
+    }
+
     //Pivot RELATIONSHIP
     public function movies()
     {
-        return $this->belongsToMany(Movie::class, 'movie_image', 'image_file_id', 'movie_id');
+        return $this->belongsToMany(Movie::class, 'movie_image', 'image_file_id', 'movie_id')
+                    ->withPivot('type')
+                    ->withTimestamps();
     }
 
-     // Relationship with TV Series
-     public function tvSeries()
-     {
-         return $this->belongsToMany(TvSerie::class, 'tv_series_image', 'image_file_id', 'tv_series_id');
-     }
- 
-     // Relationship with Seasons
-     public function seasons()
-     {
-         return $this->belongsToMany(Season::class, 'season_image', 'image_file_id', 'season_id');
-     }
- 
-     // Relationship with Episodes
-     public function episodes()
-     {
-         return $this->belongsToMany(Episode::class, 'episode_image', 'image_file_id', 'episode_id');
-     }
+    public function tvSeries()
+    {
+        return $this->belongsToMany(TvSerie::class, 'tv_series_image', 'image_file_id', 'tv_series_id')
+                    ->withPivot('type')
+                    ->withTimestamps();
+    }
 
-       // Relationship with Actors
+    public function episodes()
+    {
+        return $this->belongsToMany(Episode::class, 'episode_image', 'image_file_id', 'episode_id')
+                    ->withPivot('type')
+                    ->withTimestamps();
+    }
+
     public function persons()
     {
-        return $this->belongsToMany(Person::class, 'person_image', 'image_file_id', 'person_id');
+        return $this->belongsToMany(Person::class, 'person_image', 'image_file_id', 'person_id')
+                    ->withPivot('type')
+                    ->withTimestamps();
     }
 }

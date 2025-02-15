@@ -17,16 +17,12 @@ use App\Http\Controllers\api\v1\VideoFileController;
 use App\Http\Controllers\api\v1\ImageMovieController;
 use App\Http\Controllers\api\v1\VideoMovieController;
 use App\Http\Controllers\api\v1\ImagePersonController;
-use App\Http\Controllers\api\v1\ImageSeasonController;
-use App\Http\Controllers\api\v1\PersonMovieController;
 use App\Http\Controllers\api\v1\ImageEpisodeController;
 use App\Http\Controllers\api\v1\TrailerMovieController;
 use App\Http\Controllers\api\v1\ImageTvSeriesController;
-use App\Http\Controllers\api\v1\TrailerSeasonController;
 use App\Http\Controllers\api\v1\PersonTvSeriesController;
 use App\Http\Controllers\api\v1\TrailerTvSeriesController;
 use App\Http\Controllers\api\v1\VideoFileEpisodeController;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -38,9 +34,6 @@ use App\Http\Controllers\api\v1\VideoFileEpisodeController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-/* Route::get('/movies', [TMDBService::class, 'getMovies']);
-Route::get('/youtube', [YOUTUBEService::class, 'youtubeChannel']); */
 
 //Guests can access only register and login api
 Route::post('/register', [AuthController::class, 'register']);
@@ -97,13 +90,6 @@ Route::prefix('v1')->group(function () {
         // Trailer - TV Series Pivot
         Route::post('/tvseries/{tvSeries}/trailers', [TrailerTvSeriesController::class, 'store']); // Attach trailer to TV series
         Route::delete('/tvseries/{tvSeries}/trailers/{trailer}', [TrailerTvSeriesController::class, 'destroy']); // Detach trailer
-       
-        // Image - Season Pivot
-        Route::post('/seasons/{season}/images', [ImageSeasonController::class, 'store']); // Attach images to season
-        Route::delete('/seasons/{season}/images/{image}', [ImageSeasonController::class, 'destroy']); // Detach image
-        // Trailer - Season Pivot
-        Route::post('/seasons/{season}/trailers', [TrailerSeasonController::class, 'store']); // Attach trailers to season
-        Route::delete('/seasons/{season}/trailers/{trailer}', [TrailerSeasonController::class, 'destroy']); // Detach trailer from season
 
         // Image - Episode Pivot
         Route::post('/episodes/{episode}/images', [ImageEpisodeController::class, 'store']); // Attach images to episode
@@ -182,13 +168,6 @@ Route::prefix('v1')->group(function () {
         //Image-Tv Series Pivot
         Route::get('/tvseries/{tvSeries}/images', [ImageTvSeriesController::class, 'index']); // Get all images for TV series
 
-        
-        //Image-Season Pivot
-        Route::get('/seasons/{season}/images', [ImageSeasonController::class, 'index']); // Get all images for season
-        //Trailer-Season Pivot
-        Route::get('/seasons/{season}/trailers', [TrailerSeasonController::class, 'index']); // Get all trailers for a season
-
-        
         //Image-Episode Pivot
         Route::get('/episodes/{episode}/images', [ImageEpisodeController::class, 'index']); // Get all images for episode
 

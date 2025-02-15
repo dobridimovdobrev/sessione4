@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('episode_id')->constrained('episodes', 'episode_id')->onDelete('cascade');
             $table->foreignId('image_file_id')->constrained('image_files', 'image_id')->onDelete('cascade');
+            $table->enum('type', ['still'])->default('still');
             $table->timestamps();
         });
     }

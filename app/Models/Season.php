@@ -8,39 +8,31 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Season extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory;
 
     protected $table = 'seasons';
     protected $primaryKey = 'season_id';
 
     protected $fillable = [
+        'tv_series_id',
         'season_number',
+        'name',
+        'overview',
         'total_episodes',
         'year',
-        'premiere_date',
-        'tv_series_id',
+        'premiere_date'
     ];
 
     //RELATIONSHIPS
 
     public function tvSeries()
     {
-        return $this->belongsTo(TvSerie::class, 'tv_series_id');
+        return $this->belongsTo(TvSerie::class, 'tv_series_id', 'tv_series_id');
     }
 
     public function episodes()
     {
-        return $this->hasMany(Episode::class, 'season_id');
-    }
-
-    public function trailers()
-    {
-        return $this->belongsToMany(Trailer::class, 'season_trailer', 'season_id', 'trailer_id');
-    }
-
-    public function imageFiles()
-    {
-        return $this->belongsToMany(ImageFile::class, 'season_image', 'season_id', 'image_file_id');
+        return $this->hasMany(Episode::class, 'season_id', 'season_id');
     }
 
     public function persons()

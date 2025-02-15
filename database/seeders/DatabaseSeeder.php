@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         // Svuota le tabelle se esistono
-        $tables = ['roles', 'permissions', 'categories', 'countries'];
+        $tables = ['roles', 'categories', 'countries'];
         foreach ($tables as $table) {
             if (Schema::hasTable($table)) {
                 DB::table($table)->truncate();
@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
         // Popola le tabelle base (senza foreign key)
         $this->call([
             RoleSeeder::class,        // Prima i ruoli
-            PermissionSeeder::class,  // Poi i permessi
             CategorySeeder::class,    // Poi le categorie
             CountrySeeder::class,     // Infine i paesi
         ]);

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('person_id')->constrained('persons', 'person_id')->onDelete('cascade'); // Foreign key to persons
             $table->foreignId('image_file_id')->constrained('image_files', 'image_id')->onDelete('cascade'); // Foreign key to image files
+            $table->enum('type', ['persons'])->default('persons');
             $table->timestamps();
         });
     }

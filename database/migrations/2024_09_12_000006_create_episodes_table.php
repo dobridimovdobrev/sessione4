@@ -13,17 +13,16 @@ return new class extends Migration
     {
         Schema::create('episodes', function (Blueprint $table) {
             $table->id('episode_id');
-            $table->string('title', 64)->index();
-            $table->string('slug')->unique();
+            $table->foreignId('season_id')->constrained('seasons', 'season_id')->onDelete('cascade');
+            $table->string('title', 500)->index();
+            $table->string('slug', 500)->unique();
             $table->text('description');
             $table->unsignedTinyInteger('episode_number')->index();
-            $table->unsignedSmallInteger('duration')->nullable();
             $table->enum('status', ['published', 'draft', 'scheduled', 'coming soon'])->default('published');
+            $table->date('air_date')->nullable();
+            $table->bigInteger('tmdb_id')->unique();
             $table->timestamps();
             $table->softDeletes();
-
-            //Foreign id
-            $table->foreignId('season_id')->constrained('seasons', 'season_id')->onDelete('cascade');
         });
     }
 

@@ -13,13 +13,16 @@ return new class extends Migration
     {
         Schema::create('image_files', function (Blueprint $table) {
             $table->id('image_id');
-            $table->string('url');  // URL to the image file
-            $table->string('title')->nullable();  //  title for the image
+            $table->string('url');  // Path relativo dell'immagine da TMDB
+            $table->string('title')->nullable()->index();  //  title for the image
             $table->text('description')->nullable();  //  description for accessibility/SEO
-            $table->string('format');  // jpg, png, webp
-            $table->unsignedBigInteger('size');  //  size in bytes
-            $table->unsignedSmallInteger('width')->nullable();  //  width in pixels
-            $table->unsignedSmallInteger('height')->nullable();  // height in pixels
+            $table->enum('type', ['poster', 'backdrop', 'still', 'persons'])->index(); // Tipo di immagine
+            $table->string('size_path')->default('original'); // w500, original, etc.
+            $table->string('base_path')->default('https://image.tmdb.org/t/p/'); // Base URL TMDB
+            $table->string('format')->default('jpg');  // jpg, png, webp
+            $table->unsignedBigInteger('size')->nullable();  //  size in bytes
+            $table->unsignedInteger('width')->nullable();  // larghezza in pixel
+            $table->unsignedInteger('height')->nullable();  // altezza in pixel
         
             $table->timestamps();
             $table->softDeletes();

@@ -63,6 +63,12 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 
+        'tmdb' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/tmdb.log'),
+            'level' => 'debug',
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),

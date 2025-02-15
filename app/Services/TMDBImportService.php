@@ -68,6 +68,36 @@ class TMDBImportService
     public function importMovie($tmdbId)
     {
         try {
+            Log::info("=== INIZIO IMPORTAZIONE FILM ID: " . $tmdbId . " ===");
+
+            // Ottieni i dettagli del film
+            $response = $this->client->get("movie/{$tmdbId}", [
+                'query' => [
+                    'api_key' => $this->apiKey,
+                    'append_to_response' => 'videos,credits,images',
+                    'language' => 'en-US',
+                    'include_image_language' => 'en,null'
+                ]
+            ]);
+            
+            $movieData = json_decode($response->getBody(), true);
+            
+            // Log dettagliato dei dati ricevuti
+            Log::info("Dati film ricevuti:", [
+                'title' => $movieData['title'],
+                'release_date' => $movieData['release_date'],
+                'runtime' => $movieData['runtime'],
+                'vote_average' => $movieData['vote_average'],
+                'poster_path' => $movieData['poster_path'],
+                'backdrop_path' => $movieData['backdrop_path'],
+                'cast_count' => isset($movieData['credits']['cast']) ? count($movieData['credits']['cast']) : 0,
+                'videos_count' => isset($movieData['videos']['results']) ? count($movieData['videos']['results']) : 0,
+                'images_count' => isset($movieData['images']) ? [
+                    'posters' => count($movieData['images']['posters'] ?? []),
+                    'backdrops' => count($movieData['images']['backdrops'] ?? [])
+                ] : 0
+            ]);
+
             // Controlla se il film esiste già
             $existingMovie = Movie::where('tmdb_id', $tmdbId)->first();
             if ($existingMovie) {
@@ -75,119 +105,171 @@ class TMDBImportService
                 return $existingMovie;
             }
 
-            Log::info("=== Inizio importazione film ID: " . $tmdbId . " ===");
+            DB::beginTransaction();
+            try {
+                // 1. Crea il film
+                $movie = Movie::create([
+                    'title' => $movieData['title'],
+                    'slug' => Str::slug($movieData['title']),
+                    'description' => $movieData['overview'],
+                    'year' => substr($movieData['release_date'], 0, 4),
+                    'duration' => $movieData['runtime'],
+                    'imdb_rating' => $movieData['vote_average'],
+                    'status' => 'published',
+                    'category_id' => $this->mapGenreToCategory($movieData['genres']),
+                    'premiere_date' => $movieData['release_date'],
+                    'tmdb_id' => $tmdbId
+                ]);
+                Log::info("Film creato: " . $movie->title);
 
-            // Ottieni i dettagli del film
-            $response = $this->client->get("movie/{$tmdbId}", [
-                'query' => [
-                    'api_key' => $this->apiKey,
-                    'append_to_response' => 'videos,credits',
-                    'language' => 'en-US'
-                ]
-            ]);
-            
-            $movieData = json_decode($response->getBody(), true);
-            Log::info("Film trovato: " . $movieData['title']);
-            
-            // Crea il film
-            $movie = Movie::create([
-                'title' => $movieData['title'],
-                'slug' => Str::slug($movieData['title']),
-                'description' => $movieData['overview'],
-                'year' => substr($movieData['release_date'], 0, 4),
-                'duration' => $movieData['runtime'],
-                'imdb_rating' => $movieData['vote_average'],
-                'status' => 'published',
-                'category_id' => $this->mapGenreToCategory($movieData['genres']),
-                'premiere_date' => $movieData['release_date'],
-                'tmdb_id' => $tmdbId  // Aggiungiamo l'ID di TMDB
-            ]);
-            
-            Log::info("Film creato nel database con ID: " . $movie->movie_id);
-
-            // Gestisci le immagini
-            if (!empty($movieData['poster_path'])) {
-                $posterImage = $this->downloadAndSaveImage($movieData['poster_path'], 'poster', $movieData['title']);
-                if ($posterImage) {
-                    $image = ImageFile::create($posterImage);
-                    $movie->imageFiles()->attach($image->image_id, ['type' => 'poster']);
-                    Log::info("Poster salvato per: " . $movie->title);
+                // 2. Salva il poster se disponibile
+                if (!empty($movieData['poster_path'])) {
+                    $this->saveMovieImage($movie, $movieData['poster_path'], 'poster', $movieData['title']);
                 }
-            }
 
-            if (!empty($movieData['backdrop_path'])) {
-                $backdropImage = $this->downloadAndSaveImage($movieData['backdrop_path'], 'backdrop', $movieData['title']);
-                if ($backdropImage) {
-                    $image = ImageFile::create($backdropImage);
-                    $movie->imageFiles()->attach($image->image_id, ['type' => 'backdrop']);
-                    Log::info("Backdrop salvato per: " . $movie->title);
+                // 3. Salva il backdrop se disponibile
+                if (!empty($movieData['backdrop_path'])) {
+                    $this->saveMovieImage($movie, $movieData['backdrop_path'], 'backdrop', $movieData['title']);
                 }
-            }
 
-            // Gestisci i trailer
-            if (isset($movieData['videos']['results'])) {
-                foreach ($movieData['videos']['results'] as $video) {
-                    if ($video['type'] === 'Trailer' && $video['site'] === 'YouTube') {
-                        $trailerUrl = "https://www.youtube.com/watch?v=" . $video['key'];
-                        
-                        // Crea il trailer
-                        $trailer = Trailer::create([
-                            'title' => $movieData['title'] . ' - Trailer',
-                            'url' => $trailerUrl
-                        ]);
-                        $movie->trailers()->attach($trailer->trailer_id);
-                        
-                        // Crea il video file
-                        $videoFile = VideoFile::create([
-                            'url' => $trailerUrl,
-                            'title' => $movieData['title'] . ' - Trailer',
-                            'format' => 'mp4',
-                            'resolution' => '1080p'
-                        ]);
-                        $movie->videoFiles()->attach($videoFile->video_file_id);
-                        Log::info("Trailer salvato per: " . $movie->title);
-                        break;
-                    }
+                // 4. Salva gli attori (massimo 5)
+                if (isset($movieData['credits']['cast'])) {
+                    $this->saveMovieCast($movie, array_slice($movieData['credits']['cast'], 0, 5));
                 }
-            }
 
-            // Gestisci gli attori (massimo 5)
-            if (isset($movieData['credits']['cast'])) {
-                $cast = array_slice($movieData['credits']['cast'], 0, 5);
-                Log::info("Importo " . count($cast) . " attori per: " . $movie->title);
-                
-                foreach ($cast as $actor) {
-                    // Crea o trova la persona usando tmdb_id
-                    $person = Person::firstOrCreate(
-                        ['tmdb_id' => $actor['id']],
-                        [
-                            'name' => $actor['name'],
-                            'tmdb_id' => $actor['id']
-                        ]
-                    );
-                    
-                    // Collega la persona al film
-                    $movie->persons()->attach($person->person_id, ['role' => 'actor']);
-
-                    // Scarica e salva l'immagine della persona solo se non ne ha già una
-                    if (!$person->images()->exists() && !empty($actor['profile_path'])) {
-                        $personImage = $this->downloadAndSaveImage($actor['profile_path'], 'person', $actor['name']);
-                        if ($personImage) {
-                            $image = ImageFile::create($personImage);
-                            $person->images()->attach($image->image_id);
-                            Log::info("Immagine salvata per attore: " . $actor['name']);
-                        }
-                    }
+                // 5. Salva i trailer
+                if (isset($movieData['videos']['results'])) {
+                    $this->saveMovieTrailers($movie, $movieData['videos']['results']);
                 }
-            }
 
-            Log::info("=== Importazione completata per: " . $movie->title . " ===\n");
-            return $movie;
-            
+                DB::commit();
+                Log::info("=== IMPORTAZIONE COMPLETATA PER: " . $movie->title . " ===");
+                return $movie;
+
+            } catch (Exception $e) {
+                DB::rollBack();
+                Log::error("Errore durante la transazione: " . $e->getMessage());
+                throw $e;
+            }
         } catch (Exception $e) {
             Log::error("Errore durante l'importazione del film: " . $e->getMessage());
             Log::error($e->getTraceAsString());
             throw $e;
+        }
+    }
+
+    protected function saveMovieImage($movie, $imagePath, $type, $title)
+    {
+        Log::info("Salvataggio immagine {$type} per film: " . $movie->title);
+        
+        try {
+            // 1. Scarica e salva l'immagine
+            $imageData = $this->downloadAndSaveImage($imagePath, $type, $title);
+            if (!$imageData) {
+                Log::error("Impossibile scaricare l'immagine {$type} per: " . $movie->title);
+                return;
+            }
+
+            // 2. Crea il record ImageFile
+            $image = ImageFile::create($imageData);
+            
+            // 3. Collega l'immagine al film
+            $movie->imageFiles()->attach($image->image_id, ['type' => $type]);
+            
+            Log::info("Immagine {$type} salvata con successo per: " . $movie->title);
+        } catch (Exception $e) {
+            Log::error("Errore nel salvataggio dell'immagine {$type}: " . $e->getMessage());
+        }
+    }
+
+    protected function saveMovieCast($movie, $cast)
+    {
+        Log::info("Salvataggio cast per film: " . $movie->title);
+        
+        foreach ($cast as $actor) {
+            try {
+                // 1. Crea o trova la persona
+                $person = Person::firstOrCreate(
+                    ['tmdb_id' => $actor['id']],
+                    [
+                        'name' => $actor['name'],
+                        'tmdb_id' => $actor['id']
+                    ]
+                );
+                
+                // 2. Collega la persona al film
+                $movie->persons()->attach($person->person_id, ['role' => 'actor']);
+                
+                // 3. Salva l'immagine della persona se non esiste già
+                if (!$person->images()->exists() && !empty($actor['profile_path'])) {
+                    $this->savePersonImage($person, $actor['profile_path'], $actor['name']);
+                }
+            } catch (Exception $e) {
+                Log::error("Errore nel salvataggio dell'attore {$actor['name']}: " . $e->getMessage());
+            }
+        }
+    }
+
+    protected function savePersonImage($person, $imagePath, $name)
+    {
+        Log::info("Salvataggio immagine per attore: " . $name);
+        
+        try {
+            // 1. Scarica e salva l'immagine
+            $imageData = $this->downloadAndSaveImage($imagePath, 'persons', $name);
+            if (!$imageData) {
+                Log::error("Impossibile scaricare l'immagine per l'attore: " . $name);
+                return;
+            }
+
+            // 2. Crea il record ImageFile
+            $image = ImageFile::create($imageData);
+            
+            // 3. Collega l'immagine alla persona
+            $person->images()->attach($image->image_id);
+            
+            Log::info("Immagine salvata con successo per attore: " . $name);
+        } catch (Exception $e) {
+            Log::error("Errore nel salvataggio dell'immagine dell'attore: " . $e->getMessage());
+        }
+    }
+
+    protected function saveMovieTrailers($movie, $videos)
+    {
+        Log::info("Salvataggio trailer per film: " . $movie->title);
+        
+        foreach ($videos as $video) {
+            try {
+                if ($video['type'] === 'Trailer' && $video['site'] === 'YouTube') {
+                    $trailerUrl = "https://www.youtube.com/watch?v=" . $video['key'];
+                    
+                    // 1. Crea il trailer
+                    $trailer = Trailer::create([
+                        'title' => $movie->title . ' - Trailer',
+                        'description' => $video['name'],
+                        'url' => $trailerUrl,
+                        'format' => 'youtube'
+                    ]);
+                    
+                    // 2. Crea il video file
+                    $videoFile = VideoFile::create([
+                        'title' => $movie->title . ' - Trailer',
+                        'url' => $trailerUrl,
+                        'format' => 'youtube',
+                        'resolution' => 'HD',
+                        'size' => 0
+                    ]);
+                    
+                    // 3. Collega entrambi al film
+                    $movie->trailers()->attach($trailer->trailer_id);
+                    $movie->videoFiles()->attach($videoFile->video_file_id);
+                    
+                    Log::info("Trailer salvato con successo per: " . $movie->title);
+                    break; // Prendiamo solo il primo trailer
+                }
+            } catch (Exception $e) {
+                Log::error("Errore nel salvataggio del trailer: " . $e->getMessage());
+            }
         }
     }
 
@@ -275,73 +357,79 @@ class TMDBImportService
         return $movies;
     }
 
-    protected function downloadAndSaveImage($path, $type, $title)
+    protected function downloadAndSaveImage($path, $type, $title = null)
     {
         try {
             if (empty($path)) {
+                Log::error("Path dell'immagine vuoto");
                 return null;
             }
 
-            Log::info("Inizio download immagine: " . $path);
-
-            // Usa w500 per poster e w1280 per backdrop, w185 per person
-            $size = match($type) {
-                'poster' => 'w500',
-                'backdrop' => 'w1280',
-                'person' => 'w185',
-                default => 'original'
-            };
-            
-            $url = $this->imageBaseUrl . $size . $path;
-            
-            // Genera un nome file unico con sottocartella per tipo
-            $filename = Str::slug($title) . '-' . Str::random(10) . '.jpg';
-            
-            // Usa la cartella persons per le immagini delle persone
-            $type = $type === 'person' ? 'persons' : $type;
-            $fullPath = 'images/' . $type . '/' . $filename;
-            
-            Log::info("Download da URL: " . $url);
-            
-            // Scarica l'immagine
-            $imageContent = file_get_contents($url);
-            if ($imageContent === false) {
-                throw new Exception("Impossibile scaricare l'immagine da: " . $url);
+            // Valida il tipo di immagine
+            if (!in_array($type, ['poster', 'backdrop', 'still', 'persons'])) {
+                Log::error("Tipo di immagine non valido: " . $type);
+                return null;
             }
-            
+
+            // Mappa delle dimensioni per tipo di immagine
+            $sizeMap = [
+                'poster' => 'w500',
+                'backdrop' => 'original',
+                'still' => 'original',
+                'persons' => 'w185'
+            ];
+
+            // Costruisci l'URL TMDB completo
+            $size = $sizeMap[$type];
+            $tmdbUrl = $this->imageBaseUrl . $size . $path;
+            Log::info("Download immagine da: " . $tmdbUrl);
+
+            // Genera nome file unico
+            $filename = Str::slug($title ?? 'image') . '-' . Str::random(10) . '.jpg';
+            $relativePath = "images/{$type}/" . $filename;
+            $fullPath = storage_path('app/public/' . $relativePath);
+
             // Crea la directory se non esiste
-            $directory = storage_path('app/public/images/' . $type);
+            $directory = dirname($fullPath);
             if (!file_exists($directory)) {
                 mkdir($directory, 0755, true);
             }
-            
-            // Salva l'immagine
-            Storage::disk('public')->put($fullPath, $imageContent);
-            Log::info("Immagine salvata in: " . $fullPath);
 
-            // Ottieni le dimensioni dell'immagine
-            $imageSize = getimagesize(storage_path('app/public/' . $fullPath));
-            
-            // Costruisci l'URL assoluto
-            $absoluteUrl = 'https://api.dobridobrev.com/storage/' . $fullPath;
-            
-            Log::info("URL assoluto generato: " . $absoluteUrl);
+            // Scarica l'immagine
+            $imageContent = @file_get_contents($tmdbUrl);
+            if ($imageContent === false) {
+                Log::error("Impossibile scaricare l'immagine da: " . $tmdbUrl);
+                return null;
+            }
+
+            // Salva l'immagine
+            if (!file_put_contents($fullPath, $imageContent)) {
+                Log::error("Impossibile salvare l'immagine in: " . $fullPath);
+                return null;
+            }
+
+            // Ottieni dimensioni immagine
+            $imageSize = @getimagesize($fullPath);
+            if ($imageSize === false) {
+                Log::error("Impossibile ottenere dimensioni immagine: " . $fullPath);
+                return null;
+            }
+
+            $fileSize = filesize($fullPath);
+            Log::info("Immagine salvata con successo: {$relativePath} ({$fileSize} bytes)");
 
             return [
-                'url' => $absoluteUrl,
-                'title' => $title,
-                'description' => match($type) {
-                    'poster' => 'Movie poster for ' . $title,
-                    'backdrop' => 'Movie backdrop for ' . $title,
-                    'persons' => 'Profile photo of ' . $title,
-                    default => 'Image of ' . $title
-                },
+                'url' => $relativePath,
+                'title' => $title ?? basename($path),
+                'description' => "Image for " . ($title ?? 'unknown'),
+                'type' => $type,
+                'size_path' => $size,
+                'base_path' => $this->imageBaseUrl,
                 'format' => 'jpg',
-                'size' => Storage::disk('public')->size($fullPath),
+                'size' => $fileSize,
                 'width' => $imageSize[0],
                 'height' => $imageSize[1]
             ];
-
         } catch (Exception $e) {
             Log::error("Errore durante il download dell'immagine: " . $e->getMessage());
             Log::error($e->getTraceAsString());

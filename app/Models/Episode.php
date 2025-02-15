@@ -22,6 +22,15 @@ class Episode extends Model
         'duration',
         'status',
         'season_id',
+        'air_date',
+        'tmdb_id'
+    ];
+
+    protected $casts = [
+        'air_date' => 'date',
+        'episode_number' => 'integer',
+        'duration' => 'integer',
+        'status' => 'string'
     ];
 
 

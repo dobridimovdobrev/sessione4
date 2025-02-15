@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('seasons', function (Blueprint $table) {
             $table->id('season_id');
-            $table->unsignedTinyInteger('season_number');
-            $table->unsignedTinyInteger('total_episodes')->nullable();
-            $table->unsignedSmallInteger('year')->index();
+            $table->foreignId('tv_series_id')->constrained('tv_series', 'tv_series_id')->onDelete('cascade');
+            $table->integer('season_number');
+            $table->string('name');
+            $table->text('overview')->nullable();
+            $table->year('year')->nullable();
+            $table->integer('total_episodes')->unsigned()->nullable()->default(0);
             $table->date('premiere_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
-
-             // Foreign key for language
-             $table->foreignId('tv_series_id')->constrained('tv_series', 'tv_series_id')->onDelete('cascade');
         });
     }
 
