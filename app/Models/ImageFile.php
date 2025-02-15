@@ -29,7 +29,8 @@ class ImageFile extends Model
     // Accessor per ottenere l'URL completo
     public function getFullUrlAttribute()
     {
-        return ImageHelper::getImageUrl($this);
+        // L'immagine è sempre sul nostro server in /storage
+        return 'https://api.dobridobrev.com/storage/' . $this->url;
     }
 
     // Metodo per ottenere l'URL con una dimensione specifica
