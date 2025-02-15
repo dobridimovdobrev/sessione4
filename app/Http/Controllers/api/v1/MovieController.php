@@ -43,8 +43,8 @@ class MovieController extends Controller
             }
         }
     
-        // Execute the query and get the results
-        $movies = $query->get();
+        // Execute the query with pagination (20 items per page)
+        $movies = $query->paginate(20); // Default 20 items per page, can be changed via query parameter
     
         return new MovieCollection($movies);
     }
