@@ -471,7 +471,7 @@ class TMDBTVImportService
             $image = ImageFile::create($imageData);
             
             // 3. Collega l'immagine alla persona
-            $person->images()->attach($image->image_id);
+            $person->imageFiles()->attach($image->image_id, ['type' => 'persons']);
             
             $this->log("Immagine salvata con successo per attore: " . $name);
         } catch (\Exception $e) {

@@ -201,7 +201,7 @@ class TMDBImportService
                 $movie->persons()->attach($person->person_id, ['role' => 'actor']);
                 
                 // 3. Salva l'immagine della persona se non esiste già
-                if (!$person->images()->exists() && !empty($actor['profile_path'])) {
+                if (!$person->imageFiles()->exists() && !empty($actor['profile_path'])) {
                     $this->savePersonImage($person, $actor['profile_path'], $actor['name']);
                 }
             } catch (Exception $e) {
@@ -226,7 +226,7 @@ class TMDBImportService
             $image = ImageFile::create($imageData);
             
             // 3. Collega l'immagine alla persona
-            $person->images()->attach($image->image_id);
+            $person->imageFiles()->attach($image->image_id, ['type' => 'persons']);
             
             Log::info("Immagine salvata con successo per attore: " . $name);
         } catch (Exception $e) {
