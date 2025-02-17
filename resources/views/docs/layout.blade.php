@@ -23,9 +23,6 @@
                     <li class="docs-nav-item">
                         <a href="/docs/authentication" class="docs-nav-link {{ request()->is('docs/authentication') ? 'active' : '' }}">Authentication</a>
                     </li>
-                    <li class="docs-nav-item">
-                        <a href="/docs/roles" class="docs-nav-link {{ request()->is('docs/roles') ? 'active' : '' }}">Roles & Permissions</a>
-                    </li>
                 </ul>
             </div>
 

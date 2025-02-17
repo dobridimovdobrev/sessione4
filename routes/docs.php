@@ -2,24 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Introduction
 Route::get('/', function () {
     return view('docs.index');
-});
-
-Route::get('/movies', function () {
-    return view('docs.movies');
-});
-
-Route::get('/tv-series', function () {
-    return view('docs.tv-series');
-});
-
-Route::get('/seasons', function () {
-    return view('docs.seasons');
-});
-
-Route::get('/episodes', function () {
-    return view('docs.episodes');
 });
 
 // Authentication routes
@@ -36,6 +21,27 @@ Route::get('/profile', function () {
     return view('docs.profile');
 });
 
+// Content routes
+Route::get('/movies', function () {
+    return view('docs.movies');
+});
+
+Route::get('/tv-series', function () {
+    return view('docs.tv-series');
+});
+
+Route::get('/seasons', function () {
+    return view('docs.seasons');
+});
+
+Route::get('/episodes', function () {
+    return view('docs.episodes');
+});
+
+Route::get('/persons', function () {
+    return view('docs.persons');
+});
+
 // Media routes
 Route::get('/images', function () {
     return view('docs.images');
@@ -47,6 +53,15 @@ Route::get('/trailers', function () {
 
 Route::get('/video-files', function () {
     return view('docs.video-files');
+});
+
+// Metadata routes
+Route::get('/categories', function () {
+    return view('docs.categories');
+});
+
+Route::get('/countries', function () {
+    return view('docs.countries');
 });
 
 // Add more documentation routes here

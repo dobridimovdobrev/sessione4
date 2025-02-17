@@ -1,7 +1,5 @@
 @extends('docs.layout')
 
-@section('title', 'Countries API')
-
 @section('content')
 <article class="prose prose-invert max-w-none">
     <h1>Countries</h1>
