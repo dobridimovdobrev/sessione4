@@ -29,7 +29,7 @@
 
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/login</code>
+            <code class="endpoint">/api/login</code>
         </div>
 
         <h3>Request Body</h3>
@@ -59,7 +59,7 @@
         </table>
 
         <h3>Example Request</h3>
-        <pre><code>curl -X POST "https://api.dobridobrev.com/api/v1/login" \
+        <pre><code>curl -X POST "https://api.dobridobrev.com/api/login" \
     -H "Content-Type: application/json" \
     -d '{
         "username": "your-username",
@@ -113,7 +113,7 @@
 
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/register</code>
+            <code class="endpoint">/api/register</code>
         </div>
 
         <h3>Request Body</h3>
@@ -240,11 +240,11 @@
 
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/auth/logout</code>
+            <code class="endpoint">/api/auth/logout</code>
         </div>
 
         <h3>Example Request</h3>
-        <pre><code>curl -X POST "/api/v1/auth/logout" \
+        <pre><code>curl -X POST "/api/auth/logout" \
     -H "Authorization: Bearer your-api-token-here"</code></pre>
 
         <h3>Response</h3>
