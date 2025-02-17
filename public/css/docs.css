@@ -44,15 +44,33 @@ body {
 .docs-search {
     padding: 1rem;
     border-bottom: 1px solid var(--docs-light);
+    position: relative;
 }
 
 .docs-search input {
     width: 100%;
     padding: 0.5rem 1rem;
+    padding-right: 2.5rem;
     background-color: var(--docs-darker);
     border: 1px solid var(--docs-light);
     border-radius: 0.375rem;
     color: var(--docs-text);
+    font-size: 0.875rem;
+}
+
+.docs-search input:focus {
+    outline: none;
+    border-color: var(--docs-primary);
+    box-shadow: 0 0 0 1px var(--docs-primary);
+}
+
+.docs-search-icon {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--docs-text-light);
+    pointer-events: none;
 }
 
 .docs-nav {

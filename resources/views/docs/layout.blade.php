@@ -14,7 +14,8 @@
         </div>
 
         <div class="docs-search">
-            <input type="text" placeholder="Search documentation..." />
+            <input type="text" placeholder="Search documentation..." aria-label="Search documentation" />
+            <div class="docs-search-icon">🔍</div>
         </div>
 
         <nav class="docs-nav">
@@ -88,14 +89,14 @@
             <option>v1.0</option>
         </select>
         <button class="theme-toggle">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
-                <path fill-rule="evenodd" d="M7.455 2.004a.75.75 0 01.26.77 7 7 0 009.958 7.967.75.75 0 011.067.853A8.5 8.5 0 116.647 1.921a.75.75 0 01.808.083z" clip-rule="evenodd" />
-            </svg>
+            Theme
         </button>
     </div>
 
     <main class="docs-content">
         @yield('content')
     </main>
+
+    <script src="/js/docs.js"></script>
 </body>
 </html>
