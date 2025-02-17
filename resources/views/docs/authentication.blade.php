@@ -78,11 +78,9 @@
 
     <div class="my-8">
         <h2>Register</h2>
-        <p>Create a new account to access the API.</p>
-
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/auth/register</code>
+            <code>/api/v1/auth/register</code>
         </div>
 
         <h3>Request Body</h3>
@@ -97,49 +95,76 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><code>name</code></td>
+                    <td>username</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Your full name</td>
+                    <td>Unique username (max 64 characters)</td>
                 </tr>
                 <tr>
-                    <td><code>username</code></td>
+                    <td>email</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Your username</td>
+                    <td>Valid unique email address</td>
                 </tr>
                 <tr>
-                    <td><code>password</code></td>
+                    <td>password</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Your password (min. 8 characters)</td>
+                    <td>Password (min 8 characters)</td>
                 </tr>
                 <tr>
-                    <td><code>password_confirmation</code></td>
+                    <td>password_confirmation</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Password confirmation</td>
+                    <td>Must match password field</td>
+                </tr>
+                <tr>
+                    <td>first_name</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>User's first name (max 64 characters)</td>
+                </tr>
+                <tr>
+                    <td>last_name</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>User's last name (max 64 characters)</td>
+                </tr>
+                <tr>
+                    <td>gender</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>User's gender (male or female)</td>
+                </tr>
+                <tr>
+                    <td>birthday</td>
+                    <td>date</td>
+                    <td>Yes</td>
+                    <td>User's date of birth</td>
+                </tr>
+                <tr>
+                    <td>country_id</td>
+                    <td>integer</td>
+                    <td>No</td>
+                    <td>ID of user's country from countries table</td>
                 </tr>
             </tbody>
         </table>
 
-        <h3>Example Request</h3>
-        <pre><code>curl -X POST "/api/v1/auth/register" \
-    -H "Content-Type: application/json" \
-    -d '{
-        "name": "John Doe",
-        "username": "your-username",
-        "password": "your-password",
-        "password_confirmation": "your-password"
-    }'</code></pre>
-
         <h3>Response</h3>
         <pre><code>{
     "data": {
-        "id": 1,
-        "name": "John Doe",
-        "username": "your-username",
-        "token": "your-api-token-here"
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+        "user": {
+            "id": 1,
+            "username": "johndoe",
+            "email": "john@example.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "gender": "male",
+            "birthday": "1990-01-01",
+            "country_id": 1
+        }
     }
 }</code></pre>
     </div>

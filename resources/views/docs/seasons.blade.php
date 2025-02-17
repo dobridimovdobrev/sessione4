@@ -1,9 +1,7 @@
 @extends('docs.layout')
 
-@section('title', 'Seasons API')
-
 @section('content')
-<article class="prose max-w-none">
+<article class="prose prose-invert max-w-none">
     <h1>Seasons</h1>
     
     <p class="lead">

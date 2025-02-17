@@ -1,7 +1,5 @@
 @extends('docs.layout')
 
-@section('title', 'Images')
-
 @section('content')
 <article class="prose prose-invert max-w-none">
     <h1>Images</h1>

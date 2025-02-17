@@ -1,7 +1,5 @@
 @extends('docs.layout')
 
-@section('title', 'User Management API')
-
 @section('content')
 <article class="prose prose-invert max-w-none">
     <h1>User Management</h1>

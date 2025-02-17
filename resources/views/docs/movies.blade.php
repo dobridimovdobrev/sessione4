@@ -3,11 +3,11 @@
 @section('title', 'Movies API')
 
 @section('content')
-<article class="prose max-w-none">
+<article class="prose prose-invert max-w-none">
     <h1>Movies</h1>
     
     <p class="lead">
-        The Movies API allows you to manage movies in the streaming platform.
+        Manage movies in the streaming platform.
     </p>
 
     <div class="my-8">
@@ -17,63 +17,36 @@
             <code>/api/v1/movies</code>
         </div>
 
-        <h3>Query Parameters</h3>
-        <table class="docs-table">
-            <thead>
-                <tr>
-                    <th>Parameter</th>
-                    <th>Type</th>
-                    <th>Required</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>page</td>
-                    <td>integer</td>
-                    <td>No</td>
-                    <td>Page number (default: 1)</td>
-                </tr>
-                <tr>
-                    <td>per_page</td>
-                    <td>integer</td>
-                    <td>No</td>
-                    <td>Items per page (default: 15, max: 50)</td>
-                </tr>
-                <tr>
-                    <td>category</td>
-                    <td>string</td>
-                    <td>No</td>
-                    <td>Filter by category name</td>
-                </tr>
-                <tr>
-                    <td>country</td>
-                    <td>string</td>
-                    <td>No</td>
-                    <td>Filter by country code</td>
-                </tr>
-            </tbody>
-        </table>
-
         <h3>Response</h3>
         <pre><code>{
     "data": [
         {
-            "id": 1,
-            "title": "The Matrix",
-            "description": "A computer programmer discovers a mysterious world...",
-            "release_date": "1999-03-31",
-            "duration": 136,
-            "category": "Science Fiction",
-            "country": "US",
-            "poster_url": "https://api.dobridobrev.com/storage/movies/1/poster.jpg",
-            "backdrop_url": "https://api.dobridobrev.com/storage/movies/1/backdrop.jpg"
+            "movie_id": 1,
+            "title": "The Shawshank Redemption",
+            "year": 1994,
+            "duration": 142,
+            "imdb_rating": 9.3,
+            "status": "published",
+            "category": {
+                "id": 1,
+                "name": "Drama"
+            },
+            "poster": "https://api.dobridobrev.com/storage/movies/1/poster.jpg"
         }
     ],
+    "links": {
+        "first": "https://api.dobridobrev.com/api/v1/movies?page=1",
+        "last": "https://api.dobridobrev.com/api/v1/movies?page=1",
+        "prev": null,
+        "next": null
+    },
     "meta": {
         "current_page": 1,
+        "from": 1,
+        "last_page": 1,
         "per_page": 15,
-        "total": 100
+        "to": 1,
+        "total": 1
     }
 }</code></pre>
     </div>
@@ -108,17 +81,46 @@
         <h3>Response</h3>
         <pre><code>{
     "data": {
-        "id": 1,
-        "title": "The Matrix",
-        "description": "A computer programmer discovers a mysterious world...",
-        "release_date": "1999-03-31",
-        "duration": 136,
-        "category": "Science Fiction",
-        "country": "US",
-        "poster_url": "https://api.dobridobrev.com/storage/movies/1/poster.jpg",
-        "backdrop_url": "https://api.dobridobrev.com/storage/movies/1/backdrop.jpg",
-        "trailer_url": "https://api.dobridobrev.com/storage/movies/1/trailer.mp4",
-        "video_url": "https://api.dobridobrev.com/storage/movies/1/video.mp4"
+        "movie_id": 1,
+        "title": "The Shawshank Redemption",
+        "year": 1994,
+        "duration": 142,
+        "imdb_rating": 9.3,
+        "status": "published",
+        "category": {
+            "id": 1,
+            "name": "Drama"
+        },
+        "poster": "https://api.dobridobrev.com/storage/movies/1/poster.jpg",
+        "description": "Two imprisoned men bond over a number of years...",
+        "backdrop": "https://api.dobridobrev.com/storage/movies/1/backdrop.jpg",
+        "persons": [
+            {
+                "id": 1,
+                "name": "Frank Darabont",
+                "pivot": {
+                    "role": "director"
+                }
+            }
+        ],
+        "trailers": [
+            {
+                "id": 1,
+                "url": "https://youtube.com/watch?v=..."
+            }
+        ],
+        "images": [
+            {
+                "id": 1,
+                "type": "poster",
+                "url": "https://api.dobridobrev.com/storage/movies/1/poster.jpg"
+            },
+            {
+                "id": 2,
+                "type": "backdrop",
+                "url": "https://api.dobridobrev.com/storage/movies/1/backdrop.jpg"
+            }
+        ]
     }
 }</code></pre>
     </div>
@@ -134,7 +136,7 @@
         <table class="docs-table">
             <thead>
                 <tr>
-                    <th>Field</th>
+                    <th>Parameter</th>
                     <th>Type</th>
                     <th>Required</th>
                     <th>Description</th>
@@ -145,7 +147,13 @@
                     <td>title</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Movie title</td>
+                    <td>Movie title (max 128 characters, must be unique)</td>
+                </tr>
+                <tr>
+                    <td>slug</td>
+                    <td>string</td>
+                    <td>No</td>
+                    <td>URL-friendly title (max 128 characters)</td>
                 </tr>
                 <tr>
                     <td>description</td>
@@ -154,28 +162,64 @@
                     <td>Movie description</td>
                 </tr>
                 <tr>
-                    <td>release_date</td>
-                    <td>date</td>
+                    <td>year</td>
+                    <td>integer</td>
                     <td>Yes</td>
-                    <td>Release date (YYYY-MM-DD)</td>
+                    <td>Release year</td>
                 </tr>
                 <tr>
                     <td>duration</td>
                     <td>integer</td>
-                    <td>Yes</td>
+                    <td>No</td>
                     <td>Duration in minutes</td>
                 </tr>
                 <tr>
-                    <td>category</td>
-                    <td>string</td>
-                    <td>Yes</td>
-                    <td>Category name</td>
+                    <td>imdb_rating</td>
+                    <td>numeric</td>
+                    <td>No</td>
+                    <td>IMDB rating (between 0 and 10)</td>
                 </tr>
                 <tr>
-                    <td>country</td>
+                    <td>premiere_date</td>
+                    <td>date</td>
+                    <td>No</td>
+                    <td>Premiere date</td>
+                </tr>
+                <tr>
+                    <td>status</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Country code (ISO 3166-1 alpha-2)</td>
+                    <td>Movie status (published, draft, sheduled, coming soon)</td>
+                </tr>
+                <tr>
+                    <td>category_id</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>Category ID</td>
+                </tr>
+                <tr>
+                    <td>persons</td>
+                    <td>array</td>
+                    <td>No</td>
+                    <td>Array of person IDs</td>
+                </tr>
+                <tr>
+                    <td>trailers</td>
+                    <td>array</td>
+                    <td>No</td>
+                    <td>Array of trailer objects with URL</td>
+                </tr>
+                <tr>
+                    <td>video_files</td>
+                    <td>array</td>
+                    <td>No</td>
+                    <td>Array of video file objects with URL</td>
+                </tr>
+                <tr>
+                    <td>image_files</td>
+                    <td>array</td>
+                    <td>No</td>
+                    <td>Array of image file objects with URL</td>
                 </tr>
             </tbody>
         </table>
@@ -183,13 +227,17 @@
         <h3>Response</h3>
         <pre><code>{
     "data": {
-        "id": 1,
-        "title": "The Matrix",
-        "description": "A computer programmer discovers a mysterious world...",
-        "release_date": "1999-03-31",
-        "duration": 136,
-        "category": "Science Fiction",
-        "country": "US"
+        "movie_id": 1,
+        "title": "The Shawshank Redemption",
+        "year": 1994,
+        "duration": 142,
+        "imdb_rating": 9.3,
+        "status": "published",
+        "category": {
+            "id": 1,
+            "name": "Drama"
+        },
+        "poster": "https://api.dobridobrev.com/storage/movies/1/poster.jpg"
     }
 }</code></pre>
     </div>
@@ -222,67 +270,10 @@
         </table>
 
         <h3>Request Body</h3>
-        <table class="docs-table">
-            <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Required</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>title</td>
-                    <td>string</td>
-                    <td>No</td>
-                    <td>Movie title</td>
-                </tr>
-                <tr>
-                    <td>description</td>
-                    <td>string</td>
-                    <td>No</td>
-                    <td>Movie description</td>
-                </tr>
-                <tr>
-                    <td>release_date</td>
-                    <td>date</td>
-                    <td>No</td>
-                    <td>Release date (YYYY-MM-DD)</td>
-                </tr>
-                <tr>
-                    <td>duration</td>
-                    <td>integer</td>
-                    <td>No</td>
-                    <td>Duration in minutes</td>
-                </tr>
-                <tr>
-                    <td>category</td>
-                    <td>string</td>
-                    <td>No</td>
-                    <td>Category name</td>
-                </tr>
-                <tr>
-                    <td>country</td>
-                    <td>string</td>
-                    <td>No</td>
-                    <td>Country code (ISO 3166-1 alpha-2)</td>
-                </tr>
-            </tbody>
-        </table>
+        <p>Same as Create Movie endpoint.</p>
 
         <h3>Response</h3>
-        <pre><code>{
-    "data": {
-        "id": 1,
-        "title": "The Matrix",
-        "description": "A computer programmer discovers a mysterious world...",
-        "release_date": "1999-03-31",
-        "duration": 136,
-        "category": "Science Fiction",
-        "country": "US"
-    }
-}</code></pre>
+        <p>Same as Create Movie response.</p>
     </div>
 
     <div class="my-8">

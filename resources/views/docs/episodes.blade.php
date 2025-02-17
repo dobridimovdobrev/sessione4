@@ -1,9 +1,7 @@
 @extends('docs.layout')
 
-@section('title', 'Episodes API')
-
 @section('content')
-<article>
+<article class="prose prose-invert max-w-none">
     <h1>Episodes</h1>
     <p class="lead">
         The Episodes API provides endpoints for managing TV series episodes. Each episode belongs to a specific season
