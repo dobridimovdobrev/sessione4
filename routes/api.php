@@ -17,6 +17,7 @@ use App\Http\Controllers\api\v1\VideoFileController;
 use App\Http\Controllers\api\v1\ImageMovieController;
 use App\Http\Controllers\api\v1\VideoMovieController;
 use App\Http\Controllers\api\v1\ImagePersonController;
+use App\Http\Controllers\api\v1\PersonMovieController;
 use App\Http\Controllers\api\v1\ImageEpisodeController;
 use App\Http\Controllers\api\v1\TrailerMovieController;
 use App\Http\Controllers\api\v1\ImageTvSeriesController;

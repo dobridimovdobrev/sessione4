@@ -42,7 +42,7 @@ class Person extends Model
     }
 
       // Relationship with Image Files
-      public function images()
+      public function imageFiles()
       {
           return $this->belongsToMany(ImageFile::class, 'person_image', 'person_id', 'image_file_id');
       }

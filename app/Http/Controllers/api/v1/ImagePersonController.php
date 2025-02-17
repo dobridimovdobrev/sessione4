@@ -19,7 +19,7 @@ class ImagePersonController extends Controller
             'image_file_ids.*' => 'exists:image_files, image_id'
         ]);
 
-        $person->imageFiles()->syncWithoutDetaching($request->image_file_ids);
+        $person->images()->syncWithoutDetaching($request->image_file_ids);
 
         return ResponseMessages::success(['message' => 'Images associated successfully.'],200);
     }
@@ -27,7 +27,7 @@ class ImagePersonController extends Controller
     public function destroy($personId, $imageId)
     {
         $person = Person::findOrFail($personId);
-        $person->imageFiles()->detach($imageId);
+        $person->images()->detach($imageId);
 
         return ResponseMessages::success(['message' => 'Image detached successfully.'], 200);
     }
@@ -35,9 +35,8 @@ class ImagePersonController extends Controller
     public function index($personId)
     {
         $person = Person::findOrFail($personId);
-        $images = $person->imageFiles()->get();
+        $images = $person->images()->get();
 
         return new ImageFileCollection($images);
     }
 }
-

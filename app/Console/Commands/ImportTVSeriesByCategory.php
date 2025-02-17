@@ -24,7 +24,7 @@ class ImportTVSeriesByCategory extends Command
             $this->info("\n>> Categoria: {$category->name}");
             
             try {
-                $series = $tmdb->importTVSeriesByCategory($category->category_id, $count, function($step, $total, $message) {
+                $series = $tmdb->importByGenre($category->category_id, $count, function($step, $total, $message) {
                     $this->info("   Progresso: {$step}/{$total} - {$message}");
                 });
                 
