@@ -29,7 +29,7 @@
 
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/auth/login</code>
+            <code class="endpoint">/api/v1/login</code>
         </div>
 
         <h3>Request Body</h3>
@@ -59,7 +59,7 @@
         </table>
 
         <h3>Example Request</h3>
-        <pre><code>curl -X POST "https://api.dobridobrev.com/api/v1/auth/login" \
+        <pre><code>curl -X POST "https://api.dobridobrev.com/api/v1/login" \
     -H "Content-Type: application/json" \
     -d '{
         "username": "your-username",
@@ -68,19 +68,52 @@
 
         <h3>Response</h3>
         <pre><code>{
+    "message": "Login successful",
     "data": {
-        "token": "your-api-token-here",
-        "token_type": "Bearer",
-        "expires_in": 3600
+        "token": "your-api-token",
+        "user": {
+            "user_id": 1,
+            "username": "johndoe",
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@example.com",
+            "gender": "male",
+            "birthday": "1990-01-01",
+            "country_id": 1,
+            "user_status": "active",
+            "role_id": 2
+        }
     }
 }</code></pre>
+
+        <h3>Error Responses</h3>
+        <table class="docs-table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>401</td>
+                    <td>Invalid credentials</td>
+                </tr>
+                <tr>
+                    <td>429</td>
+                    <td>Too many login attempts. Please try again in 10 minutes.</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <div class="my-8">
         <h2>Register</h2>
+        <p>Use this endpoint to create a new user account.</p>
+
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code>/api/v1/auth/register</code>
+            <code class="endpoint">/api/v1/register</code>
         </div>
 
         <h3>Request Body</h3>
@@ -98,13 +131,13 @@
                     <td>username</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Unique username (max 64 characters)</td>
+                    <td>Username (max 64 characters)</td>
                 </tr>
                 <tr>
                     <td>email</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Valid unique email address</td>
+                    <td>Valid email address</td>
                 </tr>
                 <tr>
                     <td>password</td>
@@ -116,57 +149,89 @@
                     <td>password_confirmation</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Must match password field</td>
+                    <td>Password confirmation</td>
                 </tr>
                 <tr>
                     <td>first_name</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>User's first name (max 64 characters)</td>
+                    <td>First name (max 64 characters)</td>
                 </tr>
                 <tr>
                     <td>last_name</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>User's last name (max 64 characters)</td>
+                    <td>Last name (max 64 characters)</td>
                 </tr>
                 <tr>
                     <td>gender</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>User's gender (male or female)</td>
+                    <td>Gender (male or female)</td>
                 </tr>
                 <tr>
                     <td>birthday</td>
                     <td>date</td>
                     <td>Yes</td>
-                    <td>User's date of birth</td>
+                    <td>Date of birth</td>
                 </tr>
                 <tr>
                     <td>country_id</td>
                     <td>integer</td>
                     <td>No</td>
-                    <td>ID of user's country from countries table</td>
+                    <td>ID of the user's country</td>
                 </tr>
             </tbody>
         </table>
 
+        <h3>Example Request</h3>
+        <pre><code>{
+    "username": "johndoe",
+    "email": "john.doe@example.com",
+    "password": "password123",
+    "password_confirmation": "password123",
+    "first_name": "John",
+    "last_name": "Doe",
+    "gender": "male",
+    "birthday": "1990-01-01",
+    "country_id": 1
+}</code></pre>
+
         <h3>Response</h3>
         <pre><code>{
+    "message": "Registration successful",
     "data": {
-        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+        "token": "your-api-token",
         "user": {
-            "id": 1,
+            "user_id": 1,
             "username": "johndoe",
-            "email": "john@example.com",
             "first_name": "John",
             "last_name": "Doe",
+            "email": "john.doe@example.com",
             "gender": "male",
             "birthday": "1990-01-01",
-            "country_id": 1
+            "country_id": 1,
+            "user_status": "active",
+            "role_id": 2
         }
     }
 }</code></pre>
+
+        <h3>Error Responses</h3>
+        <table class="docs-table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>422</td>
+                    <td>Validation Error - Invalid or missing fields</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <div class="my-8">
