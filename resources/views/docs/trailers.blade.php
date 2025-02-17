@@ -4,20 +4,20 @@
 
 @section('content')
 <article class="prose prose-invert max-w-none">
-    <h1>Trailers API</h1>
+    <h1>Trailers</h1>
     
     <p class="lead">
         The Trailers API allows you to manage movie and TV series trailers.
     </p>
 
     <div class="my-8">
-        <h2>Add Trailer</h2>
+        <h2>Upload Movie Trailer</h2>
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/trailers</code>
+            <code>/api/v1/movies/{movie}/trailers</code>
         </div>
 
-        <h3>Request Body</h3>
+        <h3>Path Parameters</h3>
         <table class="docs-table">
             <thead>
                 <tr>
@@ -29,38 +29,55 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><code>title</code></td>
+                    <td>movie</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>Movie ID</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Request Body (multipart/form-data)</h3>
+        <table class="docs-table">
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>trailer</td>
+                    <td>file</td>
+                    <td>Yes</td>
+                    <td>Trailer video file (mp4, max 100MB)</td>
+                </tr>
+                <tr>
+                    <td>title</td>
                     <td>string</td>
                     <td>Yes</td>
                     <td>Trailer title</td>
                 </tr>
-                <tr>
-                    <td><code>url</code></td>
-                    <td>string</td>
-                    <td>Yes</td>
-                    <td>URL of the trailer (YouTube, Vimeo)</td>
-                </tr>
-                <tr>
-                    <td><code>entity_type</code></td>
-                    <td>string</td>
-                    <td>Yes</td>
-                    <td>Type (movie, series)</td>
-                </tr>
-                <tr>
-                    <td><code>entity_id</code></td>
-                    <td>integer</td>
-                    <td>Yes</td>
-                    <td>ID of the movie or series</td>
-                </tr>
             </tbody>
         </table>
+
+        <h3>Response</h3>
+        <pre><code>{
+    "data": {
+        "id": 1,
+        "title": "Official Trailer",
+        "url": "https://api.dobridobrev.com/storage/movies/1/trailers/official.mp4"
+    }
+}</code></pre>
     </div>
 
     <div class="my-8">
-        <h2>Get Trailer</h2>
+        <h2>Upload TV Series Trailer</h2>
         <div class="my-4">
-            <span class="method-badge method-get">GET</span>
-            <code class="endpoint">/api/v1/trailers/{id}</code>
+            <span class="method-badge method-post">POST</span>
+            <code>/api/v1/tv-series/{series}/trailers</code>
         </div>
 
         <h3>Path Parameters</h3>
@@ -69,55 +86,61 @@
                 <tr>
                     <th>Parameter</th>
                     <th>Type</th>
+                    <th>Required</th>
                     <th>Description</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><code>id</code></td>
+                    <td>series</td>
                     <td>integer</td>
-                    <td>Trailer ID</td>
+                    <td>Yes</td>
+                    <td>TV Series ID</td>
                 </tr>
             </tbody>
         </table>
-    </div>
 
-    <div class="my-8">
-        <h2>List Trailers</h2>
-        <div class="my-4">
-            <span class="method-badge method-get">GET</span>
-            <code class="endpoint">/api/v1/trailers</code>
-        </div>
-
-        <h3>Query Parameters</h3>
+        <h3>Request Body (multipart/form-data)</h3>
         <table class="docs-table">
             <thead>
                 <tr>
-                    <th>Parameter</th>
+                    <th>Field</th>
                     <th>Type</th>
+                    <th>Required</th>
                     <th>Description</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><code>entity_type</code></td>
-                    <td>string</td>
-                    <td>Filter by type (movie, series)</td>
+                    <td>trailer</td>
+                    <td>file</td>
+                    <td>Yes</td>
+                    <td>Trailer video file (mp4, max 100MB)</td>
                 </tr>
                 <tr>
-                    <td><code>entity_id</code></td>
-                    <td>integer</td>
-                    <td>Filter by movie/series ID</td>
+                    <td>title</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>Trailer title</td>
                 </tr>
             </tbody>
         </table>
+
+        <h3>Response</h3>
+        <pre><code>{
+    "data": {
+        "id": 1,
+        "title": "Season 1 Trailer",
+        "url": "https://api.dobridobrev.com/storage/series/1/trailers/season1.mp4"
+    }
+}</code></pre>
     </div>
 
     <div class="my-8">
         <h2>Delete Trailer</h2>
         <div class="my-4">
             <span class="method-badge method-delete">DELETE</span>
-            <code class="endpoint">/api/v1/trailers/{id}</code>
+            <code>/api/v1/trailers/{trailer}</code>
         </div>
 
         <h3>Path Parameters</h3>
@@ -126,17 +149,24 @@
                 <tr>
                     <th>Parameter</th>
                     <th>Type</th>
+                    <th>Required</th>
                     <th>Description</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><code>id</code></td>
+                    <td>trailer</td>
                     <td>integer</td>
+                    <td>Yes</td>
                     <td>Trailer ID</td>
                 </tr>
             </tbody>
         </table>
+
+        <h3>Response</h3>
+        <pre><code>{
+    "message": "Trailer deleted successfully"
+}</code></pre>
     </div>
 </article>
 @endsection

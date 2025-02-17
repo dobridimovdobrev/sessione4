@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,11 +11,6 @@
     <div class="docs-sidebar">
         <div class="docs-logo">
             <h1>Streaming API</h1>
-        </div>
-
-        <div class="docs-search">
-            <input type="text" placeholder="Search documentation..." aria-label="Search documentation" />
-            <div class="docs-search-icon">🔍</div>
         </div>
 
         <nav class="docs-nav">
@@ -35,7 +30,19 @@
             </div>
 
             <div class="docs-nav-section">
-                <h3 class="docs-nav-title">Core Resources</h3>
+                <h3 class="docs-nav-title">Users</h3>
+                <ul class="docs-nav-items">
+                    <li class="docs-nav-item">
+                        <a href="/docs/user-management" class="docs-nav-link {{ request()->is('docs/user-management') ? 'active' : '' }}">User Management</a>
+                    </li>
+                    <li class="docs-nav-item">
+                        <a href="/docs/profile" class="docs-nav-link {{ request()->is('docs/profile') ? 'active' : '' }}">Profile Updates</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="docs-nav-section">
+                <h3 class="docs-nav-title">Content</h3>
                 <ul class="docs-nav-items">
                     <li class="docs-nav-item">
                         <a href="/docs/movies" class="docs-nav-link {{ request()->is('docs/movies') ? 'active' : '' }}">Movies</a>
@@ -50,7 +57,7 @@
                         <a href="/docs/episodes" class="docs-nav-link {{ request()->is('docs/episodes') ? 'active' : '' }}">Episodes</a>
                     </li>
                     <li class="docs-nav-item">
-                        <a href="/docs/people" class="docs-nav-link {{ request()->is('docs/people') ? 'active' : '' }}">People</a>
+                        <a href="/docs/persons" class="docs-nav-link {{ request()->is('docs/persons') ? 'active' : '' }}">Persons</a>
                     </li>
                 </ul>
             </div>
@@ -71,13 +78,13 @@
             </div>
 
             <div class="docs-nav-section">
-                <h3 class="docs-nav-title">Users</h3>
+                <h3 class="docs-nav-title">Metadata</h3>
                 <ul class="docs-nav-items">
                     <li class="docs-nav-item">
-                        <a href="/docs/user-management" class="docs-nav-link {{ request()->is('docs/user-management') ? 'active' : '' }}">User Management</a>
+                        <a href="/docs/categories" class="docs-nav-link {{ request()->is('docs/categories') ? 'active' : '' }}">Categories</a>
                     </li>
                     <li class="docs-nav-item">
-                        <a href="/docs/profile" class="docs-nav-link {{ request()->is('docs/profile') ? 'active' : '' }}">Profile Updates</a>
+                        <a href="/docs/countries" class="docs-nav-link {{ request()->is('docs/countries') ? 'active' : '' }}">Countries</a>
                     </li>
                 </ul>
             </div>
@@ -96,7 +103,5 @@
     <main class="docs-content">
         @yield('content')
     </main>
-
-    <script src="/js/docs.js"></script>
 </body>
 </html>

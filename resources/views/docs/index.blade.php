@@ -4,7 +4,7 @@
 
 @section('content')
 <article class="prose prose-invert max-w-none">
-    <h1 id="introduction">Introduction</h1>
+    <h1>Introduction</h1>
     <p class="lead">
         Welcome to the API documentation for our streaming platform. This API provides a comprehensive set of endpoints
         to manage movies, TV series, and related media content.
@@ -12,60 +12,46 @@
 
     <h2>Base URL</h2>
     <p>All API requests should be made to:</p>
-    <pre><code>https://your-domain.com/api/v1/</code></pre>
+    <pre><code>https://api.dobridobrev.com/api/v1/</code></pre>
 
     <h2>Authentication</h2>
     <p>
-        This API uses Laravel Sanctum for authentication. All requests must include a valid Bearer token in the
-        Authorization header:
+        All API requests must include a valid Bearer token in the Authorization header:
     </p>
     <pre><code>Authorization: Bearer your-token-here</code></pre>
 
     <h2>Response Format</h2>
-    <p>All responses are returned in JSON format. A typical success response looks like:</p>
+    <p>All responses are returned in JSON format.</p>
+    
+    <h3>Success Response</h3>
     <pre><code>{
     "data": {
         // Response data here
-    },
-    "message": "Operation successful"
+    }
 }</code></pre>
 
-    <p>Error responses follow this format:</p>
+    <h3>Error Response</h3>
     <pre><code>{
     "error": "Error message here",
     "code": 400
 }</code></pre>
 
     <h2>Rate Limiting</h2>
-    <p>
-        API requests are limited to protect our servers from overwhelming traffic. The current limits are:
-    </p>
     <ul>
         <li>Authentication endpoints: 3 requests per 10 minutes</li>
         <li>Other endpoints: 60 requests per minute</li>
     </ul>
 
     <h2>Pagination</h2>
-    <p>
-        List endpoints return paginated results with 24 items per page. The response includes metadata about the
-        current page and total results:
-    </p>
+    <p>List endpoints return paginated results with 24 items per page.</p>
     <pre><code>{
-    "data": [],
-    "links": {
-        "first": "http://api.example.com/items?page=1",
-        "last": "http://api.example.com/items?page=5",
-        "prev": null,
-        "next": "http://api.example.com/items?page=2"
-    },
+    "data": [
+        // Array of items
+    ],
     "meta": {
         "current_page": 1,
-        "from": 1,
-        "last_page": 5,
-        "path": "http://api.example.com/items",
-        "per_page": 24,
-        "to": 24,
-        "total": 120
+        "total": 50,
+        "per_page": 24
     }
 }</code></pre>
 

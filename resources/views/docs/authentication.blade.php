@@ -10,10 +10,7 @@
         All API requests require authentication using Bearer tokens. You'll need to include your API token in the Authorization header of each request.
     </p>
 
-    <div class="my-8 p-4 bg-docs-light rounded-lg border border-docs-lighter">
-        <h2 class="text-xl font-semibold mb-4">Authentication Header</h2>
-        <pre><code>Authorization: Bearer your-api-token-here</code></pre>
-    </div>
+    <pre><code>Authorization: Bearer your-api-token-here</code></pre>
 
     <h2>Obtaining an API Token</h2>
     <p>
@@ -47,10 +44,10 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><code>email</code></td>
+                    <td><code>username</code></td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Your email address</td>
+                    <td>Your username</td>
                 </tr>
                 <tr>
                     <td><code>password</code></td>
@@ -62,10 +59,10 @@
         </table>
 
         <h3>Example Request</h3>
-        <pre><code>curl -X POST "https://api.example.com/v1/auth/login" \
+        <pre><code>curl -X POST "https://api.dobridobrev.com/api/v1/auth/login" \
     -H "Content-Type: application/json" \
     -d '{
-        "email": "user@example.com",
+        "username": "your-username",
         "password": "your-password"
     }'</code></pre>
 
@@ -106,10 +103,10 @@
                     <td>Your full name</td>
                 </tr>
                 <tr>
-                    <td><code>email</code></td>
+                    <td><code>username</code></td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Your email address</td>
+                    <td>Your username</td>
                 </tr>
                 <tr>
                     <td><code>password</code></td>
@@ -127,11 +124,11 @@
         </table>
 
         <h3>Example Request</h3>
-        <pre><code>curl -X POST "https://api.example.com/v1/auth/register" \
+        <pre><code>curl -X POST "/api/v1/auth/register" \
     -H "Content-Type: application/json" \
     -d '{
         "name": "John Doe",
-        "email": "user@example.com",
+        "username": "your-username",
         "password": "your-password",
         "password_confirmation": "your-password"
     }'</code></pre>
@@ -141,7 +138,7 @@
     "data": {
         "id": 1,
         "name": "John Doe",
-        "email": "user@example.com",
+        "username": "your-username",
         "token": "your-api-token-here"
     }
 }</code></pre>
@@ -157,21 +154,13 @@
         </div>
 
         <h3>Example Request</h3>
-        <pre><code>curl -X POST "https://api.example.com/v1/auth/logout" \
+        <pre><code>curl -X POST "/api/v1/auth/logout" \
     -H "Authorization: Bearer your-api-token-here"</code></pre>
 
         <h3>Response</h3>
         <pre><code>{
     "message": "Successfully logged out"
 }</code></pre>
-    </div>
-
-    <div class="my-8 p-4 bg-blue-900/50 border-l-4 border-docs-primary rounded-lg">
-        <h3 class="text-lg font-semibold mb-2">Security Note</h3>
-        <p class="mb-0">
-            Always keep your API tokens secure and never share them. If you suspect your token has been compromised,
-            you should immediately invalidate it and generate a new one.
-        </p>
     </div>
 </article>
 @endsection

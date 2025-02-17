@@ -4,48 +4,53 @@
 
 @section('content')
 <article class="prose max-w-none">
-    <h1 id="movies">Movies</h1>
-    <p>
-        The Movies API provides endpoints for managing movie resources including basic information,
-        images, trailers, and cast members.
+    <h1>Movies</h1>
+    
+    <p class="lead">
+        The Movies API allows you to manage movies in the streaming platform.
     </p>
 
-    <div class="mt-8">
-        <h2 id="list-movies">List Movies</h2>
+    <div class="my-8">
+        <h2>List Movies</h2>
         <div class="my-4">
-            <span class="method-get font-bold">GET</span>
-            <code class="endpoint">/api/v1/movies</code>
+            <span class="method-badge method-get">GET</span>
+            <code>/api/v1/movies</code>
         </div>
-        <p>Retrieve a paginated list of movies with basic information.</p>
 
         <h3>Query Parameters</h3>
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="docs-table">
             <thead>
                 <tr>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parameter</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Required</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">page</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">integer</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">No</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Page number (default: 1)</td>
+                    <td>page</td>
+                    <td>integer</td>
+                    <td>No</td>
+                    <td>Page number (default: 1)</td>
                 </tr>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">title</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">string</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">No</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Filter by title</td>
+                    <td>per_page</td>
+                    <td>integer</td>
+                    <td>No</td>
+                    <td>Items per page (default: 15, max: 50)</td>
                 </tr>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">year</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">integer</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">No</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Filter by release year</td>
+                    <td>category</td>
+                    <td>string</td>
+                    <td>No</td>
+                    <td>Filter by category name</td>
+                </tr>
+                <tr>
+                    <td>country</td>
+                    <td>string</td>
+                    <td>No</td>
+                    <td>Filter by country code</td>
                 </tr>
             </tbody>
         </table>
@@ -54,61 +59,48 @@
         <pre><code>{
     "data": [
         {
-            "movie_id": 1,
-            "title": "Inception",
-            "year": 2010,
-            "duration": "2:28:00",
-            "imdb_rating": 8.8,
-            "status": "published",
-            "category": {
-                "id": 1,
-                "name": "Science Fiction"
-            },
-            "poster": "https://example.com/posters/inception.jpg"
+            "id": 1,
+            "title": "The Matrix",
+            "description": "A computer programmer discovers a mysterious world...",
+            "release_date": "1999-03-31",
+            "duration": 136,
+            "category": "Science Fiction",
+            "country": "US",
+            "poster_url": "https://api.dobridobrev.com/storage/movies/1/poster.jpg",
+            "backdrop_url": "https://api.dobridobrev.com/storage/movies/1/backdrop.jpg"
         }
     ],
-    "links": {
-        "first": "http://api.example.com/movies?page=1",
-        "last": "http://api.example.com/movies?page=5",
-        "prev": null,
-        "next": "http://api.example.com/movies?page=2"
-    },
     "meta": {
         "current_page": 1,
-        "from": 1,
-        "last_page": 5,
-        "path": "http://api.example.com/movies",
-        "per_page": 24,
-        "to": 24,
-        "total": 120
+        "per_page": 15,
+        "total": 100
     }
 }</code></pre>
     </div>
 
-    <div class="mt-8">
-        <h2 id="get-movie">Get Movie Details</h2>
+    <div class="my-8">
+        <h2>Get Movie</h2>
         <div class="my-4">
-            <span class="method-get font-bold">GET</span>
-            <code class="endpoint">/api/v1/movies/{id}</code>
+            <span class="method-badge method-get">GET</span>
+            <code>/api/v1/movies/{movie}</code>
         </div>
-        <p>Retrieve detailed information about a specific movie.</p>
 
         <h3>Path Parameters</h3>
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="docs-table">
             <thead>
                 <tr>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parameter</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Required</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">id</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">integer</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yes</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">The movie ID</td>
+                    <td>movie</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>Movie ID</td>
                 </tr>
             </tbody>
         </table>
@@ -116,108 +108,213 @@
         <h3>Response</h3>
         <pre><code>{
     "data": {
-        "movie_id": 1,
-        "title": "Inception",
-        "year": 2010,
-        "duration": "2:28:00",
-        "imdb_rating": 8.8,
-        "status": "published",
-        "description": "A thief who steals corporate secrets...",
-        "category": {
-            "id": 1,
-            "name": "Science Fiction"
-        },
-        "poster": "https://example.com/posters/inception.jpg",
-        "backdrop": "https://example.com/backdrops/inception.jpg",
-        "persons": [
-            {
-                "person_id": 1,
-                "name": "Christopher Nolan",
-                "role": "Director",
-                "image": "https://example.com/persons/nolan.jpg"
-            }
-        ],
-        "trailers": [
-            {
-                "trailer_id": 1,
-                "title": "Official Trailer",
-                "url": "https://example.com/trailers/inception.mp4"
-            }
-        ],
-        "images": [
-            {
-                "image_id": 1,
-                "type": "poster",
-                "url": "https://example.com/images/inception-1.jpg"
-            }
-        ]
+        "id": 1,
+        "title": "The Matrix",
+        "description": "A computer programmer discovers a mysterious world...",
+        "release_date": "1999-03-31",
+        "duration": 136,
+        "category": "Science Fiction",
+        "country": "US",
+        "poster_url": "https://api.dobridobrev.com/storage/movies/1/poster.jpg",
+        "backdrop_url": "https://api.dobridobrev.com/storage/movies/1/backdrop.jpg",
+        "trailer_url": "https://api.dobridobrev.com/storage/movies/1/trailer.mp4",
+        "video_url": "https://api.dobridobrev.com/storage/movies/1/video.mp4"
     }
 }</code></pre>
     </div>
 
-    <div class="mt-8">
-        <h2 id="create-movie">Create Movie</h2>
+    <div class="my-8">
+        <h2>Create Movie</h2>
         <div class="my-4">
-            <span class="method-post font-bold">POST</span>
-            <code class="endpoint">/api/v1/movies</code>
+            <span class="method-badge method-post">POST</span>
+            <code>/api/v1/movies</code>
         </div>
-        <p>Create a new movie resource. Requires admin role.</p>
 
         <h3>Request Body</h3>
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="docs-table">
             <thead>
                 <tr>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Field</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Required</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">title</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">string</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yes</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Movie title</td>
+                    <td>title</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>Movie title</td>
                 </tr>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">year</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">integer</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yes</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Release year</td>
+                    <td>description</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>Movie description</td>
                 </tr>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">duration</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">string</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yes</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Duration in format HH:MM:SS</td>
+                    <td>release_date</td>
+                    <td>date</td>
+                    <td>Yes</td>
+                    <td>Release date (YYYY-MM-DD)</td>
+                </tr>
+                <tr>
+                    <td>duration</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>Duration in minutes</td>
+                </tr>
+                <tr>
+                    <td>category</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>Category name</td>
+                </tr>
+                <tr>
+                    <td>country</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>Country code (ISO 3166-1 alpha-2)</td>
                 </tr>
             </tbody>
         </table>
 
-        <h3>Example Request</h3>
-        <pre><code>curl -X POST /api/v1/movies \
-    -H "Authorization: Bearer {token}" \
-    -H "Content-Type: application/json" \
-    -d '{
-        "title": "Inception",
-        "year": 2010,
-        "duration": "2:28:00",
-        "description": "A thief who steals corporate secrets...",
-        "category_id": 1,
-        "status": "draft"
-    }'</code></pre>
+        <h3>Response</h3>
+        <pre><code>{
+    "data": {
+        "id": 1,
+        "title": "The Matrix",
+        "description": "A computer programmer discovers a mysterious world...",
+        "release_date": "1999-03-31",
+        "duration": 136,
+        "category": "Science Fiction",
+        "country": "US"
+    }
+}</code></pre>
+    </div>
+
+    <div class="my-8">
+        <h2>Update Movie</h2>
+        <div class="my-4">
+            <span class="method-badge method-put">PUT</span>
+            <code>/api/v1/movies/{movie}</code>
+        </div>
+
+        <h3>Path Parameters</h3>
+        <table class="docs-table">
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>movie</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>Movie ID</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Request Body</h3>
+        <table class="docs-table">
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>title</td>
+                    <td>string</td>
+                    <td>No</td>
+                    <td>Movie title</td>
+                </tr>
+                <tr>
+                    <td>description</td>
+                    <td>string</td>
+                    <td>No</td>
+                    <td>Movie description</td>
+                </tr>
+                <tr>
+                    <td>release_date</td>
+                    <td>date</td>
+                    <td>No</td>
+                    <td>Release date (YYYY-MM-DD)</td>
+                </tr>
+                <tr>
+                    <td>duration</td>
+                    <td>integer</td>
+                    <td>No</td>
+                    <td>Duration in minutes</td>
+                </tr>
+                <tr>
+                    <td>category</td>
+                    <td>string</td>
+                    <td>No</td>
+                    <td>Category name</td>
+                </tr>
+                <tr>
+                    <td>country</td>
+                    <td>string</td>
+                    <td>No</td>
+                    <td>Country code (ISO 3166-1 alpha-2)</td>
+                </tr>
+            </tbody>
+        </table>
 
         <h3>Response</h3>
         <pre><code>{
-    "message": "Movie created successfully",
     "data": {
-        "movie_id": 1,
-        "title": "Inception",
-        "year": 2010,
-        "duration": "2:28:00",
-        "status": "draft"
+        "id": 1,
+        "title": "The Matrix",
+        "description": "A computer programmer discovers a mysterious world...",
+        "release_date": "1999-03-31",
+        "duration": 136,
+        "category": "Science Fiction",
+        "country": "US"
     }
+}</code></pre>
+    </div>
+
+    <div class="my-8">
+        <h2>Delete Movie</h2>
+        <div class="my-4">
+            <span class="method-badge method-delete">DELETE</span>
+            <code>/api/v1/movies/{movie}</code>
+        </div>
+
+        <h3>Path Parameters</h3>
+        <table class="docs-table">
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>movie</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>Movie ID</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Response</h3>
+        <pre><code>{
+    "message": "Movie deleted successfully"
 }</code></pre>
     </div>
 </article>

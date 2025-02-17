@@ -1,42 +1,48 @@
 @extends('docs.layout')
 
-@section('title', 'Profile Updates API')
+@section('title', 'Profile API')
 
 @section('content')
 <article class="prose prose-invert max-w-none">
-    <h1>Profile Updates API</h1>
+    <h1>Profile</h1>
     
     <p class="lead">
-        The Profile Updates API allows users to manage their profile information and preferences.
-        <br><br>
-        <span class="text-yellow-500">
-            <strong>Permissions:</strong><br>
-            - All endpoints require authentication<br>
-            - Users can only update their own profile<br>
-            - Admins can update any profile
-        </span>
+        The Profile API allows users to manage their profile information and preferences.
     </p>
 
     <div class="my-8">
         <h2>Get Profile</h2>
         <div class="my-4">
             <span class="method-badge method-get">GET</span>
-            <code class="endpoint">/api/v1/profile</code>
+            <code>/api/v1/profile</code>
         </div>
+
+        <h3>Response</h3>
+        <pre><code>{
+    "data": {
+        "id": 1,
+        "username": "john.doe",
+        "email": "john.doe@example.com",
+        "name": "John Doe",
+        "avatar_url": "https://api.dobridobrev.com/storage/avatars/1.jpg",
+        "language": "en",
+        "notifications_enabled": true
+    }
+}</code></pre>
     </div>
 
     <div class="my-8">
         <h2>Update Profile</h2>
         <div class="my-4">
             <span class="method-badge method-put">PUT</span>
-            <code class="endpoint">/api/v1/update-profile</code>
+            <code>/api/v1/profile</code>
         </div>
 
         <h3>Request Body</h3>
         <table class="docs-table">
             <thead>
                 <tr>
-                    <th>Parameter</th>
+                    <th>Field</th>
                     <th>Type</th>
                     <th>Required</th>
                     <th>Description</th>
@@ -44,57 +50,52 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><code>name</code></td>
+                    <td>name</td>
                     <td>string</td>
                     <td>No</td>
                     <td>Full name</td>
                 </tr>
                 <tr>
-                    <td><code>email</code></td>
+                    <td>email</td>
                     <td>string</td>
                     <td>No</td>
                     <td>Email address</td>
                 </tr>
                 <tr>
-                    <td><code>password</code></td>
+                    <td>language</td>
                     <td>string</td>
                     <td>No</td>
-                    <td>New password</td>
-                </tr>
-                <tr>
-                    <td><code>password_confirmation</code></td>
-                    <td>string</td>
-                    <td>No</td>
-                    <td>Password confirmation</td>
-                </tr>
-                <tr>
-                    <td><code>language</code></td>
-                    <td>string</td>
-                    <td>No</td>
-                    <td>Preferred language</td>
-                </tr>
-                <tr>
-                    <td><code>notifications</code></td>
-                    <td>object</td>
-                    <td>No</td>
-                    <td>Notification preferences</td>
+                    <td>Preferred language (en, it)</td>
                 </tr>
             </tbody>
         </table>
+
+        <h3>Response</h3>
+        <pre><code>{
+    "data": {
+        "id": 1,
+        "username": "john.doe",
+        "email": "john.doe@example.com",
+        "name": "John Doe",
+        "avatar_url": "https://api.dobridobrev.com/storage/avatars/1.jpg",
+        "language": "en",
+        "notifications_enabled": true
+    }
+}</code></pre>
     </div>
 
     <div class="my-8">
-        <h2>Update Profile Picture</h2>
+        <h2>Update Password</h2>
         <div class="my-4">
-            <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/profile/picture</code>
+            <span class="method-badge method-put">PUT</span>
+            <code>/api/v1/profile/password</code>
         </div>
 
-        <h3>Request Body (multipart/form-data)</h3>
+        <h3>Request Body</h3>
         <table class="docs-table">
             <thead>
                 <tr>
-                    <th>Parameter</th>
+                    <th>Field</th>
                     <th>Type</th>
                     <th>Required</th>
                     <th>Description</th>
@@ -102,35 +103,44 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><code>picture</code></td>
-                    <td>file</td>
+                    <td>current_password</td>
+                    <td>string</td>
                     <td>Yes</td>
-                    <td>Profile picture (JPG, PNG)</td>
+                    <td>Current password</td>
+                </tr>
+                <tr>
+                    <td>password</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>New password (min: 8 characters)</td>
+                </tr>
+                <tr>
+                    <td>password_confirmation</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>New password confirmation</td>
                 </tr>
             </tbody>
         </table>
-    </div>
 
-    <div class="my-8">
-        <h2>Delete Profile Picture</h2>
-        <div class="my-4">
-            <span class="method-badge method-delete">DELETE</span>
-            <code class="endpoint">/api/v1/profile/picture</code>
-        </div>
+        <h3>Response</h3>
+        <pre><code>{
+    "message": "Password updated successfully"
+}</code></pre>
     </div>
 
     <div class="my-8">
         <h2>Update Notification Settings</h2>
         <div class="my-4">
             <span class="method-badge method-put">PUT</span>
-            <code class="endpoint">/api/v1/profile/notifications</code>
+            <code>/api/v1/profile/notifications</code>
         </div>
 
         <h3>Request Body</h3>
         <table class="docs-table">
             <thead>
                 <tr>
-                    <th>Parameter</th>
+                    <th>Field</th>
                     <th>Type</th>
                     <th>Required</th>
                     <th>Description</th>
@@ -138,25 +148,20 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><code>email_notifications</code></td>
+                    <td>notifications_enabled</td>
                     <td>boolean</td>
-                    <td>No</td>
-                    <td>Enable/disable email notifications</td>
-                </tr>
-                <tr>
-                    <td><code>push_notifications</code></td>
-                    <td>boolean</td>
-                    <td>No</td>
-                    <td>Enable/disable push notifications</td>
-                </tr>
-                <tr>
-                    <td><code>newsletter</code></td>
-                    <td>boolean</td>
-                    <td>No</td>
-                    <td>Subscribe/unsubscribe from newsletter</td>
+                    <td>Yes</td>
+                    <td>Enable/disable notifications</td>
                 </tr>
             </tbody>
         </table>
+
+        <h3>Response</h3>
+        <pre><code>{
+    "data": {
+        "notifications_enabled": true
+    }
+}</code></pre>
     </div>
 </article>
 @endsection

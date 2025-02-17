@@ -1,10 +1,10 @@
 @extends('docs.layout')
 
-@section('title', 'Images API')
+@section('title', 'Images')
 
 @section('content')
 <article class="prose prose-invert max-w-none">
-    <h1>Images API</h1>
+    <h1>Images</h1>
     
     <p class="lead">
         The Images API allows you to manage images for movies, TV series, episodes, and user profiles.
@@ -14,7 +14,7 @@
         <h2>Upload Movie Image</h2>
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/movies/{movie}/images</code>
+            <code>/api/v1/movies/{movie}/images</code>
         </div>
 
         <h3>Path Parameters</h3>
@@ -23,13 +23,15 @@
                 <tr>
                     <th>Parameter</th>
                     <th>Type</th>
+                    <th>Required</th>
                     <th>Description</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><code>movie</code></td>
+                    <td>movie</td>
                     <td>integer</td>
+                    <td>Yes</td>
                     <td>Movie ID</td>
                 </tr>
             </tbody>
@@ -39,7 +41,7 @@
         <table class="docs-table">
             <thead>
                 <tr>
-                    <th>Parameter</th>
+                    <th>Field</th>
                     <th>Type</th>
                     <th>Required</th>
                     <th>Description</th>
@@ -47,26 +49,35 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><code>image</code></td>
+                    <td>image</td>
                     <td>file</td>
                     <td>Yes</td>
-                    <td>Image file (JPG, PNG, WebP)</td>
+                    <td>Image file (jpeg, png, max 2MB)</td>
                 </tr>
                 <tr>
-                    <td><code>type</code></td>
+                    <td>type</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Type of image (poster, backdrop)</td>
+                    <td>Image type (poster, backdrop)</td>
                 </tr>
             </tbody>
         </table>
+
+        <h3>Response</h3>
+        <pre><code>{
+    "data": {
+        "id": 1,
+        "url": "https://api.dobridobrev.com/storage/movies/1/poster.jpg",
+        "type": "poster"
+    }
+}</code></pre>
     </div>
 
     <div class="my-8">
         <h2>Upload TV Series Image</h2>
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/tvseries/{tvSeries}/images</code>
+            <code>/api/v1/tv-series/{series}/images</code>
         </div>
 
         <h3>Path Parameters</h3>
@@ -75,13 +86,15 @@
                 <tr>
                     <th>Parameter</th>
                     <th>Type</th>
+                    <th>Required</th>
                     <th>Description</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><code>tvSeries</code></td>
+                    <td>series</td>
                     <td>integer</td>
+                    <td>Yes</td>
                     <td>TV Series ID</td>
                 </tr>
             </tbody>
@@ -91,7 +104,7 @@
         <table class="docs-table">
             <thead>
                 <tr>
-                    <th>Parameter</th>
+                    <th>Field</th>
                     <th>Type</th>
                     <th>Required</th>
                     <th>Description</th>
@@ -99,26 +112,35 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><code>image</code></td>
+                    <td>image</td>
                     <td>file</td>
                     <td>Yes</td>
-                    <td>Image file (JPG, PNG, WebP)</td>
+                    <td>Image file (jpeg, png, max 2MB)</td>
                 </tr>
                 <tr>
-                    <td><code>type</code></td>
+                    <td>type</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Type of image (poster, backdrop)</td>
+                    <td>Image type (poster, backdrop)</td>
                 </tr>
             </tbody>
         </table>
+
+        <h3>Response</h3>
+        <pre><code>{
+    "data": {
+        "id": 1,
+        "url": "https://api.dobridobrev.com/storage/series/1/poster.jpg",
+        "type": "poster"
+    }
+}</code></pre>
     </div>
 
     <div class="my-8">
         <h2>Upload Episode Image</h2>
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/episodes/{episode}/images</code>
+            <code>/api/v1/episodes/{episode}/images</code>
         </div>
 
         <h3>Path Parameters</h3>
@@ -127,13 +149,15 @@
                 <tr>
                     <th>Parameter</th>
                     <th>Type</th>
+                    <th>Required</th>
                     <th>Description</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><code>episode</code></td>
+                    <td>episode</td>
                     <td>integer</td>
+                    <td>Yes</td>
                     <td>Episode ID</td>
                 </tr>
             </tbody>
@@ -143,7 +167,7 @@
         <table class="docs-table">
             <thead>
                 <tr>
-                    <th>Parameter</th>
+                    <th>Field</th>
                     <th>Type</th>
                     <th>Required</th>
                     <th>Description</th>
@@ -151,26 +175,35 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><code>image</code></td>
+                    <td>image</td>
                     <td>file</td>
                     <td>Yes</td>
-                    <td>Image file (JPG, PNG, WebP)</td>
+                    <td>Image file (jpeg, png, max 2MB)</td>
                 </tr>
                 <tr>
-                    <td><code>type</code></td>
+                    <td>type</td>
                     <td>string</td>
                     <td>Yes</td>
-                    <td>Type of image (still, thumbnail)</td>
+                    <td>Image type (thumbnail, still)</td>
                 </tr>
             </tbody>
         </table>
+
+        <h3>Response</h3>
+        <pre><code>{
+    "data": {
+        "id": 1,
+        "url": "https://api.dobridobrev.com/storage/episodes/1/thumbnail.jpg",
+        "type": "thumbnail"
+    }
+}</code></pre>
     </div>
 
     <div class="my-8">
         <h2>Upload Person Image</h2>
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/persons/{person}/images</code>
+            <code>/api/v1/persons/{person}/images</code>
         </div>
 
         <h3>Path Parameters</h3>
@@ -179,13 +212,15 @@
                 <tr>
                     <th>Parameter</th>
                     <th>Type</th>
+                    <th>Required</th>
                     <th>Description</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><code>person</code></td>
+                    <td>person</td>
                     <td>integer</td>
+                    <td>Yes</td>
                     <td>Person ID</td>
                 </tr>
             </tbody>
@@ -195,7 +230,7 @@
         <table class="docs-table">
             <thead>
                 <tr>
-                    <th>Parameter</th>
+                    <th>Field</th>
                     <th>Type</th>
                     <th>Required</th>
                     <th>Description</th>
@@ -203,42 +238,22 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><code>image</code></td>
+                    <td>image</td>
                     <td>file</td>
                     <td>Yes</td>
-                    <td>Image file (JPG, PNG, WebP)</td>
-                </tr>
-                <tr>
-                    <td><code>type</code></td>
-                    <td>string</td>
-                    <td>Yes</td>
-                    <td>Type of image (profile, backdrop)</td>
+                    <td>Image file (jpeg, png, max 2MB)</td>
                 </tr>
             </tbody>
         </table>
-    </div>
 
-    <div class="my-8">
-        <h2>Get Images</h2>
-        <p>Each entity type has its own endpoint to retrieve images:</p>
-        <ul>
-            <li><code>GET /api/v1/movies/{movie}/images</code> - Get movie images</li>
-            <li><code>GET /api/v1/tvseries/{tvSeries}/images</code> - Get TV series images</li>
-            <li><code>GET /api/v1/episodes/{episode}/images</code> - Get episode images</li>
-            <li><code>GET /api/v1/persons/{person}/images</code> - Get person images</li>
-        </ul>
-    </div>
-
-    <div class="my-8">
-        <h2>Delete Image</h2>
-        <p>Each entity type has its own endpoint to delete images:</p>
-        <ul>
-            <li><code>DELETE /api/v1/movies/{movie}/images/{image}</code> - Delete movie image</li>
-            <li><code>DELETE /api/v1/tvseries/{tvSeries}/images/{image}</code> - Delete TV series image</li>
-            <li><code>DELETE /api/v1/episodes/{episode}/images/{image}</code> - Delete episode image</li>
-            <li><code>DELETE /api/v1/persons/{person}/images/{image}</code> - Delete person image</li>
-        </ul>
-        <p class="text-yellow-500">Note: Only administrators can delete images.</p>
+        <h3>Response</h3>
+        <pre><code>{
+    "data": {
+        "id": 1,
+        "url": "https://api.dobridobrev.com/storage/persons/1/profile.jpg",
+        "type": "profile"
+    }
+}</code></pre>
     </div>
 </article>
 @endsection

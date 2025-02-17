@@ -3,49 +3,48 @@
 @section('title', 'Episodes API')
 
 @section('content')
-<article class="prose max-w-none">
-    <h1 id="episodes">Episodes</h1>
-    <p>
+<article>
+    <h1>Episodes</h1>
+    <p class="lead">
         The Episodes API provides endpoints for managing TV series episodes. Each episode belongs to a specific season
         and includes details like title, description, duration, and associated media files.
     </p>
 
-    <div class="mt-8">
-        <h2 id="list-episodes">List Episodes</h2>
+    <div class="my-8">
+        <h2>List Episodes</h2>
         <div class="my-4">
-            <span class="method-get font-bold">GET</span>
-            <code class="endpoint">/api/v1/episodes</code>
+            <span class="method-badge method-get">GET</span>
+            <code>/api/v1/episodes</code>
         </div>
-        <p>Retrieve a paginated list of episodes.</p>
 
         <h3>Query Parameters</h3>
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="docs-table">
             <thead>
                 <tr>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parameter</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Required</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">page</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">integer</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">No</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Page number (default: 1)</td>
+                    <td>page</td>
+                    <td>integer</td>
+                    <td>No</td>
+                    <td>Page number (default: 1)</td>
                 </tr>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">season_id</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">integer</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">No</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Filter by season ID</td>
+                    <td>season_id</td>
+                    <td>integer</td>
+                    <td>No</td>
+                    <td>Filter by season ID</td>
                 </tr>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">title</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">string</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">No</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Filter by title</td>
+                    <td>title</td>
+                    <td>string</td>
+                    <td>No</td>
+                    <td>Filter by title</td>
                 </tr>
             </tbody>
         </table>
@@ -88,30 +87,29 @@
 }</code></pre>
     </div>
 
-    <div class="mt-8">
-        <h2 id="get-episode">Get Episode Details</h2>
+    <div class="my-8">
+        <h2>Get Episode Details</h2>
         <div class="my-4">
-            <span class="method-get font-bold">GET</span>
-            <code class="endpoint">/api/v1/episodes/{id}</code>
+            <span class="method-badge method-get">GET</span>
+            <code>/api/v1/episodes/{id}</code>
         </div>
-        <p>Retrieve detailed information about a specific episode.</p>
 
         <h3>Path Parameters</h3>
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="docs-table">
             <thead>
                 <tr>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parameter</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Required</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">id</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">integer</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yes</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">The episode ID</td>
+                    <td>id</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>Episode ID</td>
                 </tr>
             </tbody>
         </table>
@@ -144,54 +142,53 @@
 }</code></pre>
     </div>
 
-    <div class="mt-8">
-        <h2 id="create-episode">Create Episode</h2>
+    <div class="my-8">
+        <h2>Create Episode</h2>
         <div class="my-4">
-            <span class="method-post font-bold">POST</span>
-            <code class="endpoint">/api/v1/episodes</code>
+            <span class="method-badge method-post">POST</span>
+            <code>/api/v1/episodes</code>
         </div>
-        <p>Create a new episode for a season. Requires admin role.</p>
 
         <h3>Request Body</h3>
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="docs-table">
             <thead>
                 <tr>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Field</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Required</th>
-                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">season_id</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">integer</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yes</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">ID of the season</td>
+                    <td>season_id</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>ID of the season</td>
                 </tr>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">title</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">string</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yes</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Episode title</td>
+                    <td>title</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>Episode title</td>
                 </tr>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">episode_number</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">integer</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yes</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Episode number within the season</td>
+                    <td>episode_number</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>Episode number within the season</td>
                 </tr>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">description</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">string</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yes</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Episode description</td>
+                    <td>description</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>Episode description</td>
                 </tr>
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">duration</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">string</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Yes</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">Duration in format HH:MM:SS</td>
+                    <td>duration</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>Duration in format HH:MM:SS</td>
                 </tr>
             </tbody>
         </table>
@@ -221,7 +218,7 @@
 }</code></pre>
     </div>
 
-    <div class="mt-8 mb-16">
+    <div class="my-8 mb-16">
         <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
             <div class="flex">
                 <div class="flex-shrink-0">
