@@ -22,7 +22,10 @@ class PersonController extends Controller
 
           // Apply filters if any
           $filterData = $request->all();
-          $query = Person::query();
+          $query = Person::query()
+            ->with(['imageFiles' => function($query) {
+                $query->where('person_image.type', 'profile')->limit(1);
+            }]);
       
           // Filter Persons by different parameters/keys
           foreach ($filterData as $key => $value) {

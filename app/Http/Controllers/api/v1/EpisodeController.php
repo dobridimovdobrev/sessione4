@@ -20,7 +20,10 @@ class EpisodeController extends Controller
     {
         $this->authorize('viewAny', Episode::class);
         $filterData = $request->all();
-        $query = Episode::query();
+        $query = Episode::query()
+            ->with(['imageFiles' => function($query) {
+                $query->where('episode_image.type', 'still')->limit(1);
+            }]);
         foreach($filterData as $key => $value){
             if(in_array($key,['season_id', 'episode_id', 'title', 'episode_number', 'status'])){
                $query = $query->where($key,'LIKE', "%$value%");

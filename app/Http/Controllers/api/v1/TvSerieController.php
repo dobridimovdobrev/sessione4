@@ -20,7 +20,10 @@ class TvSerieController extends Controller
     {
         $this->authorize('viewAny', TvSerie::class);
         $filterData = $request->all();
-        $query = TvSerie::query();
+        $query = TvSerie::query()
+            ->with(['category', 'imageFiles' => function($query) {
+                $query->where('tvseries_image.type', 'poster')->limit(1);
+            }]);
 
         foreach ($filterData as $key => $value) {
             if (in_array($key, ['title', 'year', 'status', 'description', 'year', 'imdb_rating', 'category_id'])) {
