@@ -26,19 +26,18 @@ class TvSeriesResource extends JsonResource
                 'id' => $this->category_id,
                 'name' => $this->category->name, 
             ],
-            'poster' => $this->imageFiles()->where('type', 'poster')->first()?->url,
+            'poster' => $this->imageFiles()->wherePivot('type', 'poster')->first()?->url
         ];
 
-        // Add details only when relationships are loaded (for single tv series view)
-        if ($this->resource->relationLoaded('persons') || 
-            $this->resource->relationLoaded('trailers') || 
+        // Add details only when all relationships are loaded (for single tv series view)
+        if ($this->resource->relationLoaded('persons') && 
+            $this->resource->relationLoaded('trailers') && 
             $this->resource->relationLoaded('imageFiles')) {
             
             $data['description'] = $this->description;
-            $data['backdrop'] = $this->imageFiles()->where('type', 'backdrop')->first()?->url;
+            $data['backdrop'] = $this->imageFiles()->wherePivot('type', 'backdrop')->first()?->url;
             $data['persons'] = PersonResource::collection($this->whenLoaded('persons'));
             $data['trailers'] = TrailerResource::collection($this->whenLoaded('trailers'));
-            $data['images'] = ImageFileResource::collection($this->whenLoaded('imageFiles'));
             
             // Include seasons with episodes when loaded
             if ($this->resource->relationLoaded('seasons')) {
@@ -48,13 +47,12 @@ class TvSeriesResource extends JsonResource
                         'season_number' => $season->season_number,
                         'year' => $season->year,
                         'total_episodes' => $season->total_episodes,
-                        'poster' => $season->imageFiles()->where('type', 'poster')->first()?->url,
                         'episodes' => $season->episodes->map(function($episode) {
                             return [
                                 'episode_id' => $episode->episode_id,
                                 'title' => $episode->title,
                                 'episode_number' => $episode->episode_number,
-                                'still' => $episode->imageFiles()->where('type', 'still')->first()?->url,
+                                'still' => $episode->imageFiles()->wherePivot('type', 'still')->first()?->url,
                             ];
                         })
                     ];

@@ -22,7 +22,7 @@ class TvSerieController extends Controller
         $filterData = $request->all();
         $query = TvSerie::query()
             ->with(['category', 'imageFiles' => function($query) {
-                $query->where('tvseries_image.type', 'poster')->limit(1);
+                $query->wherePivot('type', 'poster')->limit(1);
             }]);
 
         foreach ($filterData as $key => $value) {
@@ -56,15 +56,20 @@ class TvSerieController extends Controller
         // Eager load only what's needed for the TV series detail
         $tvSerie->load([
             'category',
-            'persons.images',
+            'persons.imageFiles',
             'trailers',
             'imageFiles',
             'seasons' => function($query) {
                 $query->select('season_id', 'tv_series_id', 'season_number', 'year', 'total_episodes')
-                      ->orderBy('season_number', 'asc');
-            },
-            'seasons.imageFiles' => function($query) {
-                $query->where('type', 'poster');
+                      ->orderBy('season_number', 'asc')
+                      ->with(['episodes' => function($query) {
+                          $query->select('episode_id', 'season_id', 'title', 'episode_number')
+                                ->orderBy('episode_number', 'asc')
+                                ->limit(24)
+                                ->with(['imageFiles' => function($query) {
+                                    $query->wherePivot('type', 'still')->limit(1);
+                                }]);
+                      }]);
             }
         ]);
 
@@ -79,7 +84,7 @@ class TvSerieController extends Controller
         $this->authorize('update', $tvSerie);
         $validatedData = $request->validated();
         $tvSerie->update($validatedData);
-        return ResponseMessages::success(['message' => 'TV Series updated successfully', 'tv_series' => new TVSeriesResource($tvSerie)], 200);
+        return ResponseMessages::success(['message' => 'TV Series updated successfully', 'tv_series' => new TvSeriesResource($tvSerie)], 200);
     }
 
     /**

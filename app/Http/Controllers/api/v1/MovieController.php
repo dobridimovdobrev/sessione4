@@ -109,7 +109,7 @@ class MovieController extends Controller
         // Eager load all relationships for detailed view
         $movie->load([
             'category',
-            'persons.images',  // Eager load images with persons
+            'persons.imageFiles',  // Eager load imageFiles with persons
             'trailers',
             'imageFiles'
         ]);

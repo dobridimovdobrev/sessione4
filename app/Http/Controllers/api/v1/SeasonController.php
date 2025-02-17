@@ -50,18 +50,28 @@ class SeasonController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Season $season)
+    public function show(Season $season, Request $request)
     {
         $this->authorize('view', $season);
         
-        $season->load([
-            'tvSeries',
-            'episodes.imageFiles' => function($query) {
-                $query->where('type', 'still');
-            }
-        ]);
+        $season->load(['tvSeries']);
+        
+        // Paginate episodes with 24 items per page
+        $episodes = $season->episodes()
+            ->with(['imageFiles' => function($query) {
+                $query->wherePivot('type', 'still');
+            }])
+            ->paginate(24);
 
-        return new SeasonResource($season);
+        return (new SeasonResource($season))->additional([
+            'episodes' => [
+                'data' => $episodes->items(),
+                'current_page' => $episodes->currentPage(),
+                'last_page' => $episodes->lastPage(),
+                'per_page' => $episodes->perPage(),
+                'total' => $episodes->total()
+            ]
+        ]);
     }
 
     /**

@@ -60,7 +60,9 @@ class TvSerie extends Model
     // Images for the TV series
     public function imageFiles()
     {
-        return $this->belongsToMany(ImageFile::class, 'tv_series_image', 'tv_series_id', 'image_file_id');
+        return $this->belongsToMany(ImageFile::class, 'tv_series_image', 'tv_series_id', 'image_file_id')
+                    ->withPivot('type')
+                    ->withTimestamps();
     }
 
     // Actors associated with the entire series

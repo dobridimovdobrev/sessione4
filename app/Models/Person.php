@@ -41,10 +41,12 @@ class Person extends Model
         return $this->belongsToMany(Episode::class, 'episode_person', 'person_id', 'episode_id');
     }
 
-      // Relationship with Image Files
-      public function images()
-      {
-          return $this->belongsToMany(ImageFile::class, 'person_image', 'person_id', 'image_file_id');
-      }
+    // Relationship with images
+    public function imageFiles()
+    {
+        return $this->belongsToMany(ImageFile::class, 'person_image', 'person_id', 'image_file_id')
+                    ->withPivot('type')
+                    ->withTimestamps();
+    }
 
 }

@@ -48,12 +48,14 @@ class Episode extends Model
      {
          return $this->belongsToMany(VideoFile::class, 'episode_video_file', 'episode_id', 'video_file_id');
      }
- 
-     // Images for an episode (optional)
-     public function imageFiles()
-     {
-         return $this->belongsToMany(ImageFile::class, 'episode_image', 'episode_id', 'image_file_id');
-     }
+
+    // Image files for each episode
+    public function imageFiles()
+    {
+        return $this->belongsToMany(ImageFile::class, 'episode_image', 'episode_id', 'image_file_id')
+                    ->withPivot('type')
+                    ->withTimestamps();
+    }
  
      // Actors for each episode 
      public function persons()

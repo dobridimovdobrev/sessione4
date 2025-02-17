@@ -14,7 +14,7 @@ class MovieResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // Base data that is always present
+        // Base data that is always present (for list view)
         $data = [
             'movie_id' => $this->movie_id,
             'title' => $this->title,
@@ -26,19 +26,18 @@ class MovieResource extends JsonResource
                 'id' => $this->category->category_id,
                 'name' => $this->category->name,
             ] : null,
-            'poster' => $this->imageFiles()->where('type', 'poster')->first()?->url,
+            'poster' => $this->imageFiles()->wherePivot('type', 'poster')->first()?->url
         ];
 
-        // Add details only when relationships are loaded (for single movie view)
-        if ($this->resource->relationLoaded('persons') || 
-            $this->resource->relationLoaded('trailers') || 
+        // Add details only for single movie view
+        if ($this->resource->relationLoaded('persons') && 
+            $this->resource->relationLoaded('trailers') && 
             $this->resource->relationLoaded('imageFiles')) {
             
             $data['description'] = $this->description;
-            $data['backdrop'] = $this->imageFiles()->where('type', 'backdrop')->first()?->url;
+            $data['backdrop'] = $this->imageFiles()->wherePivot('type', 'backdrop')->first()?->url;
             $data['persons'] = PersonResource::collection($this->whenLoaded('persons'));
             $data['trailers'] = TrailerResource::collection($this->whenLoaded('trailers'));
-            $data['images'] = ImageFileResource::collection($this->whenLoaded('imageFiles'));
         }
 
         return $data;

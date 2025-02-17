@@ -39,5 +39,4 @@ class Season extends Model
     {
         return $this->belongsToMany(Person::class, 'season_person', 'season_id', 'person_id');
     }
-
 }

@@ -22,7 +22,7 @@ class EpisodeResource extends JsonResource
             'episode_number' => $this->episode_number,
             'duration' => $this->duration,
             'status' => $this->status,
-            'still' => $this->imageFiles()->where('type', 'still')->first()?->url,
+            'still' => $this->imageFiles()->wherePivot('type', 'still')->first()?->url,
             'video_file' => VideoFileResource::collection($this->whenLoaded('videoFiles'))
         ];
     }

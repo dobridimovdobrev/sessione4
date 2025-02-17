@@ -38,7 +38,7 @@ use App\Http\Controllers\api\v1\VideoFileEpisodeController;
 
 //Guests can access only register and login api
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:3,10'); //Login attempts, max 3 time, 15 minutes expiration
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:15,10'); //Login attempts, max 3 time, 15 minutes expiration
 
 //Routes for Version 1 
 Route::prefix('v1')->group(function () {
@@ -152,6 +152,8 @@ Route::prefix('v1')->group(function () {
         //Persons/Actors
         Route::get('/persons', [PersonController::class, 'index']);
         Route::get('/persons/{person}', [PersonController::class, 'show']);
+        Route::get('/videos', [VideoFileController::class, 'index']);
+        Route::get('/videos/{videoFile}', [VideoFileController::class, 'show']);
 
         //Person-Movie Pivot
         Route::get('/persons/{person}/movies', [PersonMovieController::class, 'index']); // Get all movies for a person
@@ -189,6 +191,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/episodes/{episode}', [EpisodeController::class, 'show']);
         //Credits
         Route::get('/credits', [CreditController::class, 'index']);
+        Route::get('/credits/{credit}', [CreditController::class, 'show']);
         //Trailers
         Route::get('/trailers', [TrailerController::class, 'index']);
         Route::get('/trailers/{trailer}', [TrailerController::class, 'show']);

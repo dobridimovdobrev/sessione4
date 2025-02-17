@@ -24,7 +24,7 @@ class PersonController extends Controller
           $filterData = $request->all();
           $query = Person::query()
             ->with(['imageFiles' => function($query) {
-                $query->where('person_image.type', 'profile')->limit(1);
+                $query->wherePivot('type', 'persons')->limit(1);
             }]);
       
           // Filter Persons by different parameters/keys

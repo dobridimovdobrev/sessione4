@@ -17,7 +17,7 @@ class PersonResource extends JsonResource
           return [
             'person_id' => $this->person_id,
             'name' => $this->name,
-            'profile_image' => $this->images()->where('type', 'profile')->first()?->url
+            'profile_image' => $this->imageFiles()->wherePivot('type', 'persons')->first()?->url
         ];
     }
 }

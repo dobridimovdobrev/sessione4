@@ -52,7 +52,9 @@ class Movie extends Model
     // Relationship with images
     public function imageFiles()
     {
-        return $this->belongsToMany(ImageFile::class, 'movie_image', 'movie_id', 'image_file_id');
+        return $this->belongsToMany(ImageFile::class, 'movie_image', 'movie_id', 'image_file_id')
+                    ->withPivot('type')
+                    ->withTimestamps();
     }
 
     // Relationship with trailers
