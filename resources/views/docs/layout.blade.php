@@ -4,127 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - API Documentation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        'docs-dark': '#0F172A',
-                        'docs-darker': '#0B1120',
-                        'docs-light': '#1E293B',
-                        'docs-lighter': '#334155',
-                        'docs-blue': '#3B82F6',
-                        'docs-text': '#E2E8F0',
-                        'docs-text-light': '#94A3B8'
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        [x-cloak] { display: none !important; }
-        .method-get { @apply px-2 py-1 text-blue-700 bg-blue-100 dark:text-blue-300 dark:bg-blue-900 rounded-md }
-        .method-post { @apply px-2 py-1 text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900 rounded-md }
-        .method-put { @apply px-2 py-1 text-yellow-700 bg-yellow-100 dark:text-yellow-300 dark:bg-yellow-900 rounded-md }
-        .method-delete { @apply px-2 py-1 text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-900 rounded-md }
-        .endpoint { @apply ml-2 text-gray-700 dark:text-gray-300 }
-        pre { @apply p-4 bg-gray-800 rounded-lg overflow-x-auto text-sm text-gray-200 }
-    </style>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/docs.css">
 </head>
-<body class="bg-docs-dark text-docs-text antialiased">
-    <div class="min-h-screen">
-        <nav class="fixed w-64 h-screen bg-docs-darker border-r border-docs-light overflow-y-auto">
-            <div class="p-6">
-                <h1 class="text-xl font-bold mb-6">API Documentation</h1>
-                <ul class="space-y-4">
-                    <li>
-                        <a href="/docs" class="text-docs-text-light hover:text-white">Introduction</a>
+<body>
+    <div class="docs-sidebar">
+        <div class="docs-logo">
+            <h1>Streaming API</h1>
+        </div>
+
+        <div class="docs-search">
+            <input type="text" placeholder="Search documentation..." />
+        </div>
+
+        <nav class="docs-nav">
+            <div class="docs-nav-section">
+                <h3 class="docs-nav-title">Getting Started</h3>
+                <ul class="docs-nav-items">
+                    <li class="docs-nav-item">
+                        <a href="/docs" class="docs-nav-link {{ request()->is('docs') ? 'active' : '' }}">Introduction</a>
                     </li>
-                    <li>
-                        <h2 class="text-sm font-semibold text-docs-text-light uppercase tracking-wider mb-2">Getting Started</h2>
-                        <ul class="space-y-2 ml-2">
-                            <li>
-                                <a href="/docs/introduction" class="text-docs-text-light hover:text-white">Introduction</a>
-                            </li>
-                            <li>
-                                <a href="/docs/authentication" class="text-docs-text-light hover:text-white">Authentication</a>
-                            </li>
-                            <li>
-                                <a href="/docs/roles" class="text-docs-text-light hover:text-white">Roles & Permissions</a>
-                            </li>
-                        </ul>
+                    <li class="docs-nav-item">
+                        <a href="/docs/authentication" class="docs-nav-link {{ request()->is('docs/authentication') ? 'active' : '' }}">Authentication</a>
                     </li>
-                    <li>
-                        <h2 class="text-sm font-semibold text-docs-text-light uppercase tracking-wider mb-2">Core Resources</h2>
-                        <ul class="space-y-2 ml-2">
-                            <li>
-                                <a href="/docs/movies" class="text-docs-text-light hover:text-white">Movies</a>
-                            </li>
-                            <li>
-                                <a href="/docs/tv-series" class="text-docs-text-light hover:text-white">TV Series</a>
-                            </li>
-                            <li>
-                                <a href="/docs/seasons" class="text-docs-text-light hover:text-white">Seasons</a>
-                            </li>
-                            <li>
-                                <a href="/docs/episodes" class="text-docs-text-light hover:text-white">Episodes</a>
-                            </li>
-                            <li>
-                                <a href="/docs/people" class="text-docs-text-light hover:text-white">People</a>
-                            </li>
-                        </ul>
+                    <li class="docs-nav-item">
+                        <a href="/docs/roles" class="docs-nav-link {{ request()->is('docs/roles') ? 'active' : '' }}">Roles & Permissions</a>
                     </li>
-                    <li>
-                        <h2 class="text-sm font-semibold text-docs-text-light uppercase tracking-wider mb-2">Media</h2>
-                        <ul class="space-y-2 ml-2">
-                            <li>
-                                <a href="/docs/images" class="text-docs-text-light hover:text-white">Images</a>
-                            </li>
-                            <li>
-                                <a href="/docs/trailers" class="text-docs-text-light hover:text-white">Trailers</a>
-                            </li>
-                            <li>
-                                <a href="/docs/video-files" class="text-docs-text-light hover:text-white">Video Files</a>
-                            </li>
-                        </ul>
+                </ul>
+            </div>
+
+            <div class="docs-nav-section">
+                <h3 class="docs-nav-title">Core Resources</h3>
+                <ul class="docs-nav-items">
+                    <li class="docs-nav-item">
+                        <a href="/docs/movies" class="docs-nav-link {{ request()->is('docs/movies') ? 'active' : '' }}">Movies</a>
                     </li>
-                    <li>
-                        <h2 class="text-sm font-semibold text-docs-text-light uppercase tracking-wider mb-2">Users</h2>
-                        <ul class="space-y-2 ml-2">
-                            <li>
-                                <a href="/docs/user-management" class="text-docs-text-light hover:text-white">User Management</a>
-                            </li>
-                            <li>
-                                <a href="/docs/profile" class="text-docs-text-light hover:text-white">Profile Updates</a>
-                            </li>
-                        </ul>
+                    <li class="docs-nav-item">
+                        <a href="/docs/tv-series" class="docs-nav-link {{ request()->is('docs/tv-series') ? 'active' : '' }}">TV Series</a>
+                    </li>
+                    <li class="docs-nav-item">
+                        <a href="/docs/seasons" class="docs-nav-link {{ request()->is('docs/seasons') ? 'active' : '' }}">Seasons</a>
+                    </li>
+                    <li class="docs-nav-item">
+                        <a href="/docs/episodes" class="docs-nav-link {{ request()->is('docs/episodes') ? 'active' : '' }}">Episodes</a>
+                    </li>
+                    <li class="docs-nav-item">
+                        <a href="/docs/people" class="docs-nav-link {{ request()->is('docs/people') ? 'active' : '' }}">People</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="docs-nav-section">
+                <h3 class="docs-nav-title">Media</h3>
+                <ul class="docs-nav-items">
+                    <li class="docs-nav-item">
+                        <a href="/docs/images" class="docs-nav-link {{ request()->is('docs/images') ? 'active' : '' }}">Images</a>
+                    </li>
+                    <li class="docs-nav-item">
+                        <a href="/docs/trailers" class="docs-nav-link {{ request()->is('docs/trailers') ? 'active' : '' }}">Trailers</a>
+                    </li>
+                    <li class="docs-nav-item">
+                        <a href="/docs/video-files" class="docs-nav-link {{ request()->is('docs/video-files') ? 'active' : '' }}">Video Files</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="docs-nav-section">
+                <h3 class="docs-nav-title">Users</h3>
+                <ul class="docs-nav-items">
+                    <li class="docs-nav-item">
+                        <a href="/docs/user-management" class="docs-nav-link {{ request()->is('docs/user-management') ? 'active' : '' }}">User Management</a>
+                    </li>
+                    <li class="docs-nav-item">
+                        <a href="/docs/profile" class="docs-nav-link {{ request()->is('docs/profile') ? 'active' : '' }}">Profile Updates</a>
                     </li>
                 </ul>
             </div>
         </nav>
-
-        <main class="ml-64">
-            <div class="max-w-4xl mx-auto py-12 px-8">
-                @yield('content')
-            </div>
-        </main>
     </div>
 
-    <script>
-        // Highlight current page in navigation
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentPath = window.location.pathname;
-            const links = document.querySelectorAll('nav a');
-            links.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('text-docs-blue', 'font-medium');
-                    link.classList.remove('text-docs-text-light');
-                }
-            });
-        });
-    </script>
+    <div class="version-selector">
+        <select>
+            <option>v1.0</option>
+        </select>
+        <button class="theme-toggle">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                <path fill-rule="evenodd" d="M7.455 2.004a.75.75 0 01.26.77 7 7 0 009.958 7.967.75.75 0 011.067.853A8.5 8.5 0 116.647 1.921a.75.75 0 01.808.083z" clip-rule="evenodd" />
+            </svg>
+        </button>
+    </div>
+
+    <main class="docs-content">
+        @yield('content')
+    </main>
 </body>
 </html>
