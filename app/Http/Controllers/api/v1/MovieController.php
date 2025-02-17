@@ -30,7 +30,7 @@ class MovieController extends Controller
         // Initialize query with eager loading for basic movie data
         $query = Movie::query()
             ->with(['category', 'imageFiles' => function($query) {
-                $query->where('movie_image.type', 'poster')->limit(1);
+                $query->where('image_files.type', 'poster')->limit(1);
             }]);
     
         // User can see only published and coming soon movies but not draft
