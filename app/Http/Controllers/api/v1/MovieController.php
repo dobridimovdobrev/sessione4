@@ -27,24 +27,27 @@ class MovieController extends Controller
         // Authorization for viewing movies
         $this->authorize('viewAny', Movie::class);
     
-        // Apply filters if any
-        $filterData = $request->all();
-        $query = Movie::query();
+        // Initialize query with eager loading for basic movie data
+        $query = Movie::query()
+            ->with(['category', 'imageFiles' => function($query) {
+                $query->where('type', 'poster')->limit(1);
+            }]);
     
         // User can see only published and coming soon movies but not draft
         if (Auth::user()->role->role_name === 'user') {
             $query->whereIn('status', ['published', 'coming soon']);
         }
     
-        // Filter movies by different parameters/keys
+        // Apply filters from request parameters
+        $filterData = $request->all();
         foreach ($filterData as $key => $value) {
-            if (in_array($key, ['movie_id', 'title', 'description', 'year', 'duration', 'imdb_rating', 'status', 'category_id'])) {
+            if (in_array($key, ['movie_id', 'title', 'year', 'duration', 'imdb_rating', 'status', 'category_id'])) {
                 $query->where($key, 'LIKE', "%$value%");
             }
         }
     
-        // Execute the query with pagination (20 items per page)
-        $movies = $query->paginate(20); // Default 20 items per page, can be changed via query parameter
+        // Execute query with pagination (24 items per page)
+        $movies = $query->paginate(24);
     
         return new MovieCollection($movies);
     }
@@ -101,14 +104,17 @@ class MovieController extends Controller
      */
     public function show(Movie $movie)
     {
-        //authorization for view a movie
         $this->authorize('view', $movie);
-        if(Auth::user()->role->role_name === 'user' && !in_array($movie->status,['published','coming soon'])){
-            ResponseMessages::error('You are not authorized', 403);
-        }
-         // Eager load the related data (category, persons, trailers, videos, images)
-        $movieData = Movie::with(['category','persons', 'trailers', 'videoFiles', 'imageFiles'])->findOrFail($movie->movie_id);
-        return new MovieResource($movieData);
+
+        // Eager load all relationships for detailed view
+        $movie->load([
+            'category',
+            'persons.images',  // Eager load images with persons
+            'trailers',
+            'imageFiles'
+        ]);
+
+        return new MovieResource($movie);
     }
 
     /**

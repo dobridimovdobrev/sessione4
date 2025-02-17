@@ -51,10 +51,17 @@ class SeasonController extends Controller
      * Display the specified resource.
      */
     public function show(Season $season)
-    {   
+    {
         $this->authorize('view', $season);
-        $seasonData = Season::with(['tvSeries'])->findOrFail($season->season_id);
-        return new SeasonResource($seasonData);
+        
+        $season->load([
+            'tvSeries',
+            'episodes.imageFiles' => function($query) {
+                $query->where('type', 'still');
+            }
+        ]);
+
+        return new SeasonResource($season);
     }
 
     /**

@@ -14,5 +14,28 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('docs.index');
+});
+
+// Documentation routes
+Route::prefix('docs')->group(function () {
+    Route::get('/', function () {
+        return view('docs.index');
+    });
+    
+    Route::get('/movies', function () {
+        return view('docs.movies');
+    });
+    
+    Route::get('/tv-series', function () {
+        return view('docs.tv-series');
+    });
+    
+    Route::get('/seasons', function () {
+        return view('docs.seasons');
+    });
+    
+    Route::get('/episodes', function () {
+        return view('docs.episodes');
+    });
 });

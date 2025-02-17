@@ -28,7 +28,7 @@ class TvSerieController extends Controller
             }
         }
 
-        $tvSeries = $query->paginate(20);
+        $tvSeries = $query->paginate(24);
         return new TvSeriesCollection($tvSeries);
     }
 
@@ -50,9 +50,22 @@ class TvSerieController extends Controller
     {
         $this->authorize('view', $tvSerie);
 
-         // Eager load the related data (category,persons, trailers, , images)
-         $tvSerieData = TvSerie::with(['category','trailers', 'persons', 'imageFiles'])->findOrFail($tvSerie->tv_series_id);
-         return new TvSeriesResource($tvSerieData);
+        // Eager load only what's needed for the TV series detail
+        $tvSerie->load([
+            'category',
+            'persons.images',
+            'trailers',
+            'imageFiles',
+            'seasons' => function($query) {
+                $query->select('season_id', 'tv_series_id', 'season_number', 'year', 'total_episodes')
+                      ->orderBy('season_number', 'asc');
+            },
+            'seasons.imageFiles' => function($query) {
+                $query->where('type', 'poster');
+            }
+        ]);
+
+        return new TvSeriesResource($tvSerie);
     }
 
     /**

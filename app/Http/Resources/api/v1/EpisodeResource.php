@@ -22,9 +22,8 @@ class EpisodeResource extends JsonResource
             'episode_number' => $this->episode_number,
             'duration' => $this->duration,
             'status' => $this->status,
-            //  video file, image file of the episode
-            'video_file' => VideoFileResource::collection($this->whenLoaded('videoFiles')),
-            'image_file' => ImageFileResource::collection($this->whenLoaded('imageFiles'))
+            'still' => $this->imageFiles()->where('type', 'still')->first()?->url,
+            'video_file' => VideoFileResource::collection($this->whenLoaded('videoFiles'))
         ];
     }
 }
