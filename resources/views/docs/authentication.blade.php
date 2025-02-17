@@ -29,7 +29,7 @@
 
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/login</code>
+            <code class="endpoint">/api/v1/login</code>
         </div>
 
         <h3>Request Body</h3>
@@ -59,7 +59,7 @@
         </table>
 
         <h3>Example Request</h3>
-        <pre><code>curl -X POST "https://api.dobridobrev.com/api/login" \
+        <pre><code>curl -X POST "https://api.dobridobrev.com/api/v1/login" \
     -H "Content-Type: application/json" \
     -d '{
         "username": "your-username",
@@ -113,7 +113,7 @@
 
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/register</code>
+            <code class="endpoint">/api/v1/register</code>
         </div>
 
         <h3>Request Body</h3>
@@ -232,25 +232,6 @@
                 </tr>
             </tbody>
         </table>
-    </div>
-
-    <div class="my-8">
-        <h2>Logout</h2>
-        <p>Invalidate your current API token.</p>
-
-        <div class="my-4">
-            <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/auth/logout</code>
-        </div>
-
-        <h3>Example Request</h3>
-        <pre><code>curl -X POST "/api/auth/logout" \
-    -H "Authorization: Bearer your-api-token-here"</code></pre>
-
-        <h3>Response</h3>
-        <pre><code>{
-    "message": "Successfully logged out"
-}</code></pre>
     </div>
 </article>
 @endsection
