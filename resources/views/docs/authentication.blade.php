@@ -29,7 +29,7 @@
 
         <div class="my-4">
             <span class="method-badge method-post">POST</span>
-            <code class="endpoint">/api/v1/login</code>
+            <code class="endpoint">/api/login</code>
         </div>
 
         <h3>Request Body</h3>
