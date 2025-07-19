@@ -74,7 +74,7 @@ class AuthController extends Controller
         ]);
 
         // Risposta JSON diretta con token, ruolo e user_id
-        return \response()->json([
+        return response()->json([
             'token' => $token,
             'role' => $user->role->role_name,  // Includi il ruolo dell'utente nella risposta
             'user_id' => $user->user_id,       // Includi l'ID utente per una più facile identificazione nel frontend
