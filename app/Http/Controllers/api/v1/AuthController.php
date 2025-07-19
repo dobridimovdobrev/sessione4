@@ -73,6 +73,11 @@ class AuthController extends Controller
             'last_activity' => now()
         ]);
 
-        return ResponseMessages::success(['token' => $token], 201);
+        // Includi il ruolo dell'utente e l'ID utente nella risposta
+return ResponseMessages::success([
+    'token' => $token,
+    'role' => $user->role->role_name,  // Includi il ruolo dell'utente nella risposta
+    'user_id' => $user->user_id       // Includi l'ID utente per una più facile identificazione nel frontend
+], 201);
     }
 }
