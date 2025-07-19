@@ -4,12 +4,12 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-
 use App\Models\Session;
 
 use App\Helpers\ResponseMessages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Response;
 use App\Http\Requests\api\v1\LoginRequest;
 use App\Http\Requests\api\v1\RegisterRequest;
 
@@ -73,11 +73,12 @@ class AuthController extends Controller
             'last_activity' => now()
         ]);
 
-        // Includi il ruolo dell'utente e l'ID utente nella risposta
-return ResponseMessages::success([
-    'token' => $token,
-    'role' => $user->role->role_name,  // Includi il ruolo dell'utente nella risposta
-    'user_id' => $user->user_id       // Includi l'ID utente per una più facile identificazione nel frontend
-], 201);
+        // Risposta JSON diretta con token, ruolo e user_id
+        return \response()->json([
+            'token' => $token,
+            'role' => $user->role->role_name,  // Includi il ruolo dell'utente nella risposta
+            'user_id' => $user->user_id,       // Includi l'ID utente per una più facile identificazione nel frontend
+            'success' => true                  // Flag di successo
+        ], 201);
     }
 }
