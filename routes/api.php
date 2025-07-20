@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\v1\AuthController;
+use App\Http\Controllers\api\v1\DashboardController;
 use App\Http\Controllers\api\v1\UserController;
 use App\Http\Controllers\api\v1\MovieController;
 use App\Http\Controllers\api\v1\CreditController;
@@ -136,6 +137,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/images', [ImageFileController::class, 'store']);
         Route::put('/images/{image}', [ImageFileController::class, 'update']);
         Route::delete('/images/{image}', [ImageFileController::class, 'destroy']);
+        
+        //Dashboard Statistics
+        Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
     });
 
 
