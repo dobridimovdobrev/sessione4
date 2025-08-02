@@ -21,12 +21,23 @@ class ImageFileStoreRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Check if we're uploading a file or using a URL
+        if ($this->hasFile('image')) {
+            return [
+                'image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240', // Max 10MB
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'type' => 'required|string|in:poster,backdrop,still,persons',
+            ];
+        }
+
+        // Default rules for URL-based images
         return [
-            'url' => 'required|url',
+            'url' => 'required_without:image|url',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'format' => 'required|string|max:10',
-            
+            'type' => 'required|string|in:poster,backdrop,still,persons',
         ];
     }
 }

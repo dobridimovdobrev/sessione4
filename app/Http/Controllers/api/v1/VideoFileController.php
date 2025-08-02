@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\v1;
 use App\Models\VideoFile;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseMessages;
+use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\api\v1\VideoFileResource;
 use App\Http\Resources\api\v1\VideoFileCollection;
@@ -42,6 +43,18 @@ class VideoFileController extends Controller
         $this->authorize('create', VideoFile::class);
 
         $validatedData = $request->validated();
+        
+        // Check if we're uploading a file
+        if ($request->hasFile('video')) {
+            $file = $request->file('video');
+            
+            // Use the helper to upload and get file metadata
+            $fileData = FileUploadHelper::uploadVideo($file);
+            
+            // Merge the file data with the validated data
+            $validatedData = array_merge($validatedData, $fileData);
+        }
+        
         $videoFile = VideoFile::create($validatedData);
 
         return ResponseMessages::success(

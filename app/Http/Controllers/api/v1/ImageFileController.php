@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\v1;
 use App\Models\ImageFile;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseMessages;
+use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\v1\ImageFileStoreRequest;
 use App\Http\Requests\api\v1\ImageFileUpdateRequest;
@@ -41,6 +42,18 @@ class ImageFileController extends Controller
         $this->authorize('create', ImageFile::class);
 
         $validatedData = $request->validated();
+        
+        // Check if we're uploading a file
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            
+            // Use the helper to upload and get file metadata
+            $fileData = FileUploadHelper::uploadImage($file, $validatedData['type']);
+            
+            // Merge the file data with the validated data
+            $validatedData = array_merge($validatedData, $fileData);
+        }
+        
         $imageFile = ImageFile::create($validatedData);
 
         return ResponseMessages::success(
