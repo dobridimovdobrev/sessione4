@@ -34,7 +34,7 @@ class PersonController extends Controller
               }
           }
 
-        $people = $query->paginate(100);
+        $people = $query->paginate(20);
         return new PersonCollection($people);
     }
     //create
