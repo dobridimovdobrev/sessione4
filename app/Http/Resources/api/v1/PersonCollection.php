@@ -14,6 +14,19 @@ class PersonCollection extends ResourceCollection
      */
     public function toArray(Request $request)
     {
-        return $this->collection;
+        return [
+            'data' => $this->collection,
+            'pagination' => [
+                'total' => $this->resource->total(),
+                'count' => $this->resource->count(),
+                'per_page' => $this->resource->perPage(),
+                'current_page' => $this->resource->currentPage(),
+                'total_pages' => $this->resource->lastPage(),
+                'links' => [
+                    'next' => $this->resource->nextPageUrl(),
+                    'previous' => $this->resource->previousPageUrl(),
+                ],
+            ]
+        ];
     }
 }
