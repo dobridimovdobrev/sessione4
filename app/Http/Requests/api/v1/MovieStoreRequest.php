@@ -22,6 +22,7 @@ class MovieStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Basic movie data
             "title" => ['required', 'string', 'max:128'],
             "slug" => ['nullable', 'string', 'max:128'],
             "description" => ['required', 'string'],
@@ -31,6 +32,16 @@ class MovieStoreRequest extends FormRequest
             "premiere_date" => ['nullable', 'date'],
             "status" => ['required', 'in:published,draft,sheduled,coming soon'],
             "category_id" => ['required', 'exists:categories,category_id'],
+
+            // Image files (optional)
+            'poster_image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240',
+            'backdrop_image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240',
+    
+            
+            // Video files (optional)
+            'trailer_video' => 'nullable|file|mimes:mp4,webm,ogg,mov|max:512000',
+            'movie_video' => 'nullable|file|mimes:mp4,webm,ogg,mov|max:512000',
+            
 
             // Persons (conditionally validated if provided)
             'persons' => 'sometimes|array',
@@ -48,7 +59,6 @@ class MovieStoreRequest extends FormRequest
             // Image files (only validate if present)
             'image_files' => 'sometimes|array',
             'image_files.*.url' => 'sometimes|url',
-
         ];
     }
 }

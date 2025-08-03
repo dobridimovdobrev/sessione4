@@ -25,8 +25,8 @@ class ImageFileStoreRequest extends FormRequest
         if ($this->hasFile('image')) {
             return [
                 'image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240', // Max 10MB
-                'title' => 'required|string|max:255',
-                'description' => 'required|string',
+                'title' => 'sometimes|string|max:255',
+                'description' => 'sometimes|string',
                 'type' => 'required|string|in:poster,backdrop,still,persons',
             ];
         }
@@ -34,8 +34,8 @@ class ImageFileStoreRequest extends FormRequest
         // Default rules for URL-based images
         return [
             'url' => 'required_without:image|url',
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'title' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
             'format' => 'required|string|max:10',
             'type' => 'required|string|in:poster,backdrop,still,persons',
         ];
