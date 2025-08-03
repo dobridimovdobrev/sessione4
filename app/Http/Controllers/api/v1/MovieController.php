@@ -129,18 +129,12 @@ class MovieController extends Controller
         
         //automatic generation of title description
         $trailerTitle = $request->title . ' - Trailer';
-        $trailerDescription = 'Trailer for ' . $request->title;
         
         $trailerVideo = VideoFile::create([
             'url' => $fileData['url'],
-            'title' => $trailerTitle,
-            'description' => $trailerDescription,
+            'title' => $trailerTitle, // Il titolo contiene 'Trailer' per identificarlo
             'format' => $fileData['format'],
-            'size' => $fileData['size'],
-            'duration' => $fileData['duration'] ?? null,
-            'width' => $fileData['width'] ?? null,
-            'height' => $fileData['height'] ?? null,
-            'type' => 'trailer', // Impostiamo il tipo direttamente nel modello VideoFile
+            'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
         ]);
         
         $movie->videoFiles()->attach($trailerVideo->video_file_id);
@@ -153,18 +147,12 @@ class MovieController extends Controller
         
         // automatic generation of title description
         $movieTitle = $request->title . ' - Full Movie';
-        $movieDescription = 'Full movie for ' . $request->title;
         
         $movieVideo = VideoFile::create([
             'url' => $fileData['url'],
-            'title' => $movieTitle,
-            'description' => $movieDescription,
+            'title' => $movieTitle, // Il titolo contiene 'Full Movie' per identificarlo
             'format' => $fileData['format'],
-            'size' => $fileData['size'],
-            'duration' => $fileData['duration'] ?? null,
-            'width' => $fileData['width'] ?? null,
-            'height' => $fileData['height'] ?? null,
-            'type' => 'movie', // Impostiamo il tipo direttamente nel modello VideoFile
+            'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
         ]);
         
         $movie->videoFiles()->attach($movieVideo->video_file_id);
@@ -311,9 +299,9 @@ class MovieController extends Controller
         // 1. Trailer video
         if ($request->hasFile('trailer_video')) {
             // Disassocia tutti i trailer esistenti
-            // Nota: poiché non abbiamo un campo 'type' nella tabella pivot,
-            // dobbiamo identificare i trailer in base al loro tipo nel modello VideoFile
-            $existingTrailers = $movie->videoFiles()->where('type', 'trailer')->get();
+            // Poiché non abbiamo un campo 'type' né nella tabella pivot né nella tabella video_files,
+            // dobbiamo identificare i trailer in base al titolo (che contiene 'Trailer')
+            $existingTrailers = $movie->videoFiles()->whereRaw("LOWER(title) LIKE '%trailer%'")->get();
             foreach ($existingTrailers as $existingTrailer) {
                 $movie->videoFiles()->detach($existingTrailer->video_file_id);
                 // Qui potresti anche eliminare il file se non è usato da altri record
@@ -329,14 +317,9 @@ class MovieController extends Controller
             
             $trailerVideo = VideoFile::create([
                 'url' => $fileData['url'],
-                'title' => $trailerTitle,
-                'description' => $trailerDescription,
+                'title' => $trailerTitle, // Il titolo contiene 'Trailer' per identificarlo
                 'format' => $fileData['format'],
-                'size' => $fileData['size'],
-                'duration' => $fileData['duration'] ?? null,
-                'width' => $fileData['width'] ?? null,
-                'height' => $fileData['height'] ?? null,
-                'type' => 'trailer', // Impostiamo il tipo direttamente nel modello VideoFile
+                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
             ]);
             
             $movie->videoFiles()->attach($trailerVideo->video_file_id);
@@ -345,9 +328,9 @@ class MovieController extends Controller
         // 2. Movie video
         if ($request->hasFile('movie_video')) {
             // Disassocia tutti i video esistenti
-            // Nota: poiché non abbiamo un campo 'type' nella tabella pivot,
-            // dobbiamo identificare i video in base al loro tipo nel modello VideoFile
-            $existingMovieVideos = $movie->videoFiles()->where('type', 'movie')->get();
+            // Poiché non abbiamo un campo 'type' né nella tabella pivot né nella tabella video_files,
+            // dobbiamo identificare i video in base al titolo (che contiene 'Full Movie')
+            $existingMovieVideos = $movie->videoFiles()->whereRaw("LOWER(title) LIKE '%full movie%'")->get();
             foreach ($existingMovieVideos as $existingMovieVideo) {
                 $movie->videoFiles()->detach($existingMovieVideo->video_file_id);
                 // Qui potresti anche eliminare il file se non è usato da altri record
@@ -363,14 +346,9 @@ class MovieController extends Controller
             
             $movieVideo = VideoFile::create([
                 'url' => $fileData['url'],
-                'title' => $movieTitle,
-                'description' => $movieDescription,
+                'title' => $movieTitle, // Il titolo contiene 'Full Movie' per identificarlo
                 'format' => $fileData['format'],
-                'size' => $fileData['size'],
-                'duration' => $fileData['duration'] ?? null,
-                'width' => $fileData['width'] ?? null,
-                'height' => $fileData['height'] ?? null,
-                'type' => 'movie', // Impostiamo il tipo direttamente nel modello VideoFile
+                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
             ]);
             
             $movie->videoFiles()->attach($movieVideo->video_file_id);
