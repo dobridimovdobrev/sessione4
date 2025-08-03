@@ -22,8 +22,8 @@ class TrailerStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'url' => 'required|url',
+            'title' => 'sometimes|string|max:255',
+            'url' => 'sometimes|url',
         ];
     }
 }

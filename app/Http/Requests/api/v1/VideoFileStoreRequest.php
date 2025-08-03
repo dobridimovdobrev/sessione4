@@ -25,16 +25,16 @@ class VideoFileStoreRequest extends FormRequest
         if ($this->hasFile('video')) {
             return [
                 'video' => 'required|file|mimes:mp4,webm,ogg,mov,avi,mkv|max:512000', // Max 500MB
-                'title' => 'required|string|max:255',
+                'title' => 'sometimes|string|max:255',
             ];
         }
 
         // Default rules for URL-based videos
         return [
-            'title' => 'required|string|max:255',
-            'url' => 'required_without:video|url',
-            'format' => 'required|string|max:10',
-            'resolution' => 'required|string|max:10',
+            'title' => 'sometimes|string|max:255',
+            'url' => 'sometimes_without:video|url',
+            'format' => 'sometimes|string|max:10',
+            'resolution' => 'sometimes|string|max:10',
         ];
     }
 }
