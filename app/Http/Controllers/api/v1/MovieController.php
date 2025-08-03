@@ -140,9 +140,10 @@ class MovieController extends Controller
             'duration' => $fileData['duration'] ?? null,
             'width' => $fileData['width'] ?? null,
             'height' => $fileData['height'] ?? null,
+            'type' => 'trailer', // Impostiamo il tipo direttamente nel modello VideoFile
         ]);
         
-        $movie->videoFiles()->attach($trailerVideo->video_file_id, ['type' => 'trailer']);
+        $movie->videoFiles()->attach($trailerVideo->video_file_id);
     }
 
     // 2. Movie video
@@ -163,9 +164,10 @@ class MovieController extends Controller
             'duration' => $fileData['duration'] ?? null,
             'width' => $fileData['width'] ?? null,
             'height' => $fileData['height'] ?? null,
+            'type' => 'movie', // Impostiamo il tipo direttamente nel modello VideoFile
         ]);
         
-        $movie->videoFiles()->attach($movieVideo->video_file_id, ['type' => 'movie']);
+        $movie->videoFiles()->attach($movieVideo->video_file_id);
     }
 
 
