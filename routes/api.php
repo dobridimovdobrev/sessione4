@@ -25,6 +25,7 @@ use App\Http\Controllers\api\v1\ImageTvSeriesController;
 use App\Http\Controllers\api\v1\PersonTvSeriesController;
 use App\Http\Controllers\api\v1\TrailerTvSeriesController;
 use App\Http\Controllers\api\v1\VideoFileEpisodeController;
+use App\Http\Controllers\api\v1\StreamController;
 
 /*
 |--------------------------------------------------------------------------
@@ -205,6 +206,9 @@ Route::prefix('v1')->group(function () {
         //Image Files
         Route::get('/images', [ImageFileController::class, 'index']);
         Route::get('/images/{image}', [ImageFileController::class, 'show']);
+        
+        // Stream video (protetto da autenticazione)
+        Route::get('/stream-video/{filename}', [StreamController::class, 'streamVideo']);
         
     });
 });
