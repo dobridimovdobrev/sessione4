@@ -308,8 +308,10 @@ class MovieController extends Controller
         
         // 1. Trailer video
         if ($request->hasFile('trailer_video')) {
-            // Trova e rimuovi l'associazione con il trailer esistente
-            $existingTrailers = $movie->videoFiles()->wherePivot('type', 'trailer')->get();
+            // Disassocia tutti i trailer esistenti
+            // Nota: poiché non abbiamo un campo 'type' nella tabella pivot,
+            // dobbiamo identificare i trailer in base al loro tipo nel modello VideoFile
+            $existingTrailers = $movie->videoFiles()->where('type', 'trailer')->get();
             foreach ($existingTrailers as $existingTrailer) {
                 $movie->videoFiles()->detach($existingTrailer->video_file_id);
                 // Qui potresti anche eliminare il file se non è usato da altri record
@@ -332,15 +334,18 @@ class MovieController extends Controller
                 'duration' => $fileData['duration'] ?? null,
                 'width' => $fileData['width'] ?? null,
                 'height' => $fileData['height'] ?? null,
+                'type' => 'trailer', // Impostiamo il tipo direttamente nel modello VideoFile
             ]);
             
-            $movie->videoFiles()->attach($trailerVideo->video_file_id, ['type' => 'trailer']);
+            $movie->videoFiles()->attach($trailerVideo->video_file_id);
         }
         
         // 2. Movie video
         if ($request->hasFile('movie_video')) {
-            // Trova e rimuovi l'associazione con il video esistente
-            $existingMovieVideos = $movie->videoFiles()->wherePivot('type', 'movie')->get();
+            // Disassocia tutti i video esistenti
+            // Nota: poiché non abbiamo un campo 'type' nella tabella pivot,
+            // dobbiamo identificare i video in base al loro tipo nel modello VideoFile
+            $existingMovieVideos = $movie->videoFiles()->where('type', 'movie')->get();
             foreach ($existingMovieVideos as $existingMovieVideo) {
                 $movie->videoFiles()->detach($existingMovieVideo->video_file_id);
                 // Qui potresti anche eliminare il file se non è usato da altri record
@@ -363,9 +368,10 @@ class MovieController extends Controller
                 'duration' => $fileData['duration'] ?? null,
                 'width' => $fileData['width'] ?? null,
                 'height' => $fileData['height'] ?? null,
+                'type' => 'movie', // Impostiamo il tipo direttamente nel modello VideoFile
             ]);
             
-            $movie->videoFiles()->attach($movieVideo->video_file_id, ['type' => 'movie']);
+            $movie->videoFiles()->attach($movieVideo->video_file_id);
         }
         
         // Attach persons (actors) to the movie if provided
