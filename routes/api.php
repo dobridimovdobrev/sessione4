@@ -26,6 +26,7 @@ use App\Http\Controllers\api\v1\PersonTvSeriesController;
 use App\Http\Controllers\api\v1\TrailerTvSeriesController;
 use App\Http\Controllers\api\v1\VideoFileEpisodeController;
 use App\Http\Controllers\api\v1\StreamController;
+use App\Http\Controllers\api\v1\FileUploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -139,6 +140,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/images', [ImageFileController::class, 'store']);
         Route::put('/images/{image}', [ImageFileController::class, 'update']);
         Route::delete('/images/{image}', [ImageFileController::class, 'destroy']);
+        
+        // File Upload Routes (dedicated for Angular frontend)
+        Route::post('/upload/image', [FileUploadController::class, 'uploadImage']);
+        Route::post('/upload/video', [FileUploadController::class, 'uploadVideo']);
+        Route::get('/upload/progress', [FileUploadController::class, 'getUploadProgress']);
+        Route::get('/upload/formats', [FileUploadController::class, 'getSupportedFormats']);
         
         //Dashboard Statistics
         Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);

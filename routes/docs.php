@@ -64,4 +64,9 @@ Route::get('/countries', function () {
     return view('docs.countries');
 });
 
+// Angular Integration Guide
+Route::get('/angular-integration', function () {
+    return view('docs.angular-integration');
+});
+
 // Add more documentation routes here
