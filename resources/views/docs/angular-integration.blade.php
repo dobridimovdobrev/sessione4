@@ -328,6 +328,222 @@ export class MoviesService {
         </div>
     </section>
 
+    <!-- TV Series API Section -->
+    <section class="mb-12">
+        <h2 class="text-3xl font-semibold mb-6 text-gray-800">📺 TV Series API per Angular</h2>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-xl font-semibold mb-4">Endpoint TV Series</h3>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-purple-50 p-4 rounded">
+                    <h4 class="text-lg font-medium mb-2">Lista Serie TV</h4>
+                    <div class="bg-gray-100 p-2 rounded mb-2">
+                        <code>GET /api/v1/tvseries</code>
+                    </div>
+                    <p class="text-sm text-gray-600">Paginazione, filtri per categoria, anno, rating</p>
+                </div>
+                
+                <div class="bg-indigo-50 p-4 rounded">
+                    <h4 class="text-lg font-medium mb-2">Dettaglio Serie TV</h4>
+                    <div class="bg-gray-100 p-2 rounded mb-2">
+                        <code>GET /api/v1/tvseries/{id}</code>
+                    </div>
+                    <p class="text-sm text-gray-600">Include stagioni, episodi, cast, trailer</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-xl font-semibold mb-4">Angular TV Series Service</h3>
+            
+@verbatim
+            <pre class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto"><code>// tv-series.service.ts
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface TvSeries {
+  tv_series_id: number;
+  title: string;
+  year: number;
+  total_seasons: number;
+  total_episodes: number;
+  imdb_rating: number;
+  status: string;
+  category: {
+    id: number;
+    name: string;
+  };
+  poster: {
+    url: string;
+    sizes: any;
+    width: number;
+    height: number;
+    format: string;
+  };
+  description?: string;
+  backdrop?: any;
+  persons?: any[];
+  trailers?: any[];
+  seasons?: Season[];
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TvSeriesService {
+  private apiUrl = 'https://api.dobridobrev.com/api/v1';
+
+  constructor(private http: HttpClient, private auth: AuthService) {}
+
+  getTvSeries(page: number = 1, filters?: any): Observable<any> {
+    let params = `?page=${page}`;
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        if (filters[key]) {
+          params += `&${key}=${encodeURIComponent(filters[key])}`;
+        }
+      });
+    }
+
+    return this.http.get(`${this.apiUrl}/tvseries${params}`, {
+      headers: this.auth.getAuthHeaders()
+    });
+  }
+
+  getTvSeriesDetail(id: number): Observable<TvSeries> {
+    return this.http.get<TvSeries>(`${this.apiUrl}/tvseries/${id}`, {
+      headers: this.auth.getAuthHeaders()
+    });
+  }
+}</code></pre>
+@endverbatim
+        </div>
+    </section>
+
+    <!-- Persons API Section -->
+    <section class="mb-12">
+        <h2 class="text-3xl font-semibold mb-6 text-gray-800">👥 Persons API per Angular</h2>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-xl font-semibold mb-4">Endpoint Persons</h3>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-orange-50 p-4 rounded">
+                    <h4 class="text-lg font-medium mb-2">Lista Persone</h4>
+                    <div class="bg-gray-100 p-2 rounded mb-2">
+                        <code>GET /api/v1/persons</code>
+                    </div>
+                    <p class="text-sm text-gray-600">Attori, registi, produttori con paginazione</p>
+                </div>
+                
+                <div class="bg-teal-50 p-4 rounded">
+                    <h4 class="text-lg font-medium mb-2">Dettaglio Persona</h4>
+                    <div class="bg-gray-100 p-2 rounded mb-2">
+                        <code>GET /api/v1/persons/{id}</code>
+                    </div>
+                    <p class="text-sm text-gray-600">Include filmografia, immagini profilo</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-xl font-semibold mb-4">Angular Persons Service</h3>
+            
+@verbatim
+            <pre class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto"><code>// persons.service.ts
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface Person {
+  person_id: number;
+  name: string;
+  profile_image: {
+    url: string;
+    sizes: {
+      w45: string;
+      w185: string;
+      h632: string;
+      original: string;
+    };
+    width: number;
+    height: number;
+    format: string;
+  };
+  movies?: any[];
+  tv_series?: any[];
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PersonsService {
+  private apiUrl = 'https://api.dobridobrev.com/api/v1';
+
+  constructor(private http: HttpClient, private auth: AuthService) {}
+
+  getPersons(page: number = 1, search?: string): Observable<any> {
+    let params = `?page=${page}`;
+    if (search) {
+      params += `&search=${encodeURIComponent(search)}`;
+    }
+
+    return this.http.get(`${this.apiUrl}/persons${params}`, {
+      headers: this.auth.getAuthHeaders()
+    });
+  }
+
+  getPerson(id: number): Observable<Person> {
+    return this.http.get<Person>(`${this.apiUrl}/persons/${id}`, {
+      headers: this.auth.getAuthHeaders()
+    });
+  }
+}</code></pre>
+@endverbatim
+        </div>
+    </section>
+
+    <!-- CORS Configuration Section -->
+    <section class="mb-12">
+        <h2 class="text-3xl font-semibold mb-6 text-gray-800">🌐 Configurazione CORS per Angular</h2>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-xl font-semibold mb-4">Configurazione Laravel CORS</h3>
+            
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <h4 class="text-lg font-medium mb-2">File: config/cors.php</h4>
+@verbatim
+                <pre class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto"><code><?php
+
+return [
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    
+    'allowed_methods' => ['*'],
+    
+    'allowed_origins' => [
+        'http://localhost:4200',     // Angular dev server
+        'https://yourapp.com',       // Production Angular app
+        'https://api.dobridobrev.com' // API domain
+    ],
+    
+    'allowed_origins_patterns' => [],
+    
+    'allowed_headers' => ['*'],
+    
+    'exposed_headers' => [],
+    
+    'max_age' => 0,
+    
+    'supports_credentials' => true,
+];
+</code></pre>
+@endverbatim
+            </div>
+        </div>
+    </section>
+
     <!-- Best Practices Section -->
     <section class="mb-12">
         <h2 class="text-3xl font-semibold mb-6 text-gray-800">✅ Best Practices</h2>
