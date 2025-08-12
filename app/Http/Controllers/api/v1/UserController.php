@@ -66,7 +66,7 @@ class UserController extends Controller
         }
 
         //this is for execute the query
-        $users = $query->get();
+        $users = $query->paginate(10);
 
         // User collection 
         return new UserCollection($users);
