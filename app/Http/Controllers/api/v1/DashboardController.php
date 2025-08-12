@@ -27,6 +27,9 @@ class DashboardController extends Controller
         // Count total registered users
         $totalUsers = DB::table('users')->count();
         
+        // Count total countries
+        $totalCountries = DB::table('countries')->count();
+        
         // Count recent uploads (ultimi 7 giorni)
         // Usiamo una semplice query SQL con DATE_SUB
         $recentUploads = DB::table('video_files')
@@ -40,6 +43,7 @@ class DashboardController extends Controller
                 'totalSeries' => $totalSeries,
                 'totalPersons' => $totalPersons,
                 'totalUsers' => $totalUsers,
+                'totalCountries' => $totalCountries,
                 'recentUploads' => $recentUploads
             ]
         ]);
