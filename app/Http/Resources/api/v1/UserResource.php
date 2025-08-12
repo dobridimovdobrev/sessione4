@@ -24,7 +24,9 @@ class UserResource extends JsonResource
             'birthday'=> $this->birthday,
             'country_id'=>$this->country_id,
             'user_status'=>$this->user_status,
-            'role_id' => $this->role_id
+            'role_id' => $this->role_id,
+            'ip_address' => $this->ip_address ?? null,
+            'last_activity' => $this->last_activity ?? null
 
         ];
     }

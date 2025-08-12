@@ -9,6 +9,7 @@ use App\Helpers\ResponseMessages;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use App\Http\Resources\api\v1\UserResource;
 use App\Http\Resources\api\v1\UserCollection;
 use App\Http\Requests\api\v1\UserStoreRequest;
@@ -103,6 +104,16 @@ class UserController extends Controller
 
         //policy authorization to perform an action
         $this->authorize('view', $user);
+
+        // Get the most recent session for this user to retrieve IP address
+        $session = DB::table('sessions')
+            ->where('user_id', $user->user_id)
+            ->orderBy('last_activity', 'desc')
+            ->first();
+
+        // Add IP address and last activity to user object
+        $user->ip_address = $session ? $session->ip_address : null;
+        $user->last_activity = $session ? $session->last_activity : null;
 
         return new UserResource($user);
     }
