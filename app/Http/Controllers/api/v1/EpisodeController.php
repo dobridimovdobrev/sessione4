@@ -29,7 +29,7 @@ class EpisodeController extends Controller
                $query = $query->where($key,'LIKE', "%$value%");
             }
         }
-        $episodes = $query->paginate(20);
+        $episodes = $query->paginate(10);
         return new EpisodeCollection($episodes);
     }
 

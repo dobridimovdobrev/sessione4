@@ -30,7 +30,7 @@ class SeasonController extends Controller
             }   
         }
         // Pagination
-        $seasons = $query->paginate(100);
+        $seasons = $query->paginate(10);
         return new SeasonCollection($seasons);
     }
 
@@ -61,7 +61,7 @@ class SeasonController extends Controller
             ->with(['imageFiles' => function($query) {
                 $query->wherePivot('type', 'still');
             }])
-            ->paginate(24);
+            ->paginate(10);
 
         return (new SeasonResource($season))->additional([
             'episodes' => [
