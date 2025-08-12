@@ -31,7 +31,7 @@ class TvSerieController extends Controller
             }
         }
 
-        $tvSeries = $query->paginate(24);
+        $tvSeries = $query->paginate(20);
         return new TvSeriesCollection($tvSeries);
     }
 
