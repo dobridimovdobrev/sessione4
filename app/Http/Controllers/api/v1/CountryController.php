@@ -35,7 +35,7 @@ class CountryController extends Controller
             
         }
         
-        $countries =$query->get();
+        $countries =$query->paginate(30);
         return new CountryCollection($countries);
     }
 
