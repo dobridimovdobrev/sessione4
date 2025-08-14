@@ -3,6 +3,12 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Movie;
+use App\Models\TvSerie;
+use App\Models\Person;
+use App\Models\User;
+use App\Models\Country;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
@@ -15,20 +21,20 @@ class DashboardController extends Controller
      */
     public function getStats()
     {
-        // Count total movies
-        $totalMovies = DB::table('movies')->count();
+        // Count total movies (respects soft delete)
+        $totalMovies = Movie::count();
         
-        // Count total TV series
-        $totalSeries = DB::table('tv_series')->count();
+        // Count total TV series (respects soft delete)
+        $totalSeries = TvSerie::count();
         
-        // Count total persons (actors, directors, etc.)
-        $totalPersons = DB::table('persons')->count();
+        // Count total persons (actors, directors, etc.) (respects soft delete)
+        $totalPersons = Person::count();
         
-        // Count total registered users
-        $totalUsers = DB::table('users')->count();
+        // Count total registered users (respects soft delete)
+        $totalUsers = User::count();
         
-        // Count total countries
-        $totalCountries = DB::table('countries')->count();
+        // Count total countries (no soft delete on countries)
+        $totalCountries = Country::count();
         
         // Count recent uploads (ultimi 7 giorni)
         // Usiamo una semplice query SQL con DATE_SUB
