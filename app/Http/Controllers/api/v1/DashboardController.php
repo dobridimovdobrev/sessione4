@@ -8,6 +8,7 @@ use App\Models\TvSerie;
 use App\Models\Person;
 use App\Models\User;
 use App\Models\Country;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
@@ -36,6 +37,9 @@ class DashboardController extends Controller
         // Count total countries (no soft delete on countries)
         $totalCountries = Country::count();
         
+        // Count total categories (respects soft delete)
+        $totalCategories = Category::count();
+        
         // Count recent uploads (ultimi 7 giorni)
         // Usiamo una semplice query SQL con DATE_SUB
         $recentUploads = DB::table('video_files')
@@ -50,6 +54,7 @@ class DashboardController extends Controller
                 'totalPersons' => $totalPersons,
                 'totalUsers' => $totalUsers,
                 'totalCountries' => $totalCountries,
+                'totalCategories' => $totalCategories,
                 'recentUploads' => $recentUploads
             ]
         ]);
