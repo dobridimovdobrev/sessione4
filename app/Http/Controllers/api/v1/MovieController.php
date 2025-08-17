@@ -133,6 +133,7 @@ class MovieController extends Controller
         $trailerVideo = VideoFile::create([
             'url' => $fileData['url'],
             'title' => $trailerTitle, // Il titolo contiene 'Trailer' per identificarlo
+            'type' => 'trailer', // Automatic type for trailer videos
             'format' => $fileData['format'],
             'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
         ]);
@@ -151,6 +152,7 @@ class MovieController extends Controller
         $movieVideo = VideoFile::create([
             'url' => $fileData['url'],
             'title' => $movieTitle, // Il titolo contiene 'Full Movie' per identificarlo
+            'type' => 'movie', // Automatic type for movie videos
             'format' => $fileData['format'],
             'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
         ]);
@@ -176,6 +178,10 @@ class MovieController extends Controller
     // Attach video files
     if ($request->has('video_files')) {
         foreach ($request->video_files as $videoData) {
+            // Set automatic type if not provided
+            if (!isset($videoData['type'])) {
+                $videoData['type'] = 'movie'; // Default type for additional video files
+            }
             $videoFile = VideoFile::create($videoData);
             $movie->videoFiles()->attach($videoFile->video_file_id);
         }

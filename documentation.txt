@@ -1,0 +1,674 @@
+# MOVIE FORM - ADMIN DASHBOARD DOCUMENTATION
+# Documentazione completa per il Backend Developer
+
+## PANORAMICA GENERALE
+Il form per la gestione dei movie nell'admin dashboard è stato modificato per utilizzare SOLO upload di file, rimuovendo tutti i campi URL per immagini e video.
+
+## STRUTTURA DEL FORM
+
+### 1. INFORMAZIONI BASE
+- **title**: string (required, max 128 caratteri)
+- **slug**: string (generato automaticamente dal title, max 128 caratteri)
+- **description**: string (required)
+- **year**: number (required, min 1900, max 2100)
+- **duration**: number (minuti, min 1)
+- **imdb_rating**: number (0-10, step 0.1)
+- **premiere_date**: date (opzionale)
+- **status**: enum ('published', 'draft', 'sheduled', 'coming soon') - required
+- **category_id**: number (required, FK alla tabella categories)
+
+### 2. IMMAGINI (SOLO UPLOAD)
+- **poster**: string (URL generato dall'upload)
+- **backdrop**: string (URL generato dall'upload)
+
+**IMPORTANTE**: I campi URL per poster e backdrop sono stati RIMOSSI dal form. 
+Ora si utilizzano SOLO gli input file per l'upload.
+
+### 3. TRAILERS (MODIFICATO - SOLO UPLOAD)
+Array di oggetti trailer:
+- **trailer_id**: number (auto-increment)
+- **title**: string (required)
+- **url**: string (URL generato dall'upload video)
+
+**MODIFICHE FATTE**:
+- Rimosso il campo input URL
+- Aggiunto input file per upload video
+- Il metodo onTrailerUpload(event, index) gestisce l'upload
+
+### 4. VIDEO FILES (MODIFICATO - SOLO UPLOAD)
+Array di oggetti video file:
+- **id**: number (auto-increment)
+- **title**: string
+- **type**: string
+- **url**: string (URL generato dall'upload video)
+
+**MODIFICHE FATTE**:
+- Rimosso il campo input URL
+- Aggiunto input file per upload video
+- Il metodo onVideoFileUpload(event, index) gestisce l'upload
+
+### 5. CAST/PERSONS (MODIFICATO)
+Array di oggetti person:
+- **person_id**: number (FK alla tabella persons)
+
+**MODIFICHE FATTE**:
+- Rimosso completamente il form per creare nuove person dal modal
+- Mantenuta SOLO la funzionalità di ricerca person esistenti
+- Le person si creano nella sezione dedicata dell'admin
+
+## METODI API ATTUALMENTE UTILIZZATI
+
+### Upload Immagini (FUNZIONANTE)
+```typescript
+// Metodo esistente nell'ApiService
+uploadImage(formData: FormData, type: string): Observable<{url: string}>
+// Endpoint: POST /api/v1/upload/image/{type}
+// Types supportati: 'poster', 'backdrop'
+```
+
+### Upload Video (DA IMPLEMENTARE)
+```typescript
+// Metodo NECESSARIO da aggiungere all'ApiService
+uploadVideo(formData: FormData, type: string): Observable<{url: string}>
+// Endpoint suggerito: POST /api/v1/upload/video/{type}
+// Types necessari: 'trailer', 'movie'
+```
+
+## METODI DEL COMPONENT
+
+### Upload Poster (FUNZIONANTE)
+```typescript
+onPosterUpload(event: any): void {
+  const file = event.target.files[0];
+  if (file) {
+    this.uploadingPoster = true;
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    this.apiService.uploadImage(formData, 'poster').subscribe({
+      next: (response: {url: string}) => {
+        this.movieForm.patchValue({ poster: response.url });
+        this.uploadingPoster = false;
+      },
+      error: (error: any) => {
+        console.error('Error uploading poster', error);
+        this.uploadingPoster = false;
+      }
+    });
+  }
+}
+```
+
+### Upload Backdrop (FUNZIONANTE)
+```typescript
+onBackdropUpload(event: any): void {
+  const file = event.target.files[0];
+  if (file) {
+    this.uploadingBackdrop = true;
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    this.apiService.uploadImage(formData, 'backdrop').subscribe({
+      next: (response: {url: string}) => {
+        this.movieForm.patchValue({ backdrop: response.url });
+        this.uploadingBackdrop = false;
+      },
+      error: (error: any) => {
+        console.error('Error uploading backdrop', error);
+        this.uploadingBackdrop = false;
+      }
+    });
+  }
+}
+```
+
+### Upload Trailer (IMPLEMENTATO MA TEMPORANEO)
+```typescript
+onTrailerUpload(event: any, index: number): void {
+  const file = event.target.files[0];
+  if (file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // TEMPORANEO: salva solo il nome del file
+    console.log('Trailer file selected:', file.name);
+    this.trailersArray.at(index).patchValue({ url: file.name });
+    
+    // TODO: Implementare quando l'API sarà disponibile
+    // this.apiService.uploadVideo(formData, 'trailer').subscribe({
+    //   next: (response: {url: string}) => {
+    //     this.trailersArray.at(index).patchValue({ url: response.url });
+    //   },
+    //   error: (error: any) => {
+    //     console.error('Error uploading trailer', error);
+    //   }
+    // });
+  }
+}
+```
+
+### Upload Video File (IMPLEMENTATO MA TEMPORANEO)
+```typescript
+onVideoFileUpload(event: any, index: number): void {
+  const file = event.target.files[0];
+  if (file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // TEMPORANEO: salva solo il nome del file
+    console.log('Video file selected:', file.name);
+    this.videoFilesArray.at(index).patchValue({ url: file.name });
+    
+    // TODO: Implementare quando l'API sarà disponibile
+    // this.apiService.uploadVideo(formData, 'movie').subscribe({
+    //   next: (response: {url: string}) => {
+    //     this.videoFilesArray.at(index).patchValue({ url: response.url });
+    //   },
+    //   error: (error: any) => {
+    //     console.error('Error uploading video file', error);
+    //   }
+    // });
+  }
+}
+```
+
+## RICHIESTE AL BACKEND DEVELOPER
+
+### 1. ENDPOINT UPLOAD VIDEO (PRIORITÀ ALTA)
+Serve implementare un endpoint per l'upload dei video simile a quello delle immagini:
+
+```
+POST /api/v1/upload/video/{type}
+Content-Type: multipart/form-data
+
+Parametri:
+- file: video file (FormData)
+- type: 'trailer' | 'movie'
+
+Risposta:
+{
+  "url": "https://domain.com/path/to/uploaded/video.mp4"
+}
+```
+
+### 2. VALIDAZIONE FILE VIDEO
+- Formati supportati: mp4, avi, mov, mkv
+- Dimensione massima: da definire (suggerito 500MB)
+- Durata massima: da definire
+
+### 3. STORAGE VIDEO
+- Dove salvare i file video?
+- Naming convention per i file?
+- CDN per la distribuzione?
+
+### 4. ENDPOINT MOVIE CRUD (VERIFICA)
+Verificare che gli endpoint esistenti supportino la nuova struttura:
+
+```
+POST /api/v1/movies (create)
+PUT /api/v1/movies/{id} (update)
+GET /api/v1/movies/{id} (read)
+DELETE /api/v1/movies/{id} (delete)
+```
+
+### 5. STRUTTURA DATI TRAILERS E VIDEO_FILES
+Verificare che le tabelle supportino:
+
+**trailers table:**
+- trailer_id (PK)
+- movie_id (FK)
+- title
+- url (path al file video)
+
+**video_files table:**
+- id (PK)
+- movie_id (FK)
+- title
+- type
+- url (path al file video)
+
+## FILE MODIFICATI
+
+### Frontend Files:
+1. `movie-form.component.html` - Template del form
+2. `movie-form.component.ts` - Logica del component
+3. `movie-form-page.component.html` - Wrapper del form
+4. `api.service.ts` - Servizio API (da estendere)
+
+### Modelli:
+- `media.models.ts` - Interfacce TypeScript
+
+## TESTING NECESSARIO
+
+1. Upload poster/backdrop (già funzionante)
+2. Upload trailer video (da testare quando API disponibile)
+3. Upload movie video file (da testare quando API disponibile)
+4. Creazione movie completo con tutti i file
+5. Modifica movie esistente
+6. Gestione errori upload
+
+## NOTE TECNICHE
+
+- Gli upload di immagini utilizzano il campo 'image' nel FormData
+- Gli upload di video dovrebbero utilizzare il campo 'file' o 'video' nel FormData
+- Tutti gli upload restituiscono un oggetto con proprietà 'url'
+- Il form gestisce automaticamente lo stato di loading durante gli upload
+- La validazione URL è stata rimossa dai form di trailer e video files
+
+## FORM VALIDATION
+
+### Campi Obbligatori:
+- title
+- description
+- year
+- status
+- category_id
+
+### Campi Opzionali:
+- slug (generato automaticamente)
+- duration
+- imdb_rating
+- premiere_date
+- poster (upload)
+- backdrop (upload)
+- trailers (array)
+- video_files (array)
+- persons (array)
+
+## STRUTTURA DATI COMPLETA
+
+### Movie Object (TypeScript Interface):
+```typescript
+interface Movie {
+  movie_id: number;
+  title: string;
+  slug?: string;
+  description: string;
+  year: number;
+  duration: number;
+  imdb_rating: number;
+  premiere_date?: string;
+  status: 'published' | 'draft' | 'sheduled' | 'coming soon';
+  category: Category;
+  category_id: number;
+  poster: string;
+  backdrop: string;
+  persons: Person[];
+  trailers: Trailer[];
+  video_files?: VideoFile[];
+  image_files?: ImageFile[];
+  deleted_at?: string | null;
+}
+```
+
+### Trailer Object:
+```typescript
+interface Trailer {
+  trailer_id: number;
+  title: string;
+  url: string;
+}
+```
+
+### VideoFile Object:
+```typescript
+interface VideoFile {
+  id?: number;
+  url: string;
+  title?: string;
+  type?: string;
+}
+```
+
+### Person Object:
+```typescript
+interface Person {
+  person_id: number;
+  name: string;
+  profile_image: string;
+  character?: string;
+}
+```
+
+## PROSSIMI PASSI
+
+1. **BACKEND**: Implementare endpoint upload video
+2. **BACKEND**: Verificare struttura database per trailers e video_files
+3. **FRONTEND**: Aggiornare ApiService con metodo uploadVideo
+4. **TESTING**: Testare funzionalità complete
+5. **DOCS**: Aggiornare documentazione API
+
+---
+**Data creazione**: 2025-08-17  
+**Versione**: 1.0  
+**Autore**: Frontend Developer  
+**Status**: Modifiche completate, in attesa implementazione backend per upload video
+
+## METODI API BACKEND ESISTENTI
+
+### Upload Immagini (FUNZIONANTE)
+```typescript
+// Endpoint Laravel esistente
+POST /api/v1/upload/image
+// Content-Type: multipart/form-data
+// Authorization: Bearer {token}
+
+// FormData fields:
+// - image: File (required)
+// - type: string (required) - 'poster' | 'backdrop' | 'still' | 'persons'
+// - title: string (optional)
+// - description: string (optional)
+
+// Response:
+{
+  "data": {
+    "message": "Image uploaded successfully",
+    "image": ImageFileResource,
+    "full_url": "https://api.dobridobrev.com/storage/images/poster/filename.jpg",
+    "available_sizes": ["w92", "w154", "w185", "w342", "w500", "w780", "original"]
+  }
+}
+```
+
+### Upload Video (FUNZIONANTE)
+```typescript
+// Endpoint Laravel esistente
+POST /api/v1/upload/video
+// Content-Type: multipart/form-data
+// Authorization: Bearer {token}
+
+// FormData fields:
+// - video: File (required)
+// - title: string (optional)
+
+// Response:
+{
+  "data": {
+    "message": "Video uploaded successfully",
+    "video": VideoFileResource,
+    "stream_url": "/api/v1/stream-video/filename.mp4",
+    "public_stream_url": "/api/v1/public-video/filename.mp4"
+  }
+}
+```
+
+## METODI DEL COMPONENT
+
+### Upload Poster (FUNZIONANTE)
+```typescript
+onPosterUpload(event: any): void {
+  const file = event.target.files[0];
+  if (file) {
+    this.uploadingPoster = true;
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('type', 'poster');
+    
+    this.apiService.uploadImage(formData).subscribe({
+      next: (response: any) => {
+        // Usa full_url dalla risposta del backend
+        this.movieForm.patchValue({ poster: response.data.full_url });
+        this.uploadingPoster = false;
+      },
+      error: (error: any) => {
+        console.error('Error uploading poster', error);
+        this.uploadingPoster = false;
+      }
+    });
+  }
+}
+```
+
+### Upload Backdrop (FUNZIONANTE)
+```typescript
+onBackdropUpload(event: any): void {
+  const file = event.target.files[0];
+  if (file) {
+    this.uploadingBackdrop = true;
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('type', 'backdrop');
+    
+    this.apiService.uploadImage(formData).subscribe({
+      next: (response: any) => {
+        // Usa full_url dalla risposta del backend
+        this.movieForm.patchValue({ backdrop: response.data.full_url });
+        this.uploadingBackdrop = false;
+      },
+      error: (error: any) => {
+        console.error('Error uploading backdrop', error);
+        this.uploadingBackdrop = false;
+      }
+    });
+  }
+}
+```
+
+### Upload Trailer (FUNZIONANTE)
+```typescript
+onTrailerUpload(event: any, index: number): void {
+  const file = event.target.files[0];
+  if (file) {
+    this.uploadingTrailer[index] = true;
+    const formData = new FormData();
+    formData.append('video', file);
+    formData.append('title', this.trailersArray.at(index).get('title')?.value + ' - Trailer');
+    
+    this.apiService.uploadVideo(formData).subscribe({
+      next: (response: any) => {
+        // Usa stream_url dalla risposta del backend
+        this.trailersArray.at(index).patchValue({ 
+          url: response.data.stream_url 
+        });
+        this.uploadingTrailer[index] = false;
+      },
+      error: (error: any) => {
+        console.error('Error uploading trailer', error);
+        this.uploadingTrailer[index] = false;
+      }
+    });
+  }
+}
+```
+
+### Upload Video File (FUNZIONANTE)
+```typescript
+onVideoFileUpload(event: any, index: number): void {
+  const file = event.target.files[0];
+  if (file) {
+    this.uploadingVideoFile[index] = true;
+    const formData = new FormData();
+    formData.append('video', file);
+    formData.append('title', this.videoFilesArray.at(index).get('title')?.value);
+    
+    this.apiService.uploadVideo(formData).subscribe({
+      next: (response: any) => {
+        // Usa stream_url dalla risposta del backend
+        this.videoFilesArray.at(index).patchValue({ 
+          url: response.data.stream_url 
+        });
+        this.uploadingVideoFile[index] = false;
+      },
+      error: (error: any) => {
+        console.error('Error uploading video file', error);
+        this.uploadingVideoFile[index] = false;
+      }
+    });
+  }
+}
+```
+
+## FLUSSO COMPLETO CREAZIONE MOVIE
+
+### BACKEND COMPLETAMENTE FUNZIONANTE
+
+Il backend Laravel supporta due approcci per la creazione di movie:
+
+### Approccio 1: Upload Separato + Creazione Movie
+```typescript
+// 1. Upload immagini separatamente
+const posterResponse = await this.apiService.uploadImage(posterFormData).toPromise();
+const backdropResponse = await this.apiService.uploadImage(backdropFormData).toPromise();
+
+// 2. Upload video separatamente
+const trailerResponse = await this.apiService.uploadVideo(trailerFormData).toPromise();
+const movieResponse = await this.apiService.uploadVideo(movieFormData).toPromise();
+
+// 3. Creare movie con URL ottenuti
+const movieData = {
+  title: 'Movie Title',
+  description: 'Description',
+  year: 2024,
+  // ... altri campi
+  poster: posterResponse.data.full_url,
+  backdrop: backdropResponse.data.full_url,
+  trailers: [{
+    title: 'Trailer 1',
+    url: trailerResponse.data.stream_url
+  }],
+  video_files: [{
+    title: 'Full Movie',
+    url: movieResponse.data.stream_url
+  }]
+};
+
+this.apiService.createMovie(movieData).subscribe(...);
+```
+
+### Approccio 2: Upload Diretto nel Movie Controller (RACCOMANDATO)
+```typescript
+// Il MovieController supporta upload diretto di file
+const formData = new FormData();
+
+// Campi base
+formData.append('title', 'Movie Title');
+formData.append('description', 'Description');
+formData.append('year', '2024');
+formData.append('status', 'published');
+formData.append('category_id', '1');
+
+// File upload diretto
+formData.append('poster_image', posterFile);
+formData.append('backdrop_image', backdropFile);
+formData.append('trailer_video', trailerFile);
+formData.append('movie_video', movieFile);
+
+// Persons (array di ID)
+formData.append('persons[]', '1');
+formData.append('persons[]', '2');
+
+// Trailers (se hai URL esterni)
+formData.append('trailers[0][title]', 'Trailer 1');
+formData.append('trailers[0][url]', 'https://youtube.com/...');
+
+this.apiService.createMovie(formData).subscribe(...);
+```
+
+## FILE MODIFICATI
+
+### Frontend Files:
+1. `movie-form.component.html` - Template del form
+2. `movie-form.component.ts` - Logica del component
+3. `movie-form-page.component.html` - Wrapper del form
+4. `api.service.ts` - Servizio API (da estendere)
+
+### Modelli:
+- `media.models.ts` - Interfacce TypeScript
+
+## API SERVICE ANGULAR - METODI NECESSARI
+
+```typescript
+// api.service.ts
+export class ApiService {
+  private apiUrl = 'https://api.dobridobrev.com/api/v1';
+
+  // Upload immagini (esistente)
+  uploadImage(formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/upload/image`, formData, {
+      headers: { Authorization: `Bearer ${this.authToken}` }
+    });
+  }
+
+  // Upload video (esistente)
+  uploadVideo(formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/upload/video`, formData, {
+      headers: { Authorization: `Bearer ${this.authToken}` }
+    });
+  }
+
+  // Creare movie (esistente)
+  createMovie(movieData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/movies`, movieData, {
+      headers: { Authorization: `Bearer ${this.authToken}` }
+    });
+  }
+
+  // Streaming video (esistente)
+  getStreamingUrl(filename: string): string {
+    return `${this.apiUrl}/stream-video/${filename}?token=${this.authToken}`;
+  }
+}
+```
+
+## VALIDAZIONE FILE
+
+### Immagini:
+- Formati: jpg, jpeg, png, webp, gif
+- Dimensione max: 10MB
+- Tipi: poster, backdrop, still, persons
+
+### Video:
+- Formati: mp4, webm, ogg, mov, avi, mkv
+- Dimensione max: 500MB
+- Streaming: Automatico con autenticazione Bearer
+
+## STRUTTURA RISPOSTA BACKEND
+
+### Upload Image Response:
+```json
+{
+  "data": {
+    "message": "Image uploaded successfully",
+    "image": {
+      "image_id": 123,
+      "url": "images/poster/filename.jpg",
+      "title": "Movie Title - Poster",
+      "type": "poster",
+      "format": "jpg",
+      "size": 1024000,
+      "width": 1920,
+      "height": 1080
+    },
+    "full_url": "https://api.dobridobrev.com/storage/images/poster/filename.jpg",
+    "available_sizes": ["w92", "w154", "w185", "w342", "w500", "w780", "original"]
+  }
+}
+```
+
+### Upload Video Response:
+```json
+{
+  "data": {
+    "message": "Video uploaded successfully",
+    "video": {
+      "video_file_id": 456,
+      "url": "videos/filename.mp4",
+      "title": "Movie Title - Trailer",
+      "format": "mp4",
+      "resolution": "1920x1080"
+    },
+    "stream_url": "/api/v1/stream-video/filename.mp4",
+    "public_stream_url": "/api/v1/public-video/filename.mp4"
+  }
+}
+```
+
+## STATUS: TUTTO FUNZIONANTE
+
+Il backend Laravel è completamente implementato e funzionante per:
+- Upload immagini (poster, backdrop)
+- Upload video (trailer, movie)
+- Creazione movie con file
+- Streaming video protetto
+- Associazioni automatiche (pivot tables)
+- Autorizzazioni e validazioni
