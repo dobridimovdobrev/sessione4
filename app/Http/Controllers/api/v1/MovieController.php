@@ -65,59 +65,34 @@ class MovieController extends Controller
     $validatedData = $request->validated();
     
     $fileFields = [
-        'poster_image', 'backdrop_image', 'trailer_video', 'movie_video'
+        'trailer_video', 'movie_video'
     ];
     $movieData = collect($validatedData)->except($fileFields)->toArray();
 
     // Create the movie
     $movie = Movie::create($movieData);
 
-    // upload images
+    // Handle poster and backdrop URLs directly
+    // These are already uploaded via /api/v1/upload/image endpoint
     
-    // 1. Poster image
-    if ($request->hasFile('poster_image')) {
-        $posterFile = $request->file('poster_image');
-        $fileData = FileUploadHelper::uploadImage($posterFile, 'poster');
-        
-        // automatic generation of title description
-        $posterTitle = $request->title . ' - Poster';
-        $posterDescription = 'Poster for ' . $request->title;
-        
-        $posterImage = ImageFile::create([
-            'url' => $fileData['url'],
-            'title' => $posterTitle,
-            'description' => $posterDescription,
-            'format' => $fileData['format'],
-            'type' => 'poster',
-            'size' => $fileData['size'],
-            'width' => $fileData['width'],
-            'height' => $fileData['height'],
-        ]);
-        
-        $movie->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
+    // 1. Poster URL - find existing ImageFile by URL
+    if ($request->has('poster')) {
+        $posterImage = ImageFile::where('url', 'LIKE', '%' . basename($request->poster) . '%')
+                                ->where('type', 'poster')
+                                ->first();
+        if ($posterImage) {
+            $movie->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
+        }
     }
 
-    // 2. Backdrop image
-    if ($request->hasFile('backdrop_image')) {
-        $backdropFile = $request->file('backdrop_image');
-        $fileData = FileUploadHelper::uploadImage($backdropFile, 'backdrop');
-        
-        // automatic generation of title description
-        $backdropTitle = $request->title . ' - Backdrop';
-        $backdropDescription = 'Backdrop for ' . $request->title;
-        
-        $backdropImage = ImageFile::create([
-            'url' => $fileData['url'],
-            'title' => $backdropTitle,
-            'description' => $backdropDescription,
-            'format' => $fileData['format'],
-            'type' => 'backdrop',
-            'size' => $fileData['size'],
-            'width' => $fileData['width'],
-            'height' => $fileData['height'],
-        ]);
-        
-        $movie->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
+    // 2. Backdrop URL - find existing ImageFile by URL
+    if ($request->has('backdrop')) {
+        $backdropImage = ImageFile::where('url', 'LIKE', '%' . basename($request->backdrop) . '%')
+                                  ->where('type', 'backdrop')
+                                  ->first();
+        if ($backdropImage) {
+            $movie->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
+        }
     }
 
     // upload video

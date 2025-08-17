@@ -344,6 +344,11 @@ interface Person {
 **Autore**: Frontend Developer  
 **Status**: Modifiche completate, in attesa implementazione backend per upload video
 
+
+
+
+
+
 ## METODI API BACKEND ESISTENTI
 
 ### Upload Immagini (FUNZIONANTE)

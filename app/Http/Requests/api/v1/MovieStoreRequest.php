@@ -33,9 +33,9 @@ class MovieStoreRequest extends FormRequest
             "status" => ['required', 'in:published,draft,sheduled,coming soon'],
             "category_id" => ['required', 'exists:categories,category_id'],
 
-            // Image files (optional)
-            'poster_image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240',
-            'backdrop_image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240',
+            // Image URLs (required)
+            'poster' => 'required|string|url',
+            'backdrop' => 'required|string|url',
     
             
             // Video files (optional)
