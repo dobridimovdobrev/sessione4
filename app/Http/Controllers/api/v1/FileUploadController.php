@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Models\ImageFile;
 use App\Models\VideoFile;
+use App\Models\Trailer;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseMessages;
 use App\Helpers\FileUploadHelper;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\api\v1\ImageFileResource;
 use App\Http\Resources\api\v1\VideoFileResource;
+use App\Http\Resources\api\v1\TrailerResource;
 
 class FileUploadController extends Controller
 {
@@ -168,6 +170,63 @@ class FileUploadController extends Controller
         ];
 
         return $sizeMaps[$type] ?? ['original'];
+    }
+
+    /**
+     * Upload trailer file for frontend Angular
+     * Saves to trailers table instead of video_files
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadTrailer(Request $request)
+    {
+        // Authorization check
+        $this->authorize('create', Trailer::class);
+
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'video' => 'required|file|mimes:mp4,webm,ogg,mov,avi,mkv|max:512000', // Max 500MB
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseMessages::error([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $file = $request->file('video');
+            
+            // Upload file using helper
+            $fileData = FileUploadHelper::uploadVideo($file);
+            
+            // Create trailer record in trailers table
+            $trailer = Trailer::create([
+                'url' => $fileData['url'],
+                'title' => $request->input('title', $file->getClientOriginalName()),
+                'description' => $request->input('description', 'Uploaded trailer'),
+                'format' => $fileData['format'] ?? 'mp4',
+            ]);
+
+            return ResponseMessages::success([
+                'message' => 'Trailer uploaded successfully',
+                'trailer' => new TrailerResource($trailer),
+                'trailer_id' => $trailer->trailer_id,
+                'stream_url' => url('/api/v1/stream-video/' . basename($fileData['url'])),
+                'public_stream_url' => url('/api/v1/public-video/' . basename($fileData['url'])),
+                'type' => 'local' // Always local for uploaded trailers
+            ], 201);
+
+        } catch (\Exception $e) {
+            return ResponseMessages::error([
+                'message' => 'Trailer upload failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

@@ -144,6 +144,7 @@ Route::prefix('v1')->group(function () {
         // File Upload Routes (dedicated for Angular frontend)
         Route::post('/upload/image', [FileUploadController::class, 'uploadImage']);
         Route::post('/upload/video', [FileUploadController::class, 'uploadVideo']);
+        Route::post('/upload/trailer', [FileUploadController::class, 'uploadTrailer']);
         Route::get('/upload/progress', [FileUploadController::class, 'getUploadProgress']);
         Route::get('/upload/formats', [FileUploadController::class, 'getSupportedFormats']);
         

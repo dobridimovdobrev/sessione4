@@ -15,7 +15,9 @@ class Trailer extends Model
 
     protected $fillable = [
         'title',
-        'url'
+        'url',
+        'description',
+        'format'
     ];
 
     protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
