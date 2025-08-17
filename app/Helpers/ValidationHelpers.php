@@ -15,7 +15,15 @@ class ValidationHelpers
         $newRules = [];
         // replacing 'required' with 'sometimes'
         foreach($rules as $key => $value){
-            $newRules[$key] = str_replace('required', 'sometimes', $value);
+            if (is_array($value)) {
+                // Handle array format rules like ['required', 'string', 'max:128']
+                $newRules[$key] = array_map(function($rule) {
+                    return $rule === 'required' ? 'sometimes' : $rule;
+                }, $value);
+            } else {
+                // Handle string format rules like 'required|string|url'
+                $newRules[$key] = str_replace('required', 'sometimes', $value);
+            }
         }
 
         return $newRules;
