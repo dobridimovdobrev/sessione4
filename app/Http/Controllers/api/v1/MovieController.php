@@ -305,6 +305,32 @@ class MovieController extends Controller
             $movie->persons()->sync($request->persons);
         }
         
+        // Update video files if provided
+        if ($request->has('video_files')) {
+            $videoFileIds = [];
+            
+            foreach ($request->video_files as $videoData) {
+                if (isset($videoData['id'])) {
+                    // Existing video file - keep the association
+                    $videoFileIds[] = $videoData['id'];
+                } elseif (isset($videoData['video_file_id'])) {
+                    // Alternative ID field
+                    $videoFileIds[] = $videoData['video_file_id'];
+                } else {
+                    // Create new video file if full data is provided
+                    if (isset($videoData['url'])) {
+                        $videoFile = VideoFile::create($videoData);
+                        $videoFileIds[] = $videoFile->video_file_id;
+                    }
+                }
+            }
+            
+            // Sync video file associations (keeps existing ones)
+            if (!empty($videoFileIds)) {
+                $movie->videoFiles()->sync($videoFileIds);
+            }
+        }
+        
         return ResponseMessages::success(['message' => 'Movie successfully updated', 'movie' => new MovieResource($movie)], 200);
     }
 
