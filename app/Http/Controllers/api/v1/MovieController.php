@@ -151,12 +151,18 @@ class MovieController extends Controller
     // Attach video files
     if ($request->has('video_files')) {
         foreach ($request->video_files as $videoData) {
-            // Set automatic type if not provided
-            if (!isset($videoData['type'])) {
-                $videoData['type'] = 'movie'; // Default type for additional video files
+            // If video_file_id is provided, attach existing video file
+            if (isset($videoData['video_file_id'])) {
+                $movie->videoFiles()->attach($videoData['video_file_id']);
+            } else {
+                // Create new video file if full data is provided
+                // Set automatic type if not provided
+                if (!isset($videoData['type'])) {
+                    $videoData['type'] = 'movie'; // Default type for additional video files
+                }
+                $videoFile = VideoFile::create($videoData);
+                $movie->videoFiles()->attach($videoFile->video_file_id);
             }
-            $videoFile = VideoFile::create($videoData);
-            $movie->videoFiles()->attach($videoFile->video_file_id);
         }
     }
 
