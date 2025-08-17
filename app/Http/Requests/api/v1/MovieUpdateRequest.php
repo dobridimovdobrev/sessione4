@@ -23,17 +23,30 @@ class MovieUpdateRequest extends MovieStoreRequest
     {
        $rules = parent::rules();
        
-       // Remove URL validation for poster and backdrop in updates
-       // Frontend might send empty strings or invalid values
-       unset($rules['poster']);
-       unset($rules['backdrop']);
-       
-       // Apply general update transformations to remaining rules
+       // Apply general update transformations (required -> sometimes)
        $updatedRules = ValidationHelpers::updateRulesHelper($rules);
        
-       // Add back poster and backdrop as completely optional
-       $updatedRules['poster'] = 'nullable|string';
-       $updatedRules['backdrop'] = 'nullable|string';
+       // Custom validation for poster and backdrop in updates
+       // Allow null, empty string, or valid URLs
+       $updatedRules['poster'] = [
+           'nullable',
+           'string',
+           function ($attribute, $value, $fail) {
+               if (!empty($value) && !filter_var($value, FILTER_VALIDATE_URL)) {
+                   $fail("The {$attribute} field must be a valid URL when provided.");
+               }
+           }
+       ];
+       
+       $updatedRules['backdrop'] = [
+           'nullable', 
+           'string',
+           function ($attribute, $value, $fail) {
+               if (!empty($value) && !filter_var($value, FILTER_VALIDATE_URL)) {
+                   $fail("The {$attribute} field must be a valid URL when provided.");
+               }
+           }
+       ];
 
        return $updatedRules;
     }
