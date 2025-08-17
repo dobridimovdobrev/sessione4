@@ -47,8 +47,8 @@ class MovieController extends Controller
             }
         }
     
-        // Execute query with pagination (24 items per page)
-        $movies = $query->paginate(20);
+        // Order by creation date (newest first) and execute query with pagination
+        $movies = $query->orderBy('created_at', 'desc')->paginate(20);
     
         return new MovieCollection($movies);
     }

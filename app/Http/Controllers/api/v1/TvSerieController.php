@@ -31,7 +31,8 @@ class TvSerieController extends Controller
             }
         }
 
-        $tvSeries = $query->paginate(20);
+        // Order by creation date (newest first) and execute query with pagination
+        $tvSeries = $query->orderBy('created_at', 'desc')->paginate(20);
         return new TvSeriesCollection($tvSeries);
     }
 
