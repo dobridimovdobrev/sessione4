@@ -22,7 +22,19 @@ class MovieUpdateRequest extends MovieStoreRequest
     public function rules(): array
     {
        $rules = parent::rules();
+       
+       // Remove URL validation for poster and backdrop in updates
+       // Frontend might send empty strings or invalid values
+       unset($rules['poster']);
+       unset($rules['backdrop']);
+       
+       // Apply general update transformations to remaining rules
+       $updatedRules = ValidationHelpers::updateRulesHelper($rules);
+       
+       // Add back poster and backdrop as completely optional
+       $updatedRules['poster'] = 'nullable|string';
+       $updatedRules['backdrop'] = 'nullable|string';
 
-       return ValidationHelpers::updateRulesHelper($rules);
+       return $updatedRules;
     }
 }
