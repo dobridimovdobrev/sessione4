@@ -33,7 +33,7 @@ class MovieStoreRequest extends FormRequest
             "status" => ['required', 'in:published,draft,sheduled,coming soon'],
             "category_id" => ['required', 'exists:categories,category_id'],
 
-            // Image URLs (required)
+            // Image URLs (required for store, optional for update)
             'poster' => 'required|string|url',
             'backdrop' => 'required|string|url',
     

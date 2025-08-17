@@ -207,140 +207,100 @@ class MovieController extends Controller
         
         $validatedData = $request->validated();
         
-        // Rimuovi i campi dei file dalla validatedData per aggiornare il film
+        // Remove file fields from validatedData for basic movie update
         $fileFields = [
-            'poster_image', 'backdrop_image', 'trailer_video', 'movie_video'
+            'poster', 'backdrop', 'trailer_video', 'movie_video'
         ];
         $movieData = collect($validatedData)->except($fileFields)->toArray();
         
-        // Update the movie
+        // Update the movie with basic data
         $movie->update($movieData);
         
-        // Gestione dell'aggiornamento delle immagini
-        
-        // 1. Poster image
-        if ($request->hasFile('poster_image')) {
-            // Trova e rimuovi l'associazione con il poster esistente
+        // Handle poster URL update (same logic as store method)
+        if ($request->has('poster')) {
+            // Remove existing poster associations
             $existingPosters = $movie->imageFiles()->wherePivot('type', 'poster')->get();
             foreach ($existingPosters as $existingPoster) {
                 $movie->imageFiles()->detach($existingPoster->image_id);
-                // Qui potresti anche eliminare il file se non è usato da altri record
             }
             
-            // Carica il nuovo poster
-            $posterFile = $request->file('poster_image');
-            $fileData = FileUploadHelper::uploadImage($posterFile, 'poster');
-            
-            // Automatic generation of title description
-            $posterTitle = $request->title . ' - Poster';
-            $posterDescription = 'Poster for ' . $request->title;
-            
-            $posterImage = ImageFile::create([
-                'url' => $fileData['url'],
-                'title' => $posterTitle,
-                'description' => $posterDescription,
-                'format' => $fileData['format'],
-                'type' => 'poster',
-                'size' => $fileData['size'],
-                'width' => $fileData['width'],
-                'height' => $fileData['height'],
-            ]);
-            
-            $movie->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
+            // Find existing ImageFile by URL
+            $posterImage = ImageFile::where('url', 'LIKE', '%' . basename($request->poster) . '%')
+                                    ->where('type', 'poster')
+                                    ->first();
+            if ($posterImage) {
+                $movie->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
+            }
         }
-        
-        // 2. Backdrop image
-        if ($request->hasFile('backdrop_image')) {
-            // Trova e rimuovi l'associazione con il backdrop esistente
+
+        // Handle backdrop URL update (same logic as store method)
+        if ($request->has('backdrop')) {
+            // Remove existing backdrop associations
             $existingBackdrops = $movie->imageFiles()->wherePivot('type', 'backdrop')->get();
             foreach ($existingBackdrops as $existingBackdrop) {
                 $movie->imageFiles()->detach($existingBackdrop->image_id);
-                // Qui potresti anche eliminare il file se non è usato da altri record
             }
             
-            // Carica il nuovo backdrop
-            $backdropFile = $request->file('backdrop_image');
-            $fileData = FileUploadHelper::uploadImage($backdropFile, 'backdrop');
-            
-            // Automatic generation of title description
-            $backdropTitle = $request->title . ' - Backdrop';
-            $backdropDescription = 'Backdrop for ' . $request->title;
-            
-            $backdropImage = ImageFile::create([
-                'url' => $fileData['url'],
-                'title' => $backdropTitle,
-                'description' => $backdropDescription,
-                'format' => $fileData['format'],
-                'type' => 'backdrop',
-                'size' => $fileData['size'],
-                'width' => $fileData['width'],
-                'height' => $fileData['height'],
-            ]);
-            
-            $movie->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
+            // Find existing ImageFile by URL
+            $backdropImage = ImageFile::where('url', 'LIKE', '%' . basename($request->backdrop) . '%')
+                                      ->where('type', 'backdrop')
+                                      ->first();
+            if ($backdropImage) {
+                $movie->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
+            }
         }
-        
-        // Upload video
-        
-        // 1. Trailer video
+
+        // Handle trailer video file upload
         if ($request->hasFile('trailer_video')) {
-            // Disassocia tutti i trailer esistenti
-            // Poiché non abbiamo un campo 'type' né nella tabella pivot né nella tabella video_files,
-            // dobbiamo identificare i trailer in base al titolo (che contiene 'Trailer')
+            // Remove existing trailer associations
             $existingTrailers = $movie->videoFiles()->whereRaw("LOWER(title) LIKE '%trailer%'")->get();
             foreach ($existingTrailers as $existingTrailer) {
                 $movie->videoFiles()->detach($existingTrailer->video_file_id);
-                // Qui potresti anche eliminare il file se non è usato da altri record
             }
             
-            // Carica il nuovo trailer
+            // Upload new trailer
             $trailerFile = $request->file('trailer_video');
             $fileData = FileUploadHelper::uploadVideo($trailerFile);
             
             // Automatic generation of title description
-            $trailerTitle = $request->title . ' - Trailer';
-            $trailerDescription = 'Trailer for ' . $request->title;
+            $trailerTitle = ($request->title ?? $movie->title) . ' - Trailer';
             
             $trailerVideo = VideoFile::create([
                 'url' => $fileData['url'],
-                'title' => $trailerTitle, // Il titolo contiene 'Trailer' per identificarlo
-                'format' => $fileData['format'],
+                'title' => $trailerTitle,
+                'format' => $fileData['format'] ?? 'mp4',
                 'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
             ]);
             
             $movie->videoFiles()->attach($trailerVideo->video_file_id);
         }
-        
-        // 2. Movie video
+
+        // Handle movie video file upload
         if ($request->hasFile('movie_video')) {
-            // Disassocia tutti i video esistenti
-            // Poiché non abbiamo un campo 'type' né nella tabella pivot né nella tabella video_files,
-            // dobbiamo identificare i video in base al titolo (che contiene 'Full Movie')
+            // Remove existing movie video associations
             $existingMovieVideos = $movie->videoFiles()->whereRaw("LOWER(title) LIKE '%full movie%'")->get();
             foreach ($existingMovieVideos as $existingMovieVideo) {
                 $movie->videoFiles()->detach($existingMovieVideo->video_file_id);
-                // Qui potresti anche eliminare il file se non è usato da altri record
             }
             
-            // Carica il nuovo video
+            // Upload new movie video
             $movieFile = $request->file('movie_video');
             $fileData = FileUploadHelper::uploadVideo($movieFile);
             
             // Automatic generation of title description
-            $movieTitle = $request->title . ' - Full Movie';
-            $movieDescription = 'Full movie for ' . $request->title;
+            $movieTitle = ($request->title ?? $movie->title) . ' - Full Movie';
             
             $movieVideo = VideoFile::create([
                 'url' => $fileData['url'],
-                'title' => $movieTitle, // Il titolo contiene 'Full Movie' per identificarlo
-                'format' => $fileData['format'],
+                'title' => $movieTitle,
+                'format' => $fileData['format'] ?? 'mp4',
                 'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
             ]);
             
             $movie->videoFiles()->attach($movieVideo->video_file_id);
         }
         
-        // Attach persons (actors) to the movie if provided
+        // Update persons (actors) if provided
         if ($request->has('persons')) {
             $movie->persons()->sync($request->persons);
         }
