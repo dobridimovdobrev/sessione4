@@ -32,7 +32,8 @@ class MovieResource extends JsonResource
         // Add details only for single movie view
         if ($this->resource->relationLoaded('persons') && 
             $this->resource->relationLoaded('trailers') && 
-            $this->resource->relationLoaded('imageFiles')) {
+            $this->resource->relationLoaded('imageFiles') &&
+            $this->resource->relationLoaded('videoFiles')) {
             
             $data['description'] = $this->description;
             $data['backdrop'] = $this->getBackdropData();
