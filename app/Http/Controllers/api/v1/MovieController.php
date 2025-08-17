@@ -184,7 +184,8 @@ class MovieController extends Controller
             'category',
             'persons.imageFiles',  // Eager load imageFiles with persons
             'trailers',
-            'imageFiles'
+            'imageFiles',
+            'videoFiles'  // Load video files for streaming
         ]);
 
         return new MovieResource($movie);
