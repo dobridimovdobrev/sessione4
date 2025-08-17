@@ -18,6 +18,25 @@ class TrailerResource extends JsonResource
             'trailer_id' => $this->trailer_id,
             'title' => $this->title,
             'url' => $this->url,
+            'format' => $this->format,
+            'type' => $this->getVideoType(),
         ];
+    }
+
+    /**
+     * Determine video type based on format and URL
+     *
+     * @return string
+     */
+    private function getVideoType()
+    {
+        // Check if it's a YouTube URL (TMDB trailers)
+        if ($this->format === 'youtube' || 
+            strpos($this->url, 'youtube.com') !== false || 
+            strpos($this->url, 'youtu.be') !== false) {
+            return 'youtube';
+        }
+        
+        return 'local';
     }
 }

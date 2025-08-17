@@ -120,8 +120,28 @@ class MovieResource extends JsonResource
                 'format' => $video->format,
                 'resolution' => $video->resolution,
                 'stream_url' => url('/api/v1/stream-video/' . basename($video->url)),
-                'public_stream_url' => url('/api/v1/public-video/' . basename($video->url))
+                'public_stream_url' => url('/api/v1/public-video/' . basename($video->url)),
+                'type' => $this->getVideoFileType($video)
             ];
         })->toArray();
+    }
+
+    /**
+     * Determine video file type based on format and URL
+     *
+     * @param object $video
+     * @return string
+     */
+    private function getVideoFileType($video)
+    {
+        // Check if it's a YouTube URL
+        if ($video->format === 'youtube' || 
+            strpos($video->url, 'youtube.com') !== false || 
+            strpos($video->url, 'youtu.be') !== false) {
+            return 'youtube';
+        }
+        
+        // Local video files (mp4, mkv, etc.)
+        return 'local';
     }
 }
