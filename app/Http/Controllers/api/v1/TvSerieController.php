@@ -27,7 +27,12 @@ class TvSerieController extends Controller
 
         foreach ($filterData as $key => $value) {
             if (in_array($key, ['title', 'year', 'status', 'description', 'year', 'imdb_rating', 'category_id'])) {
-                $query->where($key, 'LIKE', "%$value%");
+                // Use exact match for numeric IDs, LIKE for text fields
+                if (in_array($key, ['category_id', 'year'])) {
+                    $query->where($key, '=', $value);
+                } else {
+                    $query->where($key, 'LIKE', "%$value%");
+                }
             }
         }
 

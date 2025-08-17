@@ -43,7 +43,12 @@ class MovieController extends Controller
         $filterData = $request->all();
         foreach ($filterData as $key => $value) {
             if (in_array($key, ['movie_id', 'title', 'year', 'duration', 'imdb_rating', 'status', 'category_id'])) {
-                $query->where($key, 'LIKE', "%$value%");
+                // Use exact match for numeric IDs, LIKE for text fields
+                if (in_array($key, ['movie_id', 'category_id', 'year', 'duration'])) {
+                    $query->where($key, '=', $value);
+                } else {
+                    $query->where($key, 'LIKE', "%$value%");
+                }
             }
         }
     
