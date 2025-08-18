@@ -23,8 +23,8 @@ class AuthController extends Controller
         //hash the password salt is included by default
         $hashedPassword = Hash::make($userData['password']);
 
-        // Set country_id to null if it is not provided in the request
-        $countryId = $userData['country_id'] ?? null;
+        // Country_id is now required, no need for null fallback
+        $countryId = $userData['country_id'];
 
         User::create([
             'username' => $userData['username'],

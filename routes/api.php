@@ -43,6 +43,7 @@ use App\Http\Controllers\api\v1\FileUploadController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:15,10'); //Login attempts, max 3 time, 15 minutes expiration
 Route::get('/v1/public-video/{filename}', [StreamController::class, 'publicStreamVideo']); // Accesso pubblico ai video
+Route::get('/countries', [CountryController::class, 'index']); // Public access to countries list for registration
 
 //Routes for Version 1 
 Route::prefix('v1')->group(function () {

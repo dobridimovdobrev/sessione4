@@ -29,7 +29,7 @@ class RegisterRequest extends FormRequest
             'last_name' => 'required|string|max:64',
             'gender' => 'required|in:male,female',
             'birthday' => 'required|date',
-            'country_id' => 'nullable|exists:countries,country_id',
+            'country_id' => 'required|exists:countries,country_id',
         ];
     }
 }
