@@ -23,6 +23,7 @@ class PersonStoreRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:128',
+            'image_file_id' => 'nullable|exists:image_files,image_id'
         ];
     }
 }

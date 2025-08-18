@@ -47,16 +47,28 @@ class PersonController extends Controller
         $existingPerson = Person::where(['name' => $validatedData['name']])->first();
 
         if ($existingPerson) {
+            // If image_file_id is provided, associate it with existing person
+            if (!empty($validatedData['image_file_id'])) {
+                $existingPerson->imageFiles()->syncWithoutDetaching([
+                    $validatedData['image_file_id'] => ['type' => 'persons']
+                ]);
+            }
             return ResponseMessages::success(
-                ['message' => 'Person already exists', 'person' => new PersonResource($existingPerson)],
+                ['message' => 'Person already exists', 'person' => new PersonResource($existingPerson->load('imageFiles'))],
                 200
             );
         }
+        
         //create a person if not exist in the database
-        $person = Person::create($validatedData);
+        $person = Person::create(['name' => $validatedData['name']]);
+
+        // Associate image if provided
+        if (!empty($validatedData['image_file_id'])) {
+            $person->imageFiles()->attach($validatedData['image_file_id'], ['type' => 'persons']);
+        }
 
         return ResponseMessages::success(
-            ['message' => 'Person created successfully', 'person' => new PersonResource($person)], 
+            ['message' => 'Person created successfully', 'person' => new PersonResource($person->load('imageFiles'))], 
             201
         );
     }
@@ -73,10 +85,27 @@ class PersonController extends Controller
         $this->authorize('update', $person);
 
         $validatedData = $request->validated();
-        $person->update($validatedData);
+        
+        // Update person name if provided
+        if (isset($validatedData['name'])) {
+            $person->update(['name' => $validatedData['name']]);
+        }
+
+        // Handle image association/replacement only if image_file_id is provided
+        if (array_key_exists('image_file_id', $validatedData)) {
+            if ($validatedData['image_file_id'] !== null) {
+                // Replace existing image with new one
+                $person->imageFiles()->wherePivot('type', 'persons')->detach();
+                $person->imageFiles()->attach($validatedData['image_file_id'], ['type' => 'persons']);
+            } else {
+                // Remove image if null is explicitly sent
+                $person->imageFiles()->wherePivot('type', 'persons')->detach();
+            }
+        }
+        // If image_file_id is not in request, leave existing image unchanged
 
         return ResponseMessages::success(
-            ['message' => 'Person updated successfully', 'person' => new PersonResource($person)], 
+            ['message' => 'Person updated successfully', 'person' => new PersonResource($person->load('imageFiles'))], 
             200
         );
     }

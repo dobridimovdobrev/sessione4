@@ -23,6 +23,11 @@ class PersonUpdateRequest extends PersonStoreRequest
     public function rules(): array
     {
         $rules = parent::rules();
-        return ValidationHelpers::updateRulesHelper($rules);
+        $updatedRules = ValidationHelpers::updateRulesHelper($rules);
+        
+        // Keep image_file_id as nullable for updates
+        $updatedRules['image_file_id'] = 'nullable|exists:image_files,image_id';
+        
+        return $updatedRules;
     }
 }

@@ -14,10 +14,14 @@ class PersonResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-          return [
+        $profileImage = $this->imageFiles()->wherePivot('type', 'persons')->first();
+        
+        return [
             'person_id' => $this->person_id,
             'name' => $this->name,
-            'profile_image' => $this->imageFiles()->wherePivot('type', 'persons')->first()?->url
+            'profile_image' => $profileImage?->url,
+            'profile_image_full' => $profileImage ? 'https://api.dobridobrev.com/storage/' . $profileImage->url : null,
+            'image_id' => $profileImage?->image_id
         ];
     }
 }
