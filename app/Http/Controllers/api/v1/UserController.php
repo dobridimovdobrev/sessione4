@@ -53,21 +53,46 @@ class UserController extends Controller
         //policy authorization to perform an action
         $this->authorize('viewAny', User::class);
 
-        //make filtering request using different parameters
-        $filterUsers = $request->all();
-
-        //Biuld the query
+        //Build the query
         $query = User::query();
 
-        //foreach loop with all specified values for making filtering requests
-        foreach ($filterUsers as $key => $value) {
-            if (in_array($key, ['user_id', 'username', 'email', 'first_name', 'last_name', 'birthday', 'gender', 'user_status','role_id'])) {
-                $query = $query->where($key, $value);
+        // Handle global search parameter
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('username', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('first_name', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('last_name', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('email', 'LIKE', "%{$searchTerm}%");
+            });
+        }
+
+        // Handle specific filters
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('user_status', $request->status);
+        }
+
+        if ($request->has('gender') && !empty($request->gender)) {
+            $query->where('gender', $request->gender);
+        }
+
+        if ($request->has('role') && !empty($request->role)) {
+            $query->where('role_id', $request->role);
+        }
+
+        // Handle other exact match filters
+        $exactFilters = ['user_id', 'country_id', 'birthday'];
+        foreach ($exactFilters as $filter) {
+            if ($request->has($filter) && !empty($request->$filter)) {
+                $query->where($filter, $request->$filter);
             }
         }
 
-        //this is for execute the query
-        $users = $query->paginate(10);
+        // Get pagination parameter
+        $perPage = $request->get('perPage', 10);
+        
+        //Execute the query with pagination
+        $users = $query->paginate($perPage);
 
         // User collection 
         return new UserCollection($users);
