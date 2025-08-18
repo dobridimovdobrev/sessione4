@@ -30,7 +30,7 @@ class UserStoreRequest extends FormRequest
             'gender' => 'required|in:male,female',
             'birthday' => 'required|date',
             'country_id' => 'nullable|exists:countries,country_id',
-            'user_status' => 'nullable|in:active, inactive, banned'
+            'user_status' => 'nullable|in:active,inactive,banned'
         ];
     }
 }
