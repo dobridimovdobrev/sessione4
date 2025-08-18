@@ -24,12 +24,11 @@ class UserUpdateRequest extends UserStoreRequest
     {
         $rules = parent::rules();
 
-        //authenticated user
-        $user = Auth::user();
+        // Get the user ID from the route parameter (for admin updates) or authenticated user (for self updates)
+        $targetUserId = $this->route('id') ?? Auth::id();
         
-        if ($user) {
-           
-            $rules['username'] = 'required|string|max:64|unique:users,username,' . $user->user_id; 
+        if ($targetUserId) {
+            $rules['username'] = 'required|string|max:64|unique:users,username,' . $targetUserId; 
         }
         
         // Apply update rules helper
