@@ -35,7 +35,17 @@ class CountryController extends Controller
             
         }
         
-        $countries =$query->paginate(30);
+        // Check if per_page parameter is provided for getting all countries
+        $perPage = $request->get('per_page', 30);
+        
+        // If per_page is 'all' or a very high number, return all countries without pagination
+        if ($perPage === 'all' || (is_numeric($perPage) && $perPage >= 1000)) {
+            $countries = $query->get();
+            return CountryResource::collection($countries);
+        }
+        
+        // Default pagination
+        $countries = $query->paginate((int)$perPage);
         return new CountryCollection($countries);
     }
 
