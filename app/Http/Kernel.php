@@ -50,6 +50,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         // Custom middleware
         'role' => \App\Http\Middleware\RoleMiddleware::class,
+        'user.status' => \App\Http\Middleware\UserStatusMiddleware::class,
         'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
         'auth:sanctum' => \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
     ];

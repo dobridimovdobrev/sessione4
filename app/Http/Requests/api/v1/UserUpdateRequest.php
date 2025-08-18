@@ -31,6 +31,17 @@ class UserUpdateRequest extends UserStoreRequest
            
             $rules['username'] = 'required|string|max:64|unique:users,username,' . $user->user_id; 
         }
-        return ValidationHelpers::updateRulesHelper($rules);
+        
+        // Apply update rules helper
+        $updateRules = ValidationHelpers::updateRulesHelper($rules);
+        
+        // Fix password confirmation for updates - remove confirmed rule for optional updates
+        if (isset($updateRules['password'])) {
+            $updateRules['password'] = 'nullable|sometimes|string|min:8';
+            // Add password_confirmation as optional field
+            $updateRules['password_confirmation'] = 'nullable|sometimes|string|same:password';
+        }
+        
+        return $updateRules;
     }
 }

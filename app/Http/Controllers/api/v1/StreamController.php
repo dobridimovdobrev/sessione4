@@ -4,7 +4,9 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\VideoFile;
+use App\Models\Credit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -18,12 +20,31 @@ class StreamController extends Controller
      */
     public function streamVideo($filename)
     {
+        // Check user credits before streaming
+        $user = Auth::user();
+        $credit = Credit::where('user_id', $user->user_id)->first();
+        
+        // If user has no credits record or insufficient credits
+        if (!$credit || $credit->remaining_credits < 1) {
+            return response()->json([
+                'error' => 'Crediti insufficienti per guardare il video',
+                'remaining_credits' => $credit ? $credit->remaining_credits : 0,
+                'message' => 'Aggiungi crediti per continuare a guardare'
+            ], 402); // Payment Required
+        }
+        
         // Trova il video nel database usando il filename
         $video = VideoFile::where('url', 'LIKE', '%' . $filename . '%')->first();
         
         if (!$video) {
             return response()->json(['error' => 'Video non trovato'], 404);
         }
+        
+        // Consume 1 credit for watching the video
+        $credit->spent_credits += 1;
+        $credit->remaining_credits -= 1;
+        $credit->update_date = now();
+        $credit->save();
         
         $path = $video->url;
         

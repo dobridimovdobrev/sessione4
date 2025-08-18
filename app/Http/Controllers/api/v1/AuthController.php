@@ -55,6 +55,17 @@ class AuthController extends Controller
         // Authenticated user
         $user = Auth::user();
 
+        // Check user status before proceeding
+        if ($user->user_status !== 'active') {
+            $statusMessages = [
+                'inactive' => 'Account temporaneamente disabilitato. Contatta l\'amministratore.',
+                'banned' => 'Account bannato permanentemente. Accesso negato.'
+            ];
+            
+            $message = $statusMessages[$user->user_status] ?? 'Account non attivo';
+            return ResponseMessages::error($message, 403);
+        }
+
         // Define abilities for different roles
         $abilities = [];
         if ($user->role->role_name === 'admin') {

@@ -48,14 +48,15 @@ Route::get('/countries', [CountryController::class, 'index']); // Public access 
 //Routes for Version 1 
 Route::prefix('v1')->group(function () {
     // Routes  FOR USER  AND ADMIN ROLE
-    Route::middleware(['auth:sanctum', 'role:admin,user'])->group(function () {
+    Route::middleware(['auth:sanctum', 'role:admin,user', 'user.status'])->group(function () {
         Route::put('/update-profile', [UserController::class, 'updateOwnProfile']);
         Route::post('/credits', [CreditController::class, 'store']);
+        Route::get('/credits/balance', [CreditController::class, 'getBalance']);
     });
 
 
     // Routes  ONLY BY ADMIN ROLE
-    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::middleware(['auth:sanctum', 'role:admin', 'user.status'])->group(function () {
         //Users
         Route::get('/users', [UserController::class, 'index']);
         Route::put('/users/{id}', [UserController::class, 'update']);
@@ -155,7 +156,7 @@ Route::prefix('v1')->group(function () {
 
 
     // Routes FOR ADMIN AND USER ROLES
-    Route::middleware(['auth:sanctum', 'role:admin,user'])->group(function () {
+    Route::middleware(['auth:sanctum', 'role:admin,user', 'user.status'])->group(function () {
         //User profile owner
         Route::get('/users/{id}', [UserController::class, 'show']);
         //Countries

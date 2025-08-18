@@ -27,7 +27,7 @@ class CountryController extends Controller
         
         foreach($filterCountry as $key => $value){
             //check if request = key\
-            if(in_array($key,['country_id', 'name', 'continent', 'iso2','iso3', 'phone_prefix'])){
+            if(in_array($key,['country_id', 'name', 'continent', 'iso_char2','iso_char3', 'phone_prefix'])){
             //if the key exist make the query
             $query = $query->where($key,'LIKE', "%$value%");
             // this is for executiong query

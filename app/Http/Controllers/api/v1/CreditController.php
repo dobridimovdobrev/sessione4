@@ -26,6 +26,30 @@ class CreditController extends Controller
     }
 
     /**
+     * Get current user's credit balance
+     */
+    public function getBalance()
+    {
+        $credit = Credit::where('user_id', Auth::id())->first();
+        
+        if (!$credit) {
+            return response()->json([
+                'remaining_credits' => 0,
+                'total_credits' => 0,
+                'spent_credits' => 0,
+                'message' => 'Nessun credito disponibile'
+            ]);
+        }
+
+        return response()->json([
+            'remaining_credits' => $credit->remaining_credits,
+            'total_credits' => $credit->total_credits,
+            'spent_credits' => $credit->spent_credits,
+            'credit_id' => $credit->credit_id
+        ]);
+    }
+
+    /**
      * Add credits to the authenticated user's account.
      */
     public function store(CreditStoreRequest $request)

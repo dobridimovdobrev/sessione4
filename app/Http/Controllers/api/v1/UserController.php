@@ -126,7 +126,7 @@ class UserController extends Controller
         $validatedData = $request->validated();
 
         // Retrieve the user by user_id or username
-        $user = User::where('user_id', $id)->orWhere('username', $id)->findOrFail();
+        $user = User::where('user_id', $id)->orWhere('username', $id)->firstOrFail();
 
         // Policy authorization to perform an action
         $this->authorize('update', $user);
