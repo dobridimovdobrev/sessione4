@@ -51,28 +51,38 @@ class TvSeriesResource extends JsonResource
      */
     private function getPosterData()
     {
-        // Always try to get poster image, even if relation not loaded
-        $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
-        
-        if (!$poster) {
+        try {
+            // Check if imageFiles relation is already loaded
+            if ($this->relationLoaded('imageFiles')) {
+                $poster = $this->imageFiles->where('pivot.type', 'poster')->first();
+            } else {
+                // Fallback to direct query if relation not loaded
+                $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
+            }
+            
+            if (!$poster) {
+                return null;
+            }
+
+            return [
+                'url' => $poster->full_url,
+                'sizes' => [
+                    'w92' => $poster->full_url,
+                    'w154' => $poster->full_url,
+                    'w185' => $poster->full_url,
+                    'w342' => $poster->full_url,
+                    'w500' => $poster->full_url,
+                    'w780' => $poster->full_url,
+                    'original' => $poster->full_url
+                ],
+                'width' => $poster->width,
+                'height' => $poster->height,
+                'format' => $poster->format
+            ];
+        } catch (\Exception $e) {
+            \Log::error('Error getting poster data for TV series: ' . $e->getMessage());
             return null;
         }
-
-        return [
-            'url' => $poster->full_url,
-            'sizes' => [
-                'w92' => $poster->full_url, // For now, same URL - could be enhanced with actual resizing
-                'w154' => $poster->full_url,
-                'w185' => $poster->full_url,
-                'w342' => $poster->full_url,
-                'w500' => $poster->full_url,
-                'w780' => $poster->full_url,
-                'original' => $poster->full_url
-            ],
-            'width' => $poster->width,
-            'height' => $poster->height,
-            'format' => $poster->format
-        ];
     }
 
     /**
@@ -82,25 +92,35 @@ class TvSeriesResource extends JsonResource
      */
     private function getBackdropData()
     {
-        // Always try to get backdrop image, even if relation not loaded
-        $backdrop = $this->imageFiles()->wherePivot('type', 'backdrop')->first();
-        
-        if (!$backdrop) {
+        try {
+            // Check if imageFiles relation is already loaded
+            if ($this->relationLoaded('imageFiles')) {
+                $backdrop = $this->imageFiles->where('pivot.type', 'backdrop')->first();
+            } else {
+                // Fallback to direct query if relation not loaded
+                $backdrop = $this->imageFiles()->wherePivot('type', 'backdrop')->first();
+            }
+            
+            if (!$backdrop) {
+                return null;
+            }
+
+            return [
+                'url' => $backdrop->full_url,
+                'sizes' => [
+                    'w300' => $backdrop->full_url,
+                    'w780' => $backdrop->full_url,
+                    'w1280' => $backdrop->full_url,
+                    'original' => $backdrop->full_url
+                ],
+                'width' => $backdrop->width,
+                'height' => $backdrop->height,
+                'format' => $backdrop->format
+            ];
+        } catch (\Exception $e) {
+            \Log::error('Error getting backdrop data for TV series: ' . $e->getMessage());
             return null;
         }
-
-        return [
-            'url' => $backdrop->full_url,
-            'sizes' => [
-                'w300' => $backdrop->full_url,
-                'w780' => $backdrop->full_url,
-                'w1280' => $backdrop->full_url,
-                'original' => $backdrop->full_url
-            ],
-            'width' => $backdrop->width,
-            'height' => $backdrop->height,
-            'format' => $backdrop->format
-        ];
     }
 
 
@@ -191,8 +211,7 @@ class TvSeriesResource extends JsonResource
         $seasons = $this->seasons()
             ->with([
                 'episodes.imageFiles',
-                'episodes.videoFiles',
-                'episodes.persons'
+                'episodes.videoFiles'
             ])
             ->orderBy('season_number')
             ->get();

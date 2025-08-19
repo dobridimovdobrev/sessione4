@@ -156,17 +156,30 @@ class TvSerieController extends Controller
      */
     public function show(TvSerie $tvSerie)
     {
-        $this->authorize('view', $tvSerie);
+        try {
+            $this->authorize('view', $tvSerie);
 
-        // Eager load all relationships for detailed view
-        $tvSerie->load([
-            'category',
-            'persons.imageFiles',
-            'trailers',
-            'imageFiles'
-        ]);
+            // Eager load all relationships for detailed view
+            $tvSerie->load([
+                'category',
+                'persons.imageFiles',
+                'trailers',
+                'imageFiles'
+            ]);
 
-        return new TvSeriesResource($tvSerie);
+            return new TvSeriesResource($tvSerie);
+        } catch (\Exception $e) {
+            \Log::error('Error in TvSerieController@show: ' . $e->getMessage(), [
+                'tv_series_id' => $tvSerie->tv_series_id ?? null,
+                'user_id' => auth()->id(),
+                'exception' => $e
+            ]);
+
+            return response()->json([
+                'error' => 'Unable to load TV series details',
+                'message' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
     }
 
     /**

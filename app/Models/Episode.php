@@ -57,11 +57,6 @@ class Episode extends Model
                     ->withTimestamps();
     }
  
-     // Actors for each episode 
-     public function persons()
-     {
-         return $this->belongsToMany(Person::class, 'episode_person', 'episode_id', 'person_id');
-     }
     
 
 }

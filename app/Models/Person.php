@@ -35,11 +35,6 @@ class Person extends Model
         return $this->belongsToMany(Season::class, 'season_person', 'person_id', 'season_id');
     }
 
-    // Relationship with Episodes
-    public function episodes()
-    {
-        return $this->belongsToMany(Episode::class, 'episode_person', 'person_id', 'episode_id');
-    }
 
     // Relationship with images
     public function imageFiles()
