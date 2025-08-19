@@ -37,6 +37,7 @@ class TvSeriesResource extends JsonResource
             $data['backdrop'] = $this->getBackdropData();
             $data['persons'] = PersonResource::collection($this->whenLoaded('persons'));
             $data['trailers'] = TrailerResource::collection($this->whenLoaded('trailers'));
+            $data['video_files'] = $this->getVideoFilesData(); // Add TV series video files (trailers)
             
             // Add seasons and episodes for TV series - load them separately
             $data['seasons'] = $this->getSeasonsData();
@@ -177,6 +178,33 @@ class TvSeriesResource extends JsonResource
         
         // Local video files (mp4, mkv, etc.)
         return 'local';
+    }
+
+    /**
+     * Get TV series video files data (trailers) with streaming URLs
+     *
+     * @return array
+     */
+    private function getVideoFilesData()
+    {
+        // Always try to get video files, even if relation not loaded
+        $videoFiles = $this->videoFiles()->get();
+        
+        if ($videoFiles->isEmpty()) {
+            return [];
+        }
+
+        return $videoFiles->map(function($video) {
+            return [
+                'video_file_id' => $video->video_file_id,
+                'title' => $video->title,
+                'format' => $video->format,
+                'resolution' => $video->resolution,
+                'stream_url' => url('/api/v1/stream-video/' . basename($video->url)),
+                'public_stream_url' => url('/api/v1/public-video/' . basename($video->url)),
+                'type' => $this->getVideoFileType($video)
+            ];
+        })->toArray();
     }
 
     /**
