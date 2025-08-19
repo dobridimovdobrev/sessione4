@@ -23,6 +23,14 @@ class EpisodeUpdateRequest extends EpisodeStoreRequest
     public function rules(): array
     {
         $rules = parent::rules();
-        return ValidationHelpers::updateRulesHelper($rules);
+        
+        // Apply general update transformations (required -> sometimes)
+        $updatedRules = ValidationHelpers::updateRulesHelper($rules);
+        
+        // Make file uploads optional for updates (partial updates)
+        $updatedRules['episode_video'] = 'nullable|file|mimes:mp4,webm,ogg,mov,avi,mkv|max:1024000';
+        $updatedRules['still_image'] = 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:10240';
+
+        return $updatedRules;
     }
 }

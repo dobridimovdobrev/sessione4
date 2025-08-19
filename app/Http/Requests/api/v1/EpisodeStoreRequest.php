@@ -22,12 +22,23 @@ class EpisodeStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Basic episode data
             'season_id' => 'required|exists:seasons,season_id',
-            'title' => 'required|string|max:64',
+            'title' => 'required|string|max:128',
+            'slug' => 'nullable|string|max:128',
             'description' => 'required|string',
             'episode_number' => 'required|integer',
-            'duration' => 'required|integer',
+            'duration' => 'nullable|integer',
+            'air_date' => 'nullable|date',
             'status' => 'required|in:published,draft,scheduled,coming soon',
+
+            // File uploads (required for episodes)
+            'episode_video' => 'required|file|mimes:mp4,webm,ogg,mov,avi,mkv|max:1024000', // 1GB max for episodes
+            'still_image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240', // 10MB max for images
+
+            // Optional fields
+            'persons' => 'sometimes|array',
+            'persons.*' => 'exists:persons,person_id',
         ];
     }
 }
