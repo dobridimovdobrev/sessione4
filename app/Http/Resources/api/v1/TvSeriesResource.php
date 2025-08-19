@@ -54,41 +54,27 @@ class TvSeriesResource extends JsonResource
      */
     private function getPosterData()
     {
-        try {
-            $poster = null;
-            
-            // Check if imageFiles relation is already loaded
-            if ($this->relationLoaded('imageFiles')) {
-                // For list view: controller already filters for poster, so take first
-                $poster = $this->imageFiles->first();
-            } else {
-                // For detail view: do direct query
-                $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
-            }
-            
-            if (!$poster) {
-                return null;
-            }
-
-            return [
-                'url' => $poster->full_url ?? $poster->url,
-                'sizes' => [
-                    'w92' => $poster->full_url ?? $poster->url,
-                    'w154' => $poster->full_url ?? $poster->url,
-                    'w185' => $poster->full_url ?? $poster->url,
-                    'w342' => $poster->full_url ?? $poster->url,
-                    'w500' => $poster->full_url ?? $poster->url,
-                    'w780' => $poster->full_url ?? $poster->url,
-                    'original' => $poster->full_url ?? $poster->url
-                ],
-                'width' => $poster->width,
-                'height' => $poster->height,
-                'format' => $poster->format
-            ];
-        } catch (\Exception $e) {
-            \Log::error('Error getting poster data for TV series: ' . $e->getMessage());
+        $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
+        
+        if (!$poster) {
             return null;
         }
+
+        return [
+            'url' => $poster->full_url,
+            'sizes' => [
+                'w92' => $poster->full_url,
+                'w154' => $poster->full_url,
+                'w185' => $poster->full_url,
+                'w342' => $poster->full_url,
+                'w500' => $poster->full_url,
+                'w780' => $poster->full_url,
+                'original' => $poster->full_url
+            ],
+            'width' => $poster->width,
+            'height' => $poster->height,
+            'format' => $poster->format
+        ];
     }
 
     /**
@@ -98,35 +84,24 @@ class TvSeriesResource extends JsonResource
      */
     private function getBackdropData()
     {
-        try {
-            // Check if imageFiles relation is already loaded
-            if ($this->relationLoaded('imageFiles')) {
-                $backdrop = $this->imageFiles->where('pivot.type', 'backdrop')->first();
-            } else {
-                // Fallback to direct query if relation not loaded
-                $backdrop = $this->imageFiles()->wherePivot('type', 'backdrop')->first();
-            }
-            
-            if (!$backdrop) {
-                return null;
-            }
-
-            return [
-                'url' => $backdrop->full_url,
-                'sizes' => [
-                    'w300' => $backdrop->full_url,
-                    'w780' => $backdrop->full_url,
-                    'w1280' => $backdrop->full_url,
-                    'original' => $backdrop->full_url
-                ],
-                'width' => $backdrop->width,
-                'height' => $backdrop->height,
-                'format' => $backdrop->format
-            ];
-        } catch (\Exception $e) {
-            \Log::error('Error getting backdrop data for TV series: ' . $e->getMessage());
+        $backdrop = $this->imageFiles()->wherePivot('type', 'backdrop')->first();
+        
+        if (!$backdrop) {
             return null;
         }
+
+        return [
+            'url' => $backdrop->full_url,
+            'sizes' => [
+                'w300' => $backdrop->full_url,
+                'w780' => $backdrop->full_url,
+                'w1280' => $backdrop->full_url,
+                'original' => $backdrop->full_url
+            ],
+            'width' => $backdrop->width,
+            'height' => $backdrop->height,
+            'format' => $backdrop->format
+        ];
     }
 
 
