@@ -30,8 +30,8 @@ class TvSeriesResource extends JsonResource
             'poster' => $this->getPosterData()
         ];
 
-        // Add details for single TV series view - check if imageFiles relation is loaded (indicates detail view)
-        if ($this->resource->relationLoaded('imageFiles')) {
+        // Add details for single TV series view - check if seasons relation is loaded (indicates detail view)
+        if ($this->resource->relationLoaded('seasons')) {
             
             $data['description'] = $this->description;
             $data['backdrop'] = $this->getBackdropData();
@@ -53,7 +53,14 @@ class TvSeriesResource extends JsonResource
      */
     private function getPosterData()
     {
-        $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
+        // Use loaded relation if available to avoid N+1 query
+        if ($this->relationLoaded('imageFiles')) {
+            $poster = $this->imageFiles->filter(function($image) {
+                return $image->pivot && $image->pivot->type === 'poster';
+            })->first();
+        } else {
+            $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
+        }
         
         if (!$poster) {
             return null;
