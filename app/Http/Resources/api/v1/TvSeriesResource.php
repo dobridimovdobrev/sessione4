@@ -55,7 +55,10 @@ class TvSeriesResource extends JsonResource
     {
         // Use loaded relation if available, otherwise query directly
         if ($this->relationLoaded('imageFiles')) {
-            $poster = $this->imageFiles->where('pivot.type', 'poster')->first();
+            // Filter loaded collection by pivot type
+            $poster = $this->imageFiles->filter(function($image) {
+                return $image->pivot && $image->pivot->type === 'poster';
+            })->first();
         } else {
             $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
         }
