@@ -344,12 +344,26 @@ class TvSerieController extends Controller
 
         $validatedData = $request->validated();
         
+        // Debug logging
+        \Log::info('TvSerie Update - Validated Data:', $validatedData);
+        \Log::info('TvSerie Update - Request all data:', $request->all());
+        \Log::info('TvSerie Update - Has title in request:', $request->has('title'));
+        \Log::info('TvSerie Update - Title from request:', $request->get('title'));
+        
         // Extract file fields and seasons data
         $fileFields = ['poster_image', 'backdrop_image', 'trailer_video', 'seasons'];
         $tvSeriesData = collect($validatedData)->except($fileFields)->toArray();
+        
+        // Debug logging
+        \Log::info('TvSerie Update - Data for update:', $tvSeriesData);
+        \Log::info('TvSerie Update - Before update TV Series:', $tvSerie->toArray());
 
         // Update the TV series basic data
-        $tvSerie->update($tvSeriesData);
+        $updateResult = $tvSerie->update($tvSeriesData);
+        
+        // Debug logging
+        \Log::info('TvSerie Update - Update result:', ['success' => $updateResult]);
+        \Log::info('TvSerie Update - After update TV Series:', $tvSerie->fresh()->toArray());
 
         // 1. Handle poster image upload (partial update)
         if ($request->hasFile('poster_image')) {
