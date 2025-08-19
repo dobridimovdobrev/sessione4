@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::table('tv_series', function (Blueprint $table) {
             // Make tmdb_id nullable to allow frontend creation without TMDB ID
-            $table->bigInteger('tmdb_id')->nullable()->unique()->change();
+            // Don't add unique constraint as it already exists
+            $table->bigInteger('tmdb_id')->nullable()->change();
         });
     }
 
@@ -24,7 +25,8 @@ return new class extends Migration
     {
         Schema::table('tv_series', function (Blueprint $table) {
             // Revert tmdb_id to not nullable (original state)
-            $table->bigInteger('tmdb_id')->nullable(false)->unique()->change();
+            // Don't add unique constraint as it already exists
+            $table->bigInteger('tmdb_id')->nullable(false)->change();
         });
     }
 };
