@@ -76,7 +76,8 @@ class TvSeriesResource extends JsonResource
      */
     private function getPosterData()
     {
-        $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
+        // Use loaded relation instead of new query
+        $poster = $this->imageFiles->where('pivot.type', 'poster')->first();
         
         if (!$poster) {
             return null;
@@ -106,7 +107,8 @@ class TvSeriesResource extends JsonResource
      */
     private function getBackdropData()
     {
-        $backdrop = $this->imageFiles()->wherePivot('type', 'backdrop')->first();
+        // Use loaded relation instead of new query
+        $backdrop = $this->imageFiles->where('pivot.type', 'backdrop')->first();
         
         if (!$backdrop) {
             return null;
@@ -158,7 +160,8 @@ class TvSeriesResource extends JsonResource
      */
     private function getEpisodeStillData($episode)
     {
-        $still = $episode->imageFiles()->wherePivot('type', 'still')->first();
+        // Use loaded relation instead of new query
+        $still = $episode->imageFiles->where('pivot.type', 'still')->first();
         
         if (!$still) {
             return null;
