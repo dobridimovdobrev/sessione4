@@ -25,7 +25,7 @@ class TvSerie extends Model
         'total_seasons',
         'status',
         'category_id',
-        'tmdb_id',
+        // 'tmdb_id', // Removed from fillable - will be set separately when needed
         'premiere_date'
     ];
 

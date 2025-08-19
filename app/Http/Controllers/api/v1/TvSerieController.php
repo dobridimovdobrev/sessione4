@@ -258,6 +258,11 @@ class TvSerieController extends Controller
                     $episodeFields = collect($episodeData)->except($episodeFileFields)->toArray();
                     $episodeFields['season_id'] = $season->season_id;
                     
+                    // Set default description if not provided (required by database)
+                    if (!isset($episodeFields['description']) || empty($episodeFields['description'])) {
+                        $episodeFields['description'] = $episodeFields['title'] ?? 'Episode description';
+                    }
+                    
                     // Create episode
                     $episode = Episode::create($episodeFields);
                     
@@ -462,6 +467,12 @@ class TvSerieController extends Controller
                             $episodeFileFields = ['episode_video', 'still_image', 'persons'];
                             $episodeFields = collect($episodeData)->except($episodeFileFields)->toArray();
                             $episodeFields['season_id'] = $season->season_id;
+                            
+                            // Set default description if not provided (required by database)
+                            if (!isset($episodeFields['description']) || empty($episodeFields['description'])) {
+                                $episodeFields['description'] = $episodeFields['title'] ?? 'Episode description';
+                            }
+                            
                             $episode = Episode::create($episodeFields);
                         }
                         

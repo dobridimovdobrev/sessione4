@@ -23,7 +23,7 @@ class Episode extends Model
         'status',
         'season_id',
         'air_date',
-        'tmdb_id'
+        // 'tmdb_id' // Removed from fillable - will be set separately when needed
     ];
 
     protected $casts = [

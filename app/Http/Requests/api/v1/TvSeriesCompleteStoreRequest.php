@@ -30,7 +30,7 @@ class TvSeriesCompleteStoreRequest extends FormRequest
             'total_seasons' => ['nullable', 'integer'],
             'total_episodes' => ['nullable', 'integer'],
             'premiere_date' => ['nullable', 'date'],
-            'status' => ['required', 'in:published,draft,scheduled,coming soon'],
+            'status' => ['required', 'in:ongoing,ended,canceled,unknown'],
             'category_id' => ['required', 'exists:categories,category_id'],
 
             // Image files (required for complete creation)
@@ -62,6 +62,7 @@ class TvSeriesCompleteStoreRequest extends FormRequest
             'seasons.*.episodes' => 'required|array|min:1',
             'seasons.*.episodes.*.title' => 'required|string|max:128',
             'seasons.*.episodes.*.slug' => 'nullable|string|max:128',
+            'seasons.*.episodes.*.description' => 'nullable|string',
             'seasons.*.episodes.*.episode_number' => 'required|integer',
             'seasons.*.episodes.*.duration' => 'nullable|integer',
             'seasons.*.episodes.*.air_date' => 'nullable|date',
