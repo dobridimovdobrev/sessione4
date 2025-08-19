@@ -158,16 +158,27 @@ class TvSerieController extends Controller
     {
         $this->authorize('view', $tvSerie);
 
-        // Load basic relationships like MovieController
-        $tvSerie->load([
-            'category',
-            'persons.imageFiles',
-            'trailers',
-            'imageFiles',
-            'videoFiles'
-        ]);
-
-        return new TvSeriesResource($tvSerie);
+        try {
+            // Test step by step to isolate the issue
+            
+            // Step 1: Try without any relationships
+            return response()->json([
+                'tv_series_id' => $tvSerie->tv_series_id,
+                'title' => $tvSerie->title,
+                'year' => $tvSerie->year,
+                'status' => $tvSerie->status,
+                'debug_step' => 'Step 1: Basic data only'
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error in TvSerie show',
+                'message' => $e->getMessage(),
+                'tv_series_id' => $tvSerie->tv_series_id,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
+        }
     }
 
     /**

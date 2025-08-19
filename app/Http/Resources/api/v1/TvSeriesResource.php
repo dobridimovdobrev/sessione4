@@ -19,9 +19,6 @@ class TvSeriesResource extends JsonResource
             'tv_series_id' => $this->tv_series_id,
             'title' => $this->title,
             'year' => $this->year,
-            'imdb_rating' => $this->imdb_rating,
-            'total_seasons' => $this->total_seasons,
-            'total_episodes' => $this->total_episodes,
             'status' => $this->status,
             'category' => $this->category ? [
                 'id' => $this->category->category_id,
@@ -30,7 +27,7 @@ class TvSeriesResource extends JsonResource
             'poster' => $this->getPosterData()
         ];
 
-        // Add details only for single TV series view
+        // Add details only for single TV series view - same logic as MovieResource
         if ($this->resource->relationLoaded('persons') && 
             $this->resource->relationLoaded('trailers') && 
             $this->resource->relationLoaded('imageFiles') &&
@@ -42,28 +39,8 @@ class TvSeriesResource extends JsonResource
             $data['trailers'] = TrailerResource::collection($this->whenLoaded('trailers'));
             $data['video_files'] = $this->getVideoFilesData();
             
-            // Include seasons with episodes when loaded
-            if ($this->resource->relationLoaded('seasons')) {
-                $data['seasons'] = $this->seasons->map(function($season) {
-                    return [
-                        'season_id' => $season->season_id,
-                        'season_number' => $season->season_number,
-                        'year' => $season->year,
-                        'total_episodes' => $season->total_episodes,
-                        'episodes' => $season->episodes->map(function($episode) {
-                            return [
-                                'episode_id' => $episode->episode_id,
-                                'title' => $episode->title,
-                                'episode_number' => $episode->episode_number,
-                                'duration' => $episode->duration,
-                                'air_date' => $episode->air_date,
-                                'still' => $this->getEpisodeStillData($episode),
-                                'video_files' => $this->getEpisodeVideoFilesData($episode)
-                            ];
-                        })
-                    ];
-                });
-            }
+            // Add seasons and episodes for TV series - load them separately
+            $data['seasons'] = $this->getSeasonsData();
         }
 
         return $data;
