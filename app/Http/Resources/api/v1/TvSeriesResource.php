@@ -207,4 +207,53 @@ class TvSeriesResource extends JsonResource
         // Local video files (mp4, mkv, etc.)
         return 'local';
     }
+
+    /**
+     * Get seasons data with episodes for TV series details
+     *
+     * @return array
+     */
+    private function getSeasonsData()
+    {
+        // Load seasons with episodes and their relationships
+        $seasons = $this->seasons()
+            ->with([
+                'episodes.imageFiles',
+                'episodes.videoFiles',
+                'episodes.persons'
+            ])
+            ->orderBy('season_number')
+            ->get();
+        
+        if ($seasons->isEmpty()) {
+            return [];
+        }
+
+        return $seasons->map(function($season) {
+            $episodesData = $season->episodes->map(function($episode) {
+                return [
+                    'episode_id' => $episode->episode_id,
+                    'title' => $episode->title,
+                    'description' => $episode->description,
+                    'episode_number' => $episode->episode_number,
+                    'duration' => $episode->duration,
+                    'air_date' => $episode->air_date,
+                    'status' => $episode->status,
+                    'still' => $this->getEpisodeStillData($episode),
+                    'video_files' => $this->getEpisodeVideoFilesData($episode)
+                ];
+            })->toArray();
+
+            return [
+                'season_id' => $season->season_id,
+                'season_number' => $season->season_number,
+                'name' => $season->name,
+                'overview' => $season->overview,
+                'total_episodes' => $season->total_episodes,
+                'year' => $season->year,
+                'premiere_date' => $season->premiere_date,
+                'episodes' => $episodesData
+            ];
+        })->toArray();
+    }
 }
