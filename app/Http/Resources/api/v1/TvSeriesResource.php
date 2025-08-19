@@ -187,13 +187,11 @@ class TvSeriesResource extends JsonResource
      */
     private function getVideoFilesData()
     {
-        $videoFiles = $this->videoFiles()->get();
-        
-        if ($videoFiles->isEmpty()) {
+        if (!$this->resource->relationLoaded('videoFiles')) {
             return [];
         }
 
-        return $videoFiles->map(function($video) {
+        return $this->videoFiles->map(function($video) {
             return [
                 'video_file_id' => $video->video_file_id,
                 'title' => $video->title,
