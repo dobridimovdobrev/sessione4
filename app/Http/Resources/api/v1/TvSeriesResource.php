@@ -107,13 +107,8 @@ class TvSeriesResource extends JsonResource
      */
     private function getBackdropData()
     {
-        // Check if imageFiles relation is loaded, if not return null
-        if (!$this->resource->relationLoaded('imageFiles')) {
-            return null;
-        }
-        
-        // Use loaded relation instead of new query
-        $backdrop = $this->imageFiles->where('pivot.type', 'backdrop')->first();
+        // Always try to get backdrop image, even if relation not loaded
+        $backdrop = $this->imageFiles()->wherePivot('type', 'backdrop')->first();
         
         if (!$backdrop) {
             return null;
@@ -140,11 +135,14 @@ class TvSeriesResource extends JsonResource
      */
     private function getVideoFilesData()
     {
-        if (!$this->resource->relationLoaded('videoFiles')) {
+        // Always try to get video files, even if relation not loaded
+        $videoFiles = $this->videoFiles()->get();
+        
+        if ($videoFiles->isEmpty()) {
             return [];
         }
 
-        return $this->videoFiles->map(function($video) {
+        return $videoFiles->map(function($video) {
             return [
                 'video_file_id' => $video->video_file_id,
                 'title' => $video->title,
@@ -165,13 +163,8 @@ class TvSeriesResource extends JsonResource
      */
     private function getEpisodeStillData($episode)
     {
-        // Check if imageFiles relation is loaded for episode
-        if (!$episode->relationLoaded('imageFiles')) {
-            return null;
-        }
-        
-        // Use loaded relation instead of new query
-        $still = $episode->imageFiles->where('pivot.type', 'still')->first();
+        // Always try to get still image, even if relation not loaded
+        $still = $episode->imageFiles()->wherePivot('type', 'still')->first();
         
         if (!$still) {
             return null;
@@ -199,11 +192,14 @@ class TvSeriesResource extends JsonResource
      */
     private function getEpisodeVideoFilesData($episode)
     {
-        if (!$episode->relationLoaded('videoFiles')) {
+        // Always try to get video files, even if relation not loaded
+        $videoFiles = $episode->videoFiles()->get();
+        
+        if ($videoFiles->isEmpty()) {
             return [];
         }
 
-        return $episode->videoFiles->map(function($video) {
+        return $videoFiles->map(function($video) {
             return [
                 'video_file_id' => $video->video_file_id,
                 'title' => $video->title,
