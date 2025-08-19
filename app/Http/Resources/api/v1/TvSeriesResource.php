@@ -19,6 +19,9 @@ class TvSeriesResource extends JsonResource
             'tv_series_id' => $this->tv_series_id,
             'title' => $this->title,
             'year' => $this->year,
+            'imdb_rating' => $this->imdb_rating,
+            'total_seasons' => $this->total_seasons,
+            'total_episodes' => $this->total_episodes,
             'status' => $this->status,
             'category' => $this->category ? [
                 'id' => $this->category->category_id,
@@ -52,17 +55,14 @@ class TvSeriesResource extends JsonResource
     private function getPosterData()
     {
         try {
+            $poster = null;
+            
             // Check if imageFiles relation is already loaded
             if ($this->relationLoaded('imageFiles')) {
-                // If relation is loaded, it might already be filtered for posters
-                $poster = $this->imageFiles->first(); // Take the first image (should be poster)
-                
-                // If no poster found in loaded relation, try with pivot filter
-                if (!$poster) {
-                    $poster = $this->imageFiles->where('pivot.type', 'poster')->first();
-                }
+                // For list view: controller already filters for poster, so take first
+                $poster = $this->imageFiles->first();
             } else {
-                // Fallback to direct query if relation not loaded
+                // For detail view: do direct query
                 $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
             }
             
