@@ -159,35 +159,21 @@ class TvSerieController extends Controller
         $this->authorize('view', $tvSerie);
 
         try {
-            // Eager load all relationships for detailed view
-            $tvSerie->load([
-                'category',
-                'persons.imageFiles',  // Eager load imageFiles with persons
-                'trailers',
-                'imageFiles',
-                'videoFiles',  // Load video files for streaming
-                'seasons' => function($query) {
-                    $query->select('season_id', 'tv_series_id', 'season_number', 'year', 'total_episodes')
-                          ->orderBy('season_number', 'asc')
-                          ->with(['episodes' => function($query) {
-                              $query->select('episode_id', 'season_id', 'title', 'episode_number', 'duration', 'air_date')
-                                    ->orderBy('episode_number', 'asc')
-                                    ->with([
-                                        'imageFiles' => function($query) {
-                                            $query->wherePivot('type', 'still')->limit(1);
-                                        },
-                                        'videoFiles'  // Load video files for each episode
-                                    ]);
-                          }]);
-                }
+            // Test minimal response first
+            return response()->json([
+                'tv_series_id' => $tvSerie->tv_series_id,
+                'title' => $tvSerie->title,
+                'year' => $tvSerie->year,
+                'status' => $tvSerie->status,
+                'debug' => 'Basic data only - no relations loaded'
             ]);
-
-            return new TvSeriesResource($tvSerie);
         } catch (\Exception $e) {
             \Log::error('TvSerie show error for ID ' . $tvSerie->tv_series_id . ': ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'error' => 'Error loading TV series details',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
+                'tv_series_id' => $tvSerie->tv_series_id
             ], 500);
         }
     }
