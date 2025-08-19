@@ -158,24 +158,16 @@ class TvSerieController extends Controller
     {
         $this->authorize('view', $tvSerie);
 
-        try {
-            // Test minimal response first
-            return response()->json([
-                'tv_series_id' => $tvSerie->tv_series_id,
-                'title' => $tvSerie->title,
-                'year' => $tvSerie->year,
-                'status' => $tvSerie->status,
-                'debug' => 'Basic data only - no relations loaded'
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('TvSerie show error for ID ' . $tvSerie->tv_series_id . ': ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
-            return response()->json([
-                'error' => 'Error loading TV series details',
-                'message' => $e->getMessage(),
-                'tv_series_id' => $tvSerie->tv_series_id
-            ], 500);
-        }
+        // Load basic relationships like MovieController
+        $tvSerie->load([
+            'category',
+            'persons.imageFiles',
+            'trailers',
+            'imageFiles',
+            'videoFiles'
+        ]);
+
+        return new TvSeriesResource($tvSerie);
     }
 
     /**
