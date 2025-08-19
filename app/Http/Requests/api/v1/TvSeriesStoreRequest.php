@@ -31,7 +31,7 @@ class TvSeriesStoreRequest extends FormRequest
             'total_seasons' => ['nullable', 'integer'],
             'total_episodes' => ['nullable', 'integer'],
             'premiere_date' => ['nullable', 'date'],
-            'status' => ['required', 'in:published,draft,scheduled,coming soon'],
+            'status' => ['required', 'in:ongoing,ended,canceled,unknown'],
             'category_id' => ['required', 'exists:categories,category_id'],
 
             // Image URLs (required for store, optional for update)
