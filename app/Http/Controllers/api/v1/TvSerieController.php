@@ -15,6 +15,10 @@ use App\Http\Resources\api\v1\TvSeriesResource;
 use App\Http\Resources\api\v1\TvSeriesCollection;
 use App\Http\Requests\api\v1\TvSeriesStoreRequest;
 use App\Http\Requests\api\v1\TvSeriesUpdateRequest;
+use App\Http\Requests\api\v1\TvSeriesCompleteStoreRequest;
+use App\Http\Requests\api\v1\TvSeriesCompleteUpdateRequest;
+use App\Models\Season;
+use App\Models\Episode;
 
 class TvSerieController extends Controller
 {
@@ -149,6 +153,392 @@ class TvSerieController extends Controller
         }
 
         return ResponseMessages::success(['message' => 'TV Series created successfully', 'tv_series' => new TvSeriesResource($tvSeries)], 201);
+    }
+
+    /**
+     * Store a complete TV series with seasons and episodes in one request
+     */
+    public function storeComplete(TvSeriesCompleteStoreRequest $request)
+    {
+        // Authorization for creating a TV series
+        $this->authorize('create', TvSerie::class);
+
+        $validatedData = $request->validated();
+        
+        // Extract file fields and seasons data
+        $fileFields = ['poster_image', 'backdrop_image', 'trailer_video', 'seasons'];
+        $tvSeriesData = collect($validatedData)->except($fileFields)->toArray();
+
+        // Create the TV series
+        $tvSeries = TvSerie::create($tvSeriesData);
+
+        // 1. Handle poster image upload
+        if ($request->hasFile('poster_image')) {
+            $posterFile = $request->file('poster_image');
+            $fileData = FileUploadHelper::uploadImage($posterFile, 'poster');
+            
+            $posterImage = ImageFile::create([
+                'url' => $fileData['url'],
+                'title' => $request->title . ' - Poster',
+                'description' => 'TV Series poster image',
+                'type' => 'poster',
+                'format' => $fileData['format'] ?? 'jpg',
+                'size' => $fileData['size'] ?? 0,
+                'width' => $fileData['width'] ?? null,
+                'height' => $fileData['height'] ?? null,
+            ]);
+            
+            $tvSeries->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
+        }
+
+        // 2. Handle backdrop image upload
+        if ($request->hasFile('backdrop_image')) {
+            $backdropFile = $request->file('backdrop_image');
+            $fileData = FileUploadHelper::uploadImage($backdropFile, 'backdrop');
+            
+            $backdropImage = ImageFile::create([
+                'url' => $fileData['url'],
+                'title' => $request->title . ' - Backdrop',
+                'description' => 'TV Series backdrop image',
+                'type' => 'backdrop',
+                'format' => $fileData['format'] ?? 'jpg',
+                'size' => $fileData['size'] ?? 0,
+                'width' => $fileData['width'] ?? null,
+                'height' => $fileData['height'] ?? null,
+            ]);
+            
+            $tvSeries->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
+        }
+
+        // 3. Handle trailer video upload
+        if ($request->hasFile('trailer_video')) {
+            $trailerFile = $request->file('trailer_video');
+            $fileData = FileUploadHelper::uploadVideo($trailerFile);
+            
+            $trailerTitle = $request->title . ' - Trailer';
+            
+            $trailerVideo = VideoFile::create([
+                'url' => $fileData['url'],
+                'title' => $trailerTitle,
+                'format' => $fileData['format'] ?? 'mp4',
+                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
+            ]);
+            
+            $tvSeries->videoFiles()->attach($trailerVideo->video_file_id);
+        }
+        
+        // 4. Attach persons to the TV series
+        if ($request->has('persons')) {
+            $tvSeries->persons()->sync($request->persons);
+        }
+
+        // 5. Attach trailers
+        if ($request->has('trailers')) {
+            foreach ($request->trailers as $trailerData) {
+                $trailer = Trailer::create($trailerData);
+                $tvSeries->trailers()->attach($trailer->trailer_id);
+            }
+        }
+
+        // 6. Create seasons and episodes
+        if ($request->has('seasons')) {
+            foreach ($request->seasons as $seasonIndex => $seasonData) {
+                // Extract episodes data before creating season
+                $episodesData = $seasonData['episodes'];
+                $seasonFields = collect($seasonData)->except(['episodes'])->toArray();
+                $seasonFields['tv_series_id'] = $tvSeries->tv_series_id;
+                
+                // Create season
+                $season = Season::create($seasonFields);
+                
+                // Create episodes for this season
+                foreach ($episodesData as $episodeIndex => $episodeData) {
+                    // Extract file fields from episode data
+                    $episodeFileFields = ['episode_video', 'still_image', 'persons'];
+                    $episodeFields = collect($episodeData)->except($episodeFileFields)->toArray();
+                    $episodeFields['season_id'] = $season->season_id;
+                    
+                    // Create episode
+                    $episode = Episode::create($episodeFields);
+                    
+                    // Handle episode video upload
+                    $episodeVideoKey = "seasons.{$seasonIndex}.episodes.{$episodeIndex}.episode_video";
+                    if ($request->hasFile($episodeVideoKey)) {
+                        $videoFile = $request->file($episodeVideoKey);
+                        $fileData = FileUploadHelper::uploadVideo($videoFile);
+                        
+                        $videoTitle = $episodeData['title'] . ' - Episode ' . $episodeData['episode_number'];
+                        
+                        $episodeVideo = VideoFile::create([
+                            'url' => $fileData['url'],
+                            'title' => $videoTitle,
+                            'format' => $fileData['format'] ?? 'mp4',
+                            'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
+                        ]);
+                        
+                        $episode->videoFiles()->attach($episodeVideo->video_file_id);
+                    }
+                    
+                    // Handle still image upload
+                    $stillImageKey = "seasons.{$seasonIndex}.episodes.{$episodeIndex}.still_image";
+                    if ($request->hasFile($stillImageKey)) {
+                        $imageFile = $request->file($stillImageKey);
+                        $fileData = FileUploadHelper::uploadImage($imageFile, 'still');
+                        
+                        $stillImage = ImageFile::create([
+                            'url' => $fileData['url'],
+                            'title' => $episodeData['title'] . ' - Still',
+                            'description' => 'Episode still image',
+                            'type' => 'still',
+                            'format' => $fileData['format'] ?? 'jpg',
+                            'size' => $fileData['size'] ?? 0,
+                            'width' => $fileData['width'] ?? null,
+                            'height' => $fileData['height'] ?? null,
+                        ]);
+                        
+                        $episode->imageFiles()->attach($stillImage->image_id, ['type' => 'still']);
+                    }
+                    
+                    // Attach persons to episode if provided
+                    if (isset($episodeData['persons'])) {
+                        $episode->persons()->sync($episodeData['persons']);
+                    }
+                }
+            }
+        }
+
+        // Load relationships for response
+        $tvSeries->load([
+            'category',
+            'persons.imageFiles',
+            'trailers',
+            'imageFiles',
+            'videoFiles',
+            'seasons.episodes.imageFiles',
+            'seasons.episodes.videoFiles'
+        ]);
+
+        return ResponseMessages::success([
+            'message' => 'Complete TV Series created successfully', 
+            'tv_series' => new TvSeriesResource($tvSeries)
+        ], 201);
+    }
+
+    /**
+     * Update a complete TV series with partial updates for seasons and episodes
+     */
+    public function updateComplete(TvSeriesCompleteUpdateRequest $request, TvSerie $tvSerie)
+    {
+        // Authorization for updating a TV series
+        $this->authorize('update', $tvSerie);
+
+        $validatedData = $request->validated();
+        
+        // Extract file fields and seasons data
+        $fileFields = ['poster_image', 'backdrop_image', 'trailer_video', 'seasons'];
+        $tvSeriesData = collect($validatedData)->except($fileFields)->toArray();
+
+        // Update the TV series basic data
+        $tvSerie->update($tvSeriesData);
+
+        // 1. Handle poster image upload (partial update)
+        if ($request->hasFile('poster_image')) {
+            // Remove existing poster associations
+            $existingPosters = $tvSerie->imageFiles()->wherePivot('type', 'poster')->get();
+            foreach ($existingPosters as $existingPoster) {
+                $tvSerie->imageFiles()->detach($existingPoster->image_id);
+            }
+            
+            $posterFile = $request->file('poster_image');
+            $fileData = FileUploadHelper::uploadImage($posterFile, 'poster');
+            
+            $posterImage = ImageFile::create([
+                'url' => $fileData['url'],
+                'title' => ($request->title ?? $tvSerie->title) . ' - Poster',
+                'description' => 'TV Series poster image',
+                'type' => 'poster',
+                'format' => $fileData['format'] ?? 'jpg',
+                'size' => $fileData['size'] ?? 0,
+                'width' => $fileData['width'] ?? null,
+                'height' => $fileData['height'] ?? null,
+            ]);
+            
+            $tvSerie->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
+        }
+
+        // 2. Handle backdrop image upload (partial update)
+        if ($request->hasFile('backdrop_image')) {
+            // Remove existing backdrop associations
+            $existingBackdrops = $tvSerie->imageFiles()->wherePivot('type', 'backdrop')->get();
+            foreach ($existingBackdrops as $existingBackdrop) {
+                $tvSerie->imageFiles()->detach($existingBackdrop->image_id);
+            }
+            
+            $backdropFile = $request->file('backdrop_image');
+            $fileData = FileUploadHelper::uploadImage($backdropFile, 'backdrop');
+            
+            $backdropImage = ImageFile::create([
+                'url' => $fileData['url'],
+                'title' => ($request->title ?? $tvSerie->title) . ' - Backdrop',
+                'description' => 'TV Series backdrop image',
+                'type' => 'backdrop',
+                'format' => $fileData['format'] ?? 'jpg',
+                'size' => $fileData['size'] ?? 0,
+                'width' => $fileData['width'] ?? null,
+                'height' => $fileData['height'] ?? null,
+            ]);
+            
+            $tvSerie->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
+        }
+
+        // 3. Handle trailer video upload (partial update)
+        if ($request->hasFile('trailer_video')) {
+            // Remove existing trailer associations
+            $existingTrailers = $tvSerie->videoFiles()->whereRaw("LOWER(title) LIKE '%trailer%'")->get();
+            foreach ($existingTrailers as $existingTrailer) {
+                $tvSerie->videoFiles()->detach($existingTrailer->video_file_id);
+            }
+            
+            $trailerFile = $request->file('trailer_video');
+            $fileData = FileUploadHelper::uploadVideo($trailerFile);
+            
+            $trailerTitle = ($request->title ?? $tvSerie->title) . ' - Trailer';
+            
+            $trailerVideo = VideoFile::create([
+                'url' => $fileData['url'],
+                'title' => $trailerTitle,
+                'format' => $fileData['format'] ?? 'mp4',
+                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
+            ]);
+            
+            $tvSerie->videoFiles()->attach($trailerVideo->video_file_id);
+        }
+        
+        // 4. Update persons if provided
+        if ($request->has('persons')) {
+            $tvSerie->persons()->sync($request->persons);
+        }
+
+        // 5. Update trailers if provided
+        if ($request->has('trailers')) {
+            // Remove existing trailer associations
+            $tvSerie->trailers()->detach();
+            
+            foreach ($request->trailers as $trailerData) {
+                $trailer = Trailer::create($trailerData);
+                $tvSerie->trailers()->attach($trailer->trailer_id);
+            }
+        }
+
+        // 6. Update seasons and episodes (partial updates)
+        if ($request->has('seasons')) {
+            foreach ($request->seasons as $seasonIndex => $seasonData) {
+                // Check if season has an ID for update or create new
+                if (isset($seasonData['season_id'])) {
+                    // Update existing season
+                    $season = Season::findOrFail($seasonData['season_id']);
+                    $episodesData = isset($seasonData['episodes']) ? $seasonData['episodes'] : [];
+                    $seasonFields = collect($seasonData)->except(['episodes', 'season_id'])->toArray();
+                    $season->update($seasonFields);
+                } else {
+                    // Create new season
+                    $episodesData = $seasonData['episodes'] ?? [];
+                    $seasonFields = collect($seasonData)->except(['episodes'])->toArray();
+                    $seasonFields['tv_series_id'] = $tvSerie->tv_series_id;
+                    $season = Season::create($seasonFields);
+                }
+                
+                // Update episodes for this season
+                if (!empty($episodesData)) {
+                    foreach ($episodesData as $episodeIndex => $episodeData) {
+                        if (isset($episodeData['episode_id'])) {
+                            // Update existing episode
+                            $episode = Episode::findOrFail($episodeData['episode_id']);
+                            $episodeFileFields = ['episode_video', 'still_image', 'persons', 'episode_id'];
+                            $episodeFields = collect($episodeData)->except($episodeFileFields)->toArray();
+                            $episode->update($episodeFields);
+                        } else {
+                            // Create new episode
+                            $episodeFileFields = ['episode_video', 'still_image', 'persons'];
+                            $episodeFields = collect($episodeData)->except($episodeFileFields)->toArray();
+                            $episodeFields['season_id'] = $season->season_id;
+                            $episode = Episode::create($episodeFields);
+                        }
+                        
+                        // Handle episode video upload (partial update)
+                        $episodeVideoKey = "seasons.{$seasonIndex}.episodes.{$episodeIndex}.episode_video";
+                        if ($request->hasFile($episodeVideoKey)) {
+                            // Remove existing video associations
+                            $existingVideos = $episode->videoFiles()->get();
+                            foreach ($existingVideos as $existingVideo) {
+                                $episode->videoFiles()->detach($existingVideo->video_file_id);
+                            }
+                            
+                            $videoFile = $request->file($episodeVideoKey);
+                            $fileData = FileUploadHelper::uploadVideo($videoFile);
+                            
+                            $videoTitle = $episodeData['title'] . ' - Episode ' . $episodeData['episode_number'];
+                            
+                            $episodeVideo = VideoFile::create([
+                                'url' => $fileData['url'],
+                                'title' => $videoTitle,
+                                'format' => $fileData['format'] ?? 'mp4',
+                                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
+                            ]);
+                            
+                            $episode->videoFiles()->attach($episodeVideo->video_file_id);
+                        }
+                        
+                        // Handle still image upload (partial update)
+                        $stillImageKey = "seasons.{$seasonIndex}.episodes.{$episodeIndex}.still_image";
+                        if ($request->hasFile($stillImageKey)) {
+                            // Remove existing still associations
+                            $existingStills = $episode->imageFiles()->wherePivot('type', 'still')->get();
+                            foreach ($existingStills as $existingStill) {
+                                $episode->imageFiles()->detach($existingStill->image_id);
+                            }
+                            
+                            $imageFile = $request->file($stillImageKey);
+                            $fileData = FileUploadHelper::uploadImage($imageFile, 'still');
+                            
+                            $stillImage = ImageFile::create([
+                                'url' => $fileData['url'],
+                                'title' => $episodeData['title'] . ' - Still',
+                                'description' => 'Episode still image',
+                                'type' => 'still',
+                                'format' => $fileData['format'] ?? 'jpg',
+                                'size' => $fileData['size'] ?? 0,
+                                'width' => $fileData['width'] ?? null,
+                                'height' => $fileData['height'] ?? null,
+                            ]);
+                            
+                            $episode->imageFiles()->attach($stillImage->image_id, ['type' => 'still']);
+                        }
+                        
+                        // Update persons for episode if provided
+                        if (isset($episodeData['persons'])) {
+                            $episode->persons()->sync($episodeData['persons']);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Load relationships for response
+        $tvSerie->load([
+            'category',
+            'persons.imageFiles',
+            'trailers',
+            'imageFiles',
+            'videoFiles',
+            'seasons.episodes.imageFiles',
+            'seasons.episodes.videoFiles'
+        ]);
+
+        return ResponseMessages::success([
+            'message' => 'TV Series updated successfully', 
+            'tv_series' => new TvSeriesResource($tvSerie)
+        ], 200);
     }
 
     /**

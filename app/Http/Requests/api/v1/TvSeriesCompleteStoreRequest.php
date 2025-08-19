@@ -1,0 +1,94 @@
+<?php
+
+namespace App\Http\Requests\api\v1;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class TvSeriesCompleteStoreRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            // Basic TV series data
+            'title' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:128'],
+            'year' => ['required', 'integer'],
+            'imdb_rating' => ['nullable', 'numeric', 'between:0,10'],
+            'total_seasons' => ['nullable', 'integer'],
+            'total_episodes' => ['nullable', 'integer'],
+            'premiere_date' => ['nullable', 'date'],
+            'status' => ['required', 'in:published,draft,scheduled,coming soon'],
+            'category_id' => ['required', 'exists:categories,category_id'],
+
+            // Image files (required for complete creation)
+            'poster_image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240', // 10MB max
+            'backdrop_image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240', // 10MB max
+    
+            // Video files (optional)
+            'trailer_video' => 'nullable|file|mimes:mp4,webm,ogg,mov|max:512000', // 512MB max
+            
+            // Persons (conditionally validated if provided)
+            'persons' => 'sometimes|array',
+            'persons.*' => 'exists:persons,person_id',
+
+            // Trailers (only validate if present)
+            'trailers' => 'sometimes|array',
+            'trailers.*.url' => 'sometimes|url',
+            'trailers.*.title' => 'sometimes|string',
+
+            // Seasons with episodes
+            'seasons' => 'required|array|min:1',
+            'seasons.*.season_number' => 'required|integer',
+            'seasons.*.total_episodes' => 'required|integer',
+            'seasons.*.year' => 'required|integer',
+            'seasons.*.premiere_date' => 'nullable|date',
+            'seasons.*.name' => 'nullable|string|max:255',
+            'seasons.*.overview' => 'nullable|string',
+
+            // Episodes within seasons
+            'seasons.*.episodes' => 'required|array|min:1',
+            'seasons.*.episodes.*.title' => 'required|string|max:128',
+            'seasons.*.episodes.*.slug' => 'nullable|string|max:128',
+            'seasons.*.episodes.*.episode_number' => 'required|integer',
+            'seasons.*.episodes.*.duration' => 'nullable|integer',
+            'seasons.*.episodes.*.air_date' => 'nullable|date',
+            'seasons.*.episodes.*.status' => 'required|in:published,draft,scheduled,coming soon',
+            
+            // Episode files (required)
+            'seasons.*.episodes.*.episode_video' => 'required|file|mimes:mp4,webm,ogg,mov,avi,mkv|max:1024000', // 1GB max
+            'seasons.*.episodes.*.still_image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240', // 10MB max
+            
+            // Episode persons (optional)
+            'seasons.*.episodes.*.persons' => 'sometimes|array',
+            'seasons.*.episodes.*.persons.*' => 'exists:persons,person_id',
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'seasons.required' => 'At least one season is required.',
+            'seasons.*.episodes.required' => 'At least one episode is required for each season.',
+            'seasons.*.episodes.*.episode_video.required' => 'Episode video is required for each episode.',
+            'seasons.*.episodes.*.still_image.required' => 'Still image is required for each episode.',
+        ];
+    }
+}

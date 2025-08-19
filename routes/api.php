@@ -117,7 +117,9 @@ Route::prefix('v1')->group(function () {
 
         //Tv Series
         Route::post('/tvseries', [TvSerieController::class, 'store']);
+        Route::post('/tvseries/complete', [TvSerieController::class, 'storeComplete']);
         Route::put('/tvseries/{tvSerie}', [TvSerieController::class, 'update']);
+        Route::put('/tvseries/{tvSerie}/complete', [TvSerieController::class, 'updateComplete']);
         Route::delete('/tvseries/{tvSerie}', [TvSerieController::class, 'destroy']);
         //Seasons
         Route::post('/seasons', [SeasonController::class, 'store']);
