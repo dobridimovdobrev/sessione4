@@ -347,8 +347,8 @@ class TvSerieController extends Controller
         // Debug logging
         \Log::info('TvSerie Update - Validated Data:', $validatedData);
         \Log::info('TvSerie Update - Request all data:', $request->all());
-        \Log::info('TvSerie Update - Has title in request:', $request->has('title'));
-        \Log::info('TvSerie Update - Title from request:', $request->get('title'));
+        \Log::info('TvSerie Update - Has title in request:', ['has_title' => $request->has('title')]);
+        \Log::info('TvSerie Update - Title from request:', ['title' => $request->get('title')]);
         
         // Extract file fields and seasons data
         $fileFields = ['poster_image', 'backdrop_image', 'trailer_video', 'seasons'];
