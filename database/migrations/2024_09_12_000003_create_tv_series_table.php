@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('total_seasons')->default(1);
             $table->enum('status', ['ongoing', 'ended', 'canceled', 'unknown'])->default('unknown');
             $table->foreignId('category_id')->constrained('categories', 'category_id');
-            $table->bigInteger('tmdb_id')->unique();
+            $table->bigInteger('tmdb_id')->nullable()->unique();
             $table->date('premiere_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
