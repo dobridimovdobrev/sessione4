@@ -30,21 +30,22 @@ class TvSeriesCompleteStoreRequest extends FormRequest
             'total_seasons' => ['nullable', 'integer'],
             'total_episodes' => ['nullable', 'integer'],
             'premiere_date' => ['nullable', 'date'],
-            'status' => ['required', 'in:ongoing,ended,canceled,unknown'],
+            'status' => ['required', 'in:ongoing,ended,canceled,unknown,published,draft,upcoming'],
             'category_id' => ['required', 'exists:categories,category_id'],
+            'description' => ['nullable', 'string'],
 
-            // Image URLs (required for complete creation - uploaded separately)
-            'poster' => 'required|string|url',
-            'backdrop' => 'required|string|url',
+            // Image files (required for complete creation)
+            'poster_image' => 'required|file|image|max:10240', // 10MB max
+            'backdrop_image' => 'required|file|image|max:10240', // 10MB max
     
-            // Video URL (optional - uploaded separately)
-            'trailer_video_url' => 'nullable|string|url',
+            // Video file (optional)
+            'trailer_video' => 'nullable|file|mimes:mp4,webm,ogg,mov,avi,mkv|max:512000', // 500MB max
             
-            // Persons (conditionally validated if provided)
+            // Persons array (optional)
             'persons' => 'sometimes|array',
             'persons.*' => 'exists:persons,person_id',
 
-            // Trailers (only validate if present)
+            // Trailers (optional)
             'trailers' => 'sometimes|array',
             'trailers.*.url' => 'sometimes|url',
             'trailers.*.title' => 'sometimes|string',
@@ -63,14 +64,16 @@ class TvSeriesCompleteStoreRequest extends FormRequest
             'seasons.*.episodes.*.title' => 'required|string|max:128',
             'seasons.*.episodes.*.slug' => 'nullable|string|max:128',
             'seasons.*.episodes.*.description' => 'nullable|string',
+            'seasons.*.episodes.*.overview' => 'nullable|string',
             'seasons.*.episodes.*.episode_number' => 'required|integer',
             'seasons.*.episodes.*.duration' => 'nullable|integer',
+            'seasons.*.episodes.*.runtime' => 'nullable|integer',
             'seasons.*.episodes.*.air_date' => 'nullable|date',
             'seasons.*.episodes.*.status' => 'required|in:published,draft,scheduled,coming soon',
             
-            // Episode file URLs (required - uploaded separately)
-            'seasons.*.episodes.*.episode_video' => 'required|string|url',
-            'seasons.*.episodes.*.still_image' => 'required|string|url',
+            // Episode file uploads (required)
+            'seasons.*.episodes.*.still_image' => 'required|file|image|max:10240', // 10MB max
+            'seasons.*.episodes.*.episode_video' => 'required|file|mimes:mp4,webm,ogg,mov,avi,mkv|max:512000', // 500MB max
             
             // Episode persons (optional)
             'seasons.*.episodes.*.persons' => 'sometimes|array',
@@ -86,10 +89,12 @@ class TvSeriesCompleteStoreRequest extends FormRequest
     public function messages()
     {
         return [
+            'poster_image.required' => 'Poster image is required.',
+            'backdrop_image.required' => 'Backdrop image is required.',
             'seasons.required' => 'At least one season is required.',
             'seasons.*.episodes.required' => 'At least one episode is required for each season.',
-            'seasons.*.episodes.*.episode_video.required' => 'Episode video is required for each episode.',
             'seasons.*.episodes.*.still_image.required' => 'Still image is required for each episode.',
+            'seasons.*.episodes.*.episode_video.required' => 'Episode video is required for each episode.',
         ];
     }
 }
