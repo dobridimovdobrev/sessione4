@@ -27,17 +27,15 @@ class TvSeriesResource extends JsonResource
             'poster' => $this->getPosterData()
         ];
 
-        // Add details only for single TV series view - same logic as MovieResource
+        // Add details only for single TV series view - TV series don't have video files, only episodes do
         if ($this->resource->relationLoaded('persons') && 
             $this->resource->relationLoaded('trailers') && 
-            $this->resource->relationLoaded('imageFiles') &&
-            $this->resource->relationLoaded('videoFiles')) {
+            $this->resource->relationLoaded('imageFiles')) {
             
             $data['description'] = $this->description;
             $data['backdrop'] = $this->getBackdropData();
             $data['persons'] = PersonResource::collection($this->whenLoaded('persons'));
             $data['trailers'] = TrailerResource::collection($this->whenLoaded('trailers'));
-            $data['video_files'] = $this->getVideoFilesData();
             
             // Add seasons and episodes for TV series - load them separately
             $data['seasons'] = $this->getSeasonsData();
@@ -105,32 +103,6 @@ class TvSeriesResource extends JsonResource
         ];
     }
 
-    /**
-     * Get video files data with streaming URLs for Angular (TV series trailers)
-     *
-     * @return array
-     */
-    private function getVideoFilesData()
-    {
-        // Always try to get video files, even if relation not loaded
-        $videoFiles = $this->videoFiles()->get();
-        
-        if ($videoFiles->isEmpty()) {
-            return [];
-        }
-
-        return $videoFiles->map(function($video) {
-            return [
-                'video_file_id' => $video->video_file_id,
-                'title' => $video->title,
-                'format' => $video->format,
-                'resolution' => $video->resolution,
-                'stream_url' => url('/api/v1/stream-video/' . basename($video->url)),
-                'public_stream_url' => url('/api/v1/public-video/' . basename($video->url)),
-                'type' => $this->getVideoFileType($video)
-            ];
-        })->toArray();
-    }
 
     /**
      * Get episode still data with full URLs and multiple sizes

@@ -163,8 +163,7 @@ class TvSerieController extends Controller
             'category',
             'persons.imageFiles',
             'trailers',
-            'imageFiles',
-            'videoFiles'
+            'imageFiles'
         ]);
 
         return new TvSeriesResource($tvSerie);

@@ -71,9 +71,4 @@ class TvSerie extends Model
         return $this->belongsToMany(Person::class, 'tv_series_person', 'tv_series_id', 'person_id');
     }
 
-    // Relationship with video files
-    public function videoFiles()
-    {
-        return $this->belongsToMany(VideoFile::class, 'tv_series_video_file', 'tv_series_id', 'video_file_id');
-    }
 }
