@@ -77,24 +77,36 @@ class TvSerieController extends Controller
         // Handle poster and backdrop URLs directly
         // These are already uploaded via /api/v1/upload/image endpoint
         
-        // 1. Poster URL - find existing ImageFile by URL
+        // 1. Poster URL - create ImageFile directly from URL
         if ($request->has('poster')) {
-            $posterImage = ImageFile::where('url', 'LIKE', '%' . basename($request->poster) . '%')
-                                    ->where('type', 'poster')
-                                    ->first();
-            if ($posterImage) {
-                $tvSeries->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
-            }
+            $posterImage = ImageFile::create([
+                'url' => $request->poster,
+                'title' => $request->title . ' - Poster',
+                'description' => 'TV Series poster image',
+                'type' => 'poster',
+                'format' => pathinfo($request->poster, PATHINFO_EXTENSION) ?: 'jpg',
+                'size' => 0, // Unknown size for URL
+                'width' => null,
+                'height' => null,
+            ]);
+            
+            $tvSeries->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
         }
 
-        // 2. Backdrop URL - find existing ImageFile by URL
+        // 2. Backdrop URL - create ImageFile directly from URL
         if ($request->has('backdrop')) {
-            $backdropImage = ImageFile::where('url', 'LIKE', '%' . basename($request->backdrop) . '%')
-                                      ->where('type', 'backdrop')
-                                      ->first();
-            if ($backdropImage) {
-                $tvSeries->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
-            }
+            $backdropImage = ImageFile::create([
+                'url' => $request->backdrop,
+                'title' => $request->title . ' - Backdrop',
+                'description' => 'TV Series backdrop image',
+                'type' => 'backdrop',
+                'format' => pathinfo($request->backdrop, PATHINFO_EXTENSION) ?: 'jpg',
+                'size' => 0, // Unknown size for URL
+                'width' => null,
+                'height' => null,
+            ]);
+            
+            $tvSeries->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
         }
 
         // Upload trailer video
@@ -191,7 +203,7 @@ class TvSerieController extends Controller
         // Update the TV series with basic data
         $tvSerie->update($tvSeriesData);
         
-        // Handle poster URL update (same logic as store method)
+        // Handle poster URL update
         if ($request->has('poster')) {
             // Remove existing poster associations
             $existingPosters = $tvSerie->imageFiles()->wherePivot('type', 'poster')->get();
@@ -199,16 +211,22 @@ class TvSerieController extends Controller
                 $tvSerie->imageFiles()->detach($existingPoster->image_id);
             }
             
-            // Find existing ImageFile by URL
-            $posterImage = ImageFile::where('url', 'LIKE', '%' . basename($request->poster) . '%')
-                                    ->where('type', 'poster')
-                                    ->first();
-            if ($posterImage) {
-                $tvSerie->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
-            }
+            // Create new ImageFile from URL
+            $posterImage = ImageFile::create([
+                'url' => $request->poster,
+                'title' => ($request->title ?? $tvSerie->title) . ' - Poster',
+                'description' => 'TV Series poster image',
+                'type' => 'poster',
+                'format' => pathinfo($request->poster, PATHINFO_EXTENSION) ?: 'jpg',
+                'size' => 0,
+                'width' => null,
+                'height' => null,
+            ]);
+            
+            $tvSerie->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
         }
 
-        // Handle backdrop URL update (same logic as store method)
+        // Handle backdrop URL update
         if ($request->has('backdrop')) {
             // Remove existing backdrop associations
             $existingBackdrops = $tvSerie->imageFiles()->wherePivot('type', 'backdrop')->get();
@@ -216,13 +234,19 @@ class TvSerieController extends Controller
                 $tvSerie->imageFiles()->detach($existingBackdrop->image_id);
             }
             
-            // Find existing ImageFile by URL
-            $backdropImage = ImageFile::where('url', 'LIKE', '%' . basename($request->backdrop) . '%')
-                                      ->where('type', 'backdrop')
-                                      ->first();
-            if ($backdropImage) {
-                $tvSerie->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
-            }
+            // Create new ImageFile from URL
+            $backdropImage = ImageFile::create([
+                'url' => $request->backdrop,
+                'title' => ($request->title ?? $tvSerie->title) . ' - Backdrop',
+                'description' => 'TV Series backdrop image',
+                'type' => 'backdrop',
+                'format' => pathinfo($request->backdrop, PATHINFO_EXTENSION) ?: 'jpg',
+                'size' => 0,
+                'width' => null,
+                'height' => null,
+            ]);
+            
+            $tvSerie->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
         }
 
         // Handle trailer video file upload
