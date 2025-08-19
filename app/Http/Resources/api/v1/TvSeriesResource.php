@@ -76,13 +76,8 @@ class TvSeriesResource extends JsonResource
      */
     private function getPosterData()
     {
-        // Check if imageFiles relation is loaded, if not return null
-        if (!$this->resource->relationLoaded('imageFiles')) {
-            return null;
-        }
-        
-        // Use loaded relation instead of new query
-        $poster = $this->imageFiles->where('pivot.type', 'poster')->first();
+        // Always try to get poster image, even if relation not loaded
+        $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
         
         if (!$poster) {
             return null;
