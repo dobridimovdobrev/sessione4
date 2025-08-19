@@ -158,30 +158,38 @@ class TvSerieController extends Controller
     {
         $this->authorize('view', $tvSerie);
 
-        // Eager load all relationships for detailed view
-        $tvSerie->load([
-            'category',
-            'persons.imageFiles',  // Eager load imageFiles with persons
-            'trailers',
-            'imageFiles',
-            'videoFiles',  // Load video files for streaming
-            'seasons' => function($query) {
-                $query->select('season_id', 'tv_series_id', 'season_number', 'year', 'total_episodes')
-                      ->orderBy('season_number', 'asc')
-                      ->with(['episodes' => function($query) {
-                          $query->select('episode_id', 'season_id', 'title', 'episode_number', 'duration', 'air_date')
-                                ->orderBy('episode_number', 'asc')
-                                ->with([
-                                    'imageFiles' => function($query) {
-                                        $query->wherePivot('type', 'still')->limit(1);
-                                    },
-                                    'videoFiles'  // Load video files for each episode
-                                ]);
-                      }]);
-            }
-        ]);
+        try {
+            // Eager load all relationships for detailed view
+            $tvSerie->load([
+                'category',
+                'persons.imageFiles',  // Eager load imageFiles with persons
+                'trailers',
+                'imageFiles',
+                'videoFiles',  // Load video files for streaming
+                'seasons' => function($query) {
+                    $query->select('season_id', 'tv_series_id', 'season_number', 'year', 'total_episodes')
+                          ->orderBy('season_number', 'asc')
+                          ->with(['episodes' => function($query) {
+                              $query->select('episode_id', 'season_id', 'title', 'episode_number', 'duration', 'air_date')
+                                    ->orderBy('episode_number', 'asc')
+                                    ->with([
+                                        'imageFiles' => function($query) {
+                                            $query->wherePivot('type', 'still')->limit(1);
+                                        },
+                                        'videoFiles'  // Load video files for each episode
+                                    ]);
+                          }]);
+                }
+            ]);
 
-        return new TvSeriesResource($tvSerie);
+            return new TvSeriesResource($tvSerie);
+        } catch (\Exception $e) {
+            \Log::error('TvSerie show error for ID ' . $tvSerie->tv_series_id . ': ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Error loading TV series details',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
