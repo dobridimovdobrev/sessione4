@@ -53,13 +53,7 @@ class TvSeriesResource extends JsonResource
      */
     private function getPosterData()
     {
-        // Use loaded relation if available to avoid N+1 query
-        if ($this->relationLoaded('imageFiles')) {
-            // Controller already loads only poster images, so just get first
-            $poster = $this->imageFiles->first();
-        } else {
-            $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
-        }
+        $poster = $this->imageFiles()->wherePivot('type', 'poster')->first();
         
         if (!$poster) {
             return null;

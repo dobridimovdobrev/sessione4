@@ -21,24 +21,56 @@ class TvSeriesCompleteUpdateRequest extends TvSeriesCompleteStoreRequest
      */
     public function rules(): array
     {
-        $rules = parent::rules();
-        
-        // Apply general update transformations (required -> sometimes)
-        $updatedRules = ValidationHelpers::updateRulesHelper($rules);
-        
-        // Custom validation for file uploads in updates - make them all optional
-        $updatedRules['poster_image'] = 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:10240';
-        $updatedRules['backdrop_image'] = 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:10240';
-        $updatedRules['trailer_video'] = 'nullable|file|mimes:mp4,webm,ogg,mov|max:512000';
-        
-        // Make seasons optional for updates
-        $updatedRules['seasons'] = 'sometimes|array';
-        
-        // Update nested episode file rules to be optional
-        $updatedRules['seasons.*.episodes.*.episode_video'] = 'nullable|file|mimes:mp4,webm,ogg,mov,avi,mkv|max:1024000';
-        $updatedRules['seasons.*.episodes.*.still_image'] = 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:10240';
-        
-        return $updatedRules;
+        return [
+            // Basic TV series data - use sometimes for partial updates
+            'title' => ['sometimes', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:128'],
+            'year' => ['sometimes', 'integer'],
+            'imdb_rating' => ['nullable', 'numeric', 'between:0,10'],
+            'total_seasons' => ['nullable', 'integer'],
+            'total_episodes' => ['nullable', 'integer'],
+            'premiere_date' => ['nullable', 'date'],
+            'status' => ['sometimes', 'in:ongoing,ended,canceled,unknown,published,draft,upcoming'],
+            'category_id' => ['sometimes', 'exists:categories,category_id'],
+            'description' => ['nullable', 'string'],
+
+            // Image files (optional for updates)
+            'poster_image' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:10240',
+            'backdrop_image' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:10240',
+    
+            // Video file (optional)
+            'trailer_video' => 'nullable|file|mimes:mp4,webm,ogg,mov,avi,mkv|max:512000',
+            
+            // Persons array (optional)
+            'persons' => 'sometimes|array',
+            'persons.*' => 'exists:persons,person_id',
+
+            // Trailers (optional)
+            'trailers' => 'sometimes|array',
+            'trailers.*.url' => 'sometimes|url',
+            'trailers.*.title' => 'sometimes|string|max:255',
+
+            // Seasons (optional for updates)
+            'seasons' => 'sometimes|array',
+            'seasons.*.season_number' => 'sometimes|integer|min:1',
+            'seasons.*.name' => 'sometimes|string|max:255',
+            'seasons.*.overview' => 'nullable|string',
+            'seasons.*.year' => 'sometimes|integer|min:1900|max:2100',
+            'seasons.*.premiere_date' => 'nullable|date',
+
+            // Episodes within seasons
+            'seasons.*.episodes' => 'sometimes|array',
+            'seasons.*.episodes.*.title' => 'sometimes|string|max:255',
+            'seasons.*.episodes.*.description' => 'nullable|string',
+            'seasons.*.episodes.*.episode_number' => 'sometimes|integer|min:1',
+            'seasons.*.episodes.*.duration' => 'nullable|integer|min:1',
+            'seasons.*.episodes.*.air_date' => 'nullable|date',
+            'seasons.*.episodes.*.status' => 'sometimes|in:published,draft,upcoming',
+
+            // Episode files (optional for updates)
+            'seasons.*.episodes.*.episode_video' => 'nullable|file|mimes:mp4,webm,ogg,mov,avi,mkv|max:1024000',
+            'seasons.*.episodes.*.still_image' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:10240',
+        ];
     }
 
     /**
