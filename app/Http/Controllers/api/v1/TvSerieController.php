@@ -166,62 +166,53 @@ class TvSerieController extends Controller
         $validatedData = $request->validated();
         
         // Extract file fields and seasons data
-        $fileFields = ['poster_image', 'backdrop_image', 'trailer_video', 'seasons'];
+        $fileFields = ['poster', 'backdrop', 'trailer_video_url', 'seasons'];
         $tvSeriesData = collect($validatedData)->except($fileFields)->toArray();
 
         // Create the TV series
         $tvSeries = TvSerie::create($tvSeriesData);
 
-        // 1. Handle poster image upload
-        if ($request->hasFile('poster_image')) {
-            $posterFile = $request->file('poster_image');
-            $fileData = FileUploadHelper::uploadImage($posterFile, 'poster');
-            
+        // 1. Handle poster URL (already uploaded)
+        if ($request->has('poster')) {
             $posterImage = ImageFile::create([
-                'url' => $fileData['url'],
+                'url' => $request->poster,
                 'title' => $request->title . ' - Poster',
                 'description' => 'TV Series poster image',
                 'type' => 'poster',
-                'format' => $fileData['format'] ?? 'jpg',
-                'size' => $fileData['size'] ?? 0,
-                'width' => $fileData['width'] ?? null,
-                'height' => $fileData['height'] ?? null,
+                'format' => pathinfo($request->poster, PATHINFO_EXTENSION) ?: 'jpg',
+                'size' => 0,
+                'width' => null,
+                'height' => null,
             ]);
             
             $tvSeries->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
         }
 
-        // 2. Handle backdrop image upload
-        if ($request->hasFile('backdrop_image')) {
-            $backdropFile = $request->file('backdrop_image');
-            $fileData = FileUploadHelper::uploadImage($backdropFile, 'backdrop');
-            
+        // 2. Handle backdrop URL (already uploaded)
+        if ($request->has('backdrop')) {
             $backdropImage = ImageFile::create([
-                'url' => $fileData['url'],
+                'url' => $request->backdrop,
                 'title' => $request->title . ' - Backdrop',
                 'description' => 'TV Series backdrop image',
                 'type' => 'backdrop',
-                'format' => $fileData['format'] ?? 'jpg',
-                'size' => $fileData['size'] ?? 0,
-                'width' => $fileData['width'] ?? null,
-                'height' => $fileData['height'] ?? null,
+                'format' => pathinfo($request->backdrop, PATHINFO_EXTENSION) ?: 'jpg',
+                'size' => 0,
+                'width' => null,
+                'height' => null,
             ]);
             
             $tvSeries->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
         }
 
-        // 3. Handle trailer video upload
-        if ($request->hasFile('trailer_video')) {
-            $trailerFile = $request->file('trailer_video');
-            $fileData = FileUploadHelper::uploadVideo($trailerFile);
-            
+        // 3. Handle trailer video URL (already uploaded)
+        if ($request->has('trailer_video_url')) {
             $trailerTitle = $request->title . ' - Trailer';
             
             $trailerVideo = VideoFile::create([
-                'url' => $fileData['url'],
+                'url' => $request->trailer_video_url,
                 'title' => $trailerTitle,
-                'format' => $fileData['format'] ?? 'mp4',
-                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
+                'format' => pathinfo($request->trailer_video_url, PATHINFO_EXTENSION) ?: 'mp4',
+                'resolution' => null,
             ]);
             
             $tvSeries->videoFiles()->attach($trailerVideo->video_file_id);
@@ -248,6 +239,11 @@ class TvSerieController extends Controller
                 $seasonFields = collect($seasonData)->except(['episodes'])->toArray();
                 $seasonFields['tv_series_id'] = $tvSeries->tv_series_id;
                 
+                // Auto-calculate total_episodes if not provided
+                if (!isset($seasonFields['total_episodes']) || empty($seasonFields['total_episodes'])) {
+                    $seasonFields['total_episodes'] = count($episodesData);
+                }
+                
                 // Create season
                 $season = Season::create($seasonFields);
                 
@@ -266,39 +262,31 @@ class TvSerieController extends Controller
                     // Create episode
                     $episode = Episode::create($episodeFields);
                     
-                    // Handle episode video upload
-                    $episodeVideoKey = "seasons.{$seasonIndex}.episodes.{$episodeIndex}.episode_video";
-                    if ($request->hasFile($episodeVideoKey)) {
-                        $videoFile = $request->file($episodeVideoKey);
-                        $fileData = FileUploadHelper::uploadVideo($videoFile);
-                        
+                    // Handle episode video URL (already uploaded)
+                    if (isset($episodeData['episode_video'])) {
                         $videoTitle = $episodeData['title'] . ' - Episode ' . $episodeData['episode_number'];
                         
                         $episodeVideo = VideoFile::create([
-                            'url' => $fileData['url'],
+                            'url' => $episodeData['episode_video'],
                             'title' => $videoTitle,
-                            'format' => $fileData['format'] ?? 'mp4',
-                            'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
+                            'format' => pathinfo($episodeData['episode_video'], PATHINFO_EXTENSION) ?: 'mp4',
+                            'resolution' => null,
                         ]);
                         
                         $episode->videoFiles()->attach($episodeVideo->video_file_id);
                     }
                     
-                    // Handle still image upload
-                    $stillImageKey = "seasons.{$seasonIndex}.episodes.{$episodeIndex}.still_image";
-                    if ($request->hasFile($stillImageKey)) {
-                        $imageFile = $request->file($stillImageKey);
-                        $fileData = FileUploadHelper::uploadImage($imageFile, 'still');
-                        
+                    // Handle still image URL (already uploaded)
+                    if (isset($episodeData['still_image'])) {
                         $stillImage = ImageFile::create([
-                            'url' => $fileData['url'],
+                            'url' => $episodeData['still_image'],
                             'title' => $episodeData['title'] . ' - Still',
                             'description' => 'Episode still image',
                             'type' => 'still',
-                            'format' => $fileData['format'] ?? 'jpg',
-                            'size' => $fileData['size'] ?? 0,
-                            'width' => $fileData['width'] ?? null,
-                            'height' => $fileData['height'] ?? null,
+                            'format' => pathinfo($episodeData['still_image'], PATHINFO_EXTENSION) ?: 'jpg',
+                            'size' => 0,
+                            'width' => null,
+                            'height' => null,
                         ]);
                         
                         $episode->imageFiles()->attach($stillImage->image_id, ['type' => 'still']);
@@ -467,12 +455,6 @@ class TvSerieController extends Controller
                             $episodeFileFields = ['episode_video', 'still_image', 'persons'];
                             $episodeFields = collect($episodeData)->except($episodeFileFields)->toArray();
                             $episodeFields['season_id'] = $season->season_id;
-                            
-                            // Set default description if not provided (required by database)
-                            if (!isset($episodeFields['description']) || empty($episodeFields['description'])) {
-                                $episodeFields['description'] = $episodeFields['title'] ?? 'Episode description';
-                            }
-                            
                             $episode = Episode::create($episodeFields);
                         }
                         
@@ -591,17 +573,7 @@ class TvSerieController extends Controller
         // Authorization for update a TV series
         $this->authorize('update', $tvSerie);
         
-        $validatedData = $request->validated();
-        
-        // Remove file fields from validatedData for basic TV series update
-        $fileFields = [
-            'poster', 'backdrop', 'trailer_video'
-        ];
-        $tvSeriesData = collect($validatedData)->except($fileFields)->toArray();
-        
-        // Update the TV series with basic data
-        $tvSerie->update($tvSeriesData);
-        
+        $tvSerie->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
         // Handle poster URL update
         if ($request->has('poster')) {
             // Remove existing poster associations

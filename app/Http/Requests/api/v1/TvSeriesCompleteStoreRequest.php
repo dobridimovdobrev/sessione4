@@ -33,12 +33,12 @@ class TvSeriesCompleteStoreRequest extends FormRequest
             'status' => ['required', 'in:ongoing,ended,canceled,unknown'],
             'category_id' => ['required', 'exists:categories,category_id'],
 
-            // Image files (required for complete creation)
-            'poster_image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240', // 10MB max
-            'backdrop_image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240', // 10MB max
+            // Image URLs (required for complete creation - uploaded separately)
+            'poster' => 'required|string|url',
+            'backdrop' => 'required|string|url',
     
-            // Video files (optional)
-            'trailer_video' => 'nullable|file|mimes:mp4,webm,ogg,mov|max:512000', // 512MB max
+            // Video URL (optional - uploaded separately)
+            'trailer_video_url' => 'nullable|string|url',
             
             // Persons (conditionally validated if provided)
             'persons' => 'sometimes|array',
@@ -52,7 +52,7 @@ class TvSeriesCompleteStoreRequest extends FormRequest
             // Seasons with episodes
             'seasons' => 'required|array|min:1',
             'seasons.*.season_number' => 'required|integer',
-            'seasons.*.total_episodes' => 'required|integer',
+            'seasons.*.total_episodes' => 'nullable|integer',
             'seasons.*.year' => 'required|integer',
             'seasons.*.premiere_date' => 'nullable|date',
             'seasons.*.name' => 'nullable|string|max:255',
@@ -68,9 +68,9 @@ class TvSeriesCompleteStoreRequest extends FormRequest
             'seasons.*.episodes.*.air_date' => 'nullable|date',
             'seasons.*.episodes.*.status' => 'required|in:published,draft,scheduled,coming soon',
             
-            // Episode files (required)
-            'seasons.*.episodes.*.episode_video' => 'required|file|mimes:mp4,webm,ogg,mov,avi,mkv|max:1024000', // 1GB max
-            'seasons.*.episodes.*.still_image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:10240', // 10MB max
+            // Episode file URLs (required - uploaded separately)
+            'seasons.*.episodes.*.episode_video' => 'required|string|url',
+            'seasons.*.episodes.*.still_image' => 'required|string|url',
             
             // Episode persons (optional)
             'seasons.*.episodes.*.persons' => 'sometimes|array',
