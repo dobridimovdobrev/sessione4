@@ -30,10 +30,8 @@ class TvSeriesResource extends JsonResource
             'poster' => $this->getPosterData()
         ];
 
-        // Add details only for single TV series view - TV series don't have video files, only episodes do
-        if ($this->resource->relationLoaded('persons') && 
-            $this->resource->relationLoaded('trailers') && 
-            $this->resource->relationLoaded('imageFiles')) {
+        // Add details for single TV series view - check if at least imageFiles relation is loaded (indicates detail view)
+        if ($this->resource->relationLoaded('imageFiles')) {
             
             $data['description'] = $this->description;
             $data['backdrop'] = $this->getBackdropData();
