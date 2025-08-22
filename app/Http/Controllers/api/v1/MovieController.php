@@ -540,46 +540,7 @@ class MovieController extends Controller
             $movie->videoFiles()->attach($trailerVideo->video_file_id);
         }
 
-        // 4. Handle movie video upload (replace existing)
-        if ($request->hasFile('movie_video')) {
-            // Remove existing movie video associations
-            $existingMovieVideos = $movie->videoFiles()->whereRaw("LOWER(title) LIKE '%full movie%'")->get();
-            foreach ($existingMovieVideos as $existingMovieVideo) {
-                $movie->videoFiles()->detach($existingMovieVideo->video_file_id);
-            }
-            
-            $movieFile = $request->file('movie_video');
-            $fileData = FileUploadHelper::uploadVideo($movieFile);
-            
-            $movieTitle = ($request->title ?? $movie->title) . ' - Full Movie';
-            
-            $movieVideo = VideoFile::create([
-                'url' => $fileData['url'],
-                'title' => $movieTitle,
-                'format' => $fileData['format'] ?? 'mp4',
-                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
-            ]);
-            
-            $movie->videoFiles()->attach($movieVideo->video_file_id);
-        }
-        
-        // 5. Update persons if provided
-        if ($request->has('persons')) {
-            $movie->persons()->sync($request->persons);
-        }
-        
-        // 6. Update trailers if provided
-        if ($request->has('trailers')) {
-            // Remove existing trailer associations
-            $movie->trailers()->detach();
-            
-            foreach ($request->trailers as $trailerData) {
-                $trailer = Trailer::create($trailerData);
-                $movie->trailers()->attach($trailer->trailer_id);
-            }
-        }
-
-        // 7. Handle existing video files sync (keep only specified IDs)
+        // 4. Handle existing video files sync FIRST (keep only specified IDs)
         if ($request->has('existing_video_ids')) {
             $existingVideoIds = $request->existing_video_ids ?? [];
             
@@ -600,6 +561,39 @@ class MovieController extends Controller
                 'current_video_ids' => $currentVideoIds,
                 'videos_to_detach' => $videosToDetach
             ]);
+        }
+
+        // 5. Handle movie video upload (add new video)
+        if ($request->hasFile('movie_video')) {
+            $movieFile = $request->file('movie_video');
+            $fileData = FileUploadHelper::uploadVideo($movieFile);
+            
+            $movieTitle = ($request->title ?? $movie->title) . ' - Full Movie';
+            
+            $movieVideo = VideoFile::create([
+                'url' => $fileData['url'],
+                'title' => $movieTitle,
+                'format' => $fileData['format'] ?? 'mp4',
+                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
+            ]);
+            
+            $movie->videoFiles()->attach($movieVideo->video_file_id);
+        }
+        
+        // 6. Update persons if provided
+        if ($request->has('persons')) {
+            $movie->persons()->sync($request->persons);
+        }
+        
+        // 7. Update trailers if provided
+        if ($request->has('trailers')) {
+            // Remove existing trailer associations
+            $movie->trailers()->detach();
+            
+            foreach ($request->trailers as $trailerData) {
+                $trailer = Trailer::create($trailerData);
+                $movie->trailers()->attach($trailer->trailer_id);
+            }
         }
 
         // Load relationships for response
