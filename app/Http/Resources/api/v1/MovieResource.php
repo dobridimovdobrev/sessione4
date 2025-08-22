@@ -39,6 +39,10 @@ class MovieResource extends JsonResource
             $data['backdrop'] = $this->getBackdropData();
             $data['persons'] = PersonResource::collection($this->whenLoaded('persons'));
             $data['trailers'] = TrailerResource::collection($this->whenLoaded('trailers'));
+        }
+
+        // Always include video_files if the relation is loaded (for both list and detail views)
+        if ($this->resource->relationLoaded('videoFiles')) {
             $data['video_files'] = $this->getVideoFilesData();
         }
 
