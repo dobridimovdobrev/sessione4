@@ -579,6 +579,29 @@ class MovieController extends Controller
             }
         }
 
+        // 7. Handle existing video files sync (keep only specified IDs)
+        if ($request->has('existing_video_ids')) {
+            $existingVideoIds = $request->existing_video_ids ?? [];
+            
+            // Get current video file IDs associated with this movie
+            $currentVideoIds = $movie->videoFiles()->pluck('video_files.video_file_id')->toArray();
+            
+            // Determine which videos to detach (current - existing)
+            $videosToDetach = array_diff($currentVideoIds, $existingVideoIds);
+            
+            // Detach videos that are no longer needed
+            if (!empty($videosToDetach)) {
+                $movie->videoFiles()->detach($videosToDetach);
+            }
+            
+            \Log::info('Movie Update - Video sync completed:', [
+                'movie_id' => $movie->movie_id,
+                'existing_video_ids' => $existingVideoIds,
+                'current_video_ids' => $currentVideoIds,
+                'videos_to_detach' => $videosToDetach
+            ]);
+        }
+
         // Load relationships for response
         $movie->load([
             'category',

@@ -49,6 +49,10 @@ class MovieCompleteStoreRequest extends FormRequest
             'trailers' => 'sometimes|array',
             'trailers.*.url' => 'sometimes|url',
             'trailers.*.title' => 'sometimes|string',
+
+            // Existing video IDs to keep (for updates)
+            'existing_video_ids' => 'sometimes|array',
+            'existing_video_ids.*' => 'integer|exists:video_files,video_file_id',
         ];
     }
 
