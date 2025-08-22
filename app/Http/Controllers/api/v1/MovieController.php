@@ -15,6 +15,8 @@ use App\Http\Resources\api\v1\MovieResource;
 use App\Http\Resources\api\v1\MovieCollection;
 use App\Http\Requests\api\v1\MovieStoreRequest;
 use App\Http\Requests\api\v1\MovieUpdateRequest;
+use App\Http\Requests\api\v1\MovieCompleteStoreRequest;
+use App\Http\Requests\api\v1\MovieCompleteUpdateRequest;
 
 
 class MovieController extends Controller
@@ -182,6 +184,119 @@ class MovieController extends Controller
     return ResponseMessages::success(['message' => 'Movie created successfully', 'movie' => new MovieResource($movie)], 201);
 }
 
+    /**
+     * Store a complete movie with all files in one request
+     */
+    public function storeComplete(MovieCompleteStoreRequest $request)
+    {
+        // Authorization for creating a movie
+        $this->authorize('create', Movie::class);
+
+        $validatedData = $request->validated();
+        
+        // Extract file fields
+        $fileFields = ['poster_image', 'backdrop_image', 'trailer_video', 'movie_video'];
+        $movieData = collect($validatedData)->except($fileFields)->toArray();
+
+        // Create the movie
+        $movie = Movie::create($movieData);
+
+        // 1. Handle poster image upload
+        if ($request->hasFile('poster_image')) {
+            $posterFile = $request->file('poster_image');
+            $fileData = FileUploadHelper::uploadImage($posterFile, 'poster');
+            
+            $posterImage = ImageFile::create([
+                'url' => $fileData['url'],
+                'type' => 'poster',
+                'format' => $fileData['format'] ?? 'jpg',
+                'size' => $fileData['size'] ?? 0,
+                'width' => $fileData['width'] ?? null,
+                'height' => $fileData['height'] ?? null,
+            ]);
+            
+            $movie->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
+        }
+
+        // 2. Handle backdrop image upload
+        if ($request->hasFile('backdrop_image')) {
+            $backdropFile = $request->file('backdrop_image');
+            $fileData = FileUploadHelper::uploadImage($backdropFile, 'backdrop');
+            
+            $backdropImage = ImageFile::create([
+                'url' => $fileData['url'],
+                'type' => 'backdrop',
+                'format' => $fileData['format'] ?? 'jpg',
+                'size' => $fileData['size'] ?? 0,
+                'width' => $fileData['width'] ?? null,
+                'height' => $fileData['height'] ?? null,
+            ]);
+            
+            $movie->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
+        }
+
+        // 3. Handle trailer video upload
+        if ($request->hasFile('trailer_video')) {
+            $trailerFile = $request->file('trailer_video');
+            $fileData = FileUploadHelper::uploadVideo($trailerFile);
+            
+            $trailerTitle = $request->title . ' - Trailer';
+            
+            $trailerVideo = VideoFile::create([
+                'url' => $fileData['url'],
+                'title' => $trailerTitle,
+                'format' => $fileData['format'] ?? 'mp4',
+                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
+            ]);
+            
+            $movie->videoFiles()->attach($trailerVideo->video_file_id);
+        }
+
+        // 4. Handle movie video upload
+        if ($request->hasFile('movie_video')) {
+            $movieFile = $request->file('movie_video');
+            $fileData = FileUploadHelper::uploadVideo($movieFile);
+            
+            $movieTitle = $request->title . ' - Full Movie';
+            
+            $movieVideo = VideoFile::create([
+                'url' => $fileData['url'],
+                'title' => $movieTitle,
+                'format' => $fileData['format'] ?? 'mp4',
+                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
+            ]);
+            
+            $movie->videoFiles()->attach($movieVideo->video_file_id);
+        }
+
+        // 5. Attach persons if provided
+        if ($request->has('persons')) {
+            $movie->persons()->sync($request->persons);
+        }
+
+        // 6. Handle trailers if provided
+        if ($request->has('trailers')) {
+            foreach ($request->trailers as $trailerData) {
+                $trailer = Trailer::create($trailerData);
+                $movie->trailers()->attach($trailer->trailer_id);
+            }
+        }
+
+        // Load relationships for response
+        $movie->load([
+            'category',
+            'persons.imageFiles',
+            'trailers',
+            'imageFiles',
+            'videoFiles'
+        ]);
+
+        return ResponseMessages::success([
+            'message' => 'Movie created successfully',
+            'movie' => new MovieResource($movie)
+        ], 201);
+    }
+
 
     /**
      * Display the specified resource.
@@ -337,6 +452,146 @@ class MovieController extends Controller
         }
         
         return ResponseMessages::success(['message' => 'Movie successfully updated', 'movie' => new MovieResource($movie)], 200);
+    }
+
+    /**
+     * Update a complete movie with all files in one request
+     */
+    public function updateComplete(MovieCompleteUpdateRequest $request, Movie $movie)
+    {
+        // Authorization for updating a movie
+        $this->authorize('update', $movie);
+        
+        $validatedData = $request->validated();
+        
+        // Extract file fields
+        $fileFields = ['poster_image', 'backdrop_image', 'trailer_video', 'movie_video'];
+        $movieData = collect($validatedData)->except($fileFields)->toArray();
+        
+        // Update the movie with basic data
+        $movie->update($movieData);
+        
+        // 1. Handle poster image upload (replace existing)
+        if ($request->hasFile('poster_image')) {
+            // Remove existing poster associations
+            $existingPosters = $movie->imageFiles()->wherePivot('type', 'poster')->get();
+            foreach ($existingPosters as $existingPoster) {
+                $movie->imageFiles()->detach($existingPoster->image_id);
+            }
+            
+            $posterFile = $request->file('poster_image');
+            $fileData = FileUploadHelper::uploadImage($posterFile, 'poster');
+            
+            $posterImage = ImageFile::create([
+                'url' => $fileData['url'],
+                'type' => 'poster',
+                'format' => $fileData['format'] ?? 'jpg',
+                'size' => $fileData['size'] ?? 0,
+                'width' => $fileData['width'] ?? null,
+                'height' => $fileData['height'] ?? null,
+            ]);
+            
+            $movie->imageFiles()->attach($posterImage->image_id, ['type' => 'poster']);
+        }
+
+        // 2. Handle backdrop image upload (replace existing)
+        if ($request->hasFile('backdrop_image')) {
+            // Remove existing backdrop associations
+            $existingBackdrops = $movie->imageFiles()->wherePivot('type', 'backdrop')->get();
+            foreach ($existingBackdrops as $existingBackdrop) {
+                $movie->imageFiles()->detach($existingBackdrop->image_id);
+            }
+            
+            $backdropFile = $request->file('backdrop_image');
+            $fileData = FileUploadHelper::uploadImage($backdropFile, 'backdrop');
+            
+            $backdropImage = ImageFile::create([
+                'url' => $fileData['url'],
+                'type' => 'backdrop',
+                'format' => $fileData['format'] ?? 'jpg',
+                'size' => $fileData['size'] ?? 0,
+                'width' => $fileData['width'] ?? null,
+                'height' => $fileData['height'] ?? null,
+            ]);
+            
+            $movie->imageFiles()->attach($backdropImage->image_id, ['type' => 'backdrop']);
+        }
+
+        // 3. Handle trailer video upload (replace existing)
+        if ($request->hasFile('trailer_video')) {
+            // Remove existing trailer associations
+            $existingTrailers = $movie->videoFiles()->whereRaw("LOWER(title) LIKE '%trailer%'")->get();
+            foreach ($existingTrailers as $existingTrailer) {
+                $movie->videoFiles()->detach($existingTrailer->video_file_id);
+            }
+            
+            $trailerFile = $request->file('trailer_video');
+            $fileData = FileUploadHelper::uploadVideo($trailerFile);
+            
+            $trailerTitle = ($request->title ?? $movie->title) . ' - Trailer';
+            
+            $trailerVideo = VideoFile::create([
+                'url' => $fileData['url'],
+                'title' => $trailerTitle,
+                'format' => $fileData['format'] ?? 'mp4',
+                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
+            ]);
+            
+            $movie->videoFiles()->attach($trailerVideo->video_file_id);
+        }
+
+        // 4. Handle movie video upload (replace existing)
+        if ($request->hasFile('movie_video')) {
+            // Remove existing movie video associations
+            $existingMovieVideos = $movie->videoFiles()->whereRaw("LOWER(title) LIKE '%full movie%'")->get();
+            foreach ($existingMovieVideos as $existingMovieVideo) {
+                $movie->videoFiles()->detach($existingMovieVideo->video_file_id);
+            }
+            
+            $movieFile = $request->file('movie_video');
+            $fileData = FileUploadHelper::uploadVideo($movieFile);
+            
+            $movieTitle = ($request->title ?? $movie->title) . ' - Full Movie';
+            
+            $movieVideo = VideoFile::create([
+                'url' => $fileData['url'],
+                'title' => $movieTitle,
+                'format' => $fileData['format'] ?? 'mp4',
+                'resolution' => isset($fileData['width']) && isset($fileData['height']) ? $fileData['width'].'x'.$fileData['height'] : null,
+            ]);
+            
+            $movie->videoFiles()->attach($movieVideo->video_file_id);
+        }
+        
+        // 5. Update persons if provided
+        if ($request->has('persons')) {
+            $movie->persons()->sync($request->persons);
+        }
+        
+        // 6. Update trailers if provided
+        if ($request->has('trailers')) {
+            // Remove existing trailer associations
+            $movie->trailers()->detach();
+            
+            foreach ($request->trailers as $trailerData) {
+                $trailer = Trailer::create($trailerData);
+                $movie->trailers()->attach($trailer->trailer_id);
+            }
+        }
+
+        // Load relationships for response
+        $movie->load([
+            'category',
+            'persons.imageFiles',
+            'trailers',
+            'imageFiles',
+            'videoFiles'
+        ]);
+
+        return ResponseMessages::success([
+            'message' => 'Movie updated successfully',
+            'movie' => new MovieResource($movie)
+        ], 200);
     }
 
     /**

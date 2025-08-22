@@ -111,7 +111,9 @@ Route::prefix('v1')->group(function () {
 
         // Movies 
         Route::post('/movies', [MovieController::class, 'store']);
+        Route::post('/movies/complete', [MovieController::class, 'storeComplete']);
         Route::put('/movies/{movie}', [MovieController::class, 'update']);
+        Route::post('/movies/{movie}/complete-update', [MovieController::class, 'updateComplete']);
         Route::delete('/movies/{movie}', [MovieController::class, 'destroy']);
 
 
