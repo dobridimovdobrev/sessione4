@@ -342,6 +342,13 @@ class TvSerieController extends Controller
         // Authorization for updating a TV series
         $this->authorize('update', $tvSerie);
 
+        // CRITICAL DEBUG: Check what Laravel actually receives
+        \Log::info('TvSerie Update - Raw Request Data:', $request->all());
+        \Log::info('TvSerie Update - Request Input Keys:', array_keys($request->all()));
+        \Log::info('TvSerie Update - Request Content Type:', ['content_type' => $request->header('Content-Type')]);
+        \Log::info('TvSerie Update - Request Method:', ['method' => $request->method()]);
+        \Log::info('TvSerie Update - Has Files:', ['has_files' => $request->hasFile('poster_image') || $request->hasFile('backdrop_image') || $request->hasFile('trailer_video')]);
+
         $validatedData = $request->validated();
         
         // Debug logging
