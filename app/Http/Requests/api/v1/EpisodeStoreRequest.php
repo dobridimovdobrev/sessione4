@@ -26,7 +26,7 @@ class EpisodeStoreRequest extends FormRequest
             'season_id' => 'required|exists:seasons,season_id',
             'title' => 'required|string|max:128',
             'slug' => 'nullable|string|max:128',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'episode_number' => 'required|integer',
             'duration' => 'nullable|integer',
             'air_date' => 'nullable|date',
