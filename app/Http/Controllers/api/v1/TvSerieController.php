@@ -585,6 +585,7 @@ class TvSerieController extends Controller
                 'category',
                 'persons.imageFiles',
                 'trailers',
+                'videoFiles',
                 'imageFiles',
                 'seasons.episodes.imageFiles',
                 'seasons.episodes.videoFiles'
