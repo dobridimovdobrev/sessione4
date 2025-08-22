@@ -52,7 +52,7 @@ class MovieCompleteStoreRequest extends FormRequest
 
             // Existing video IDs to keep (for updates)
             'existing_video_ids' => 'sometimes|array',
-            'existing_video_ids.*' => 'integer|exists:video_files,video_file_id',
+            'existing_video_ids.*' => 'nullable|integer|exists:video_files,video_file_id',
         ];
     }
 
