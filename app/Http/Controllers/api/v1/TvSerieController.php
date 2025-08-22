@@ -461,8 +461,26 @@ class TvSerieController extends Controller
             }
         }
 
-        // 6. Update seasons and episodes (partial updates)
+        // 6. Update seasons and episodes (sync logic - delete seasons not in request)
         if ($request->has('seasons')) {
+            // Get current season IDs from request
+            $requestSeasonIds = collect($request->seasons)
+                ->filter(function($seasonData) {
+                    return isset($seasonData['season_id']);
+                })
+                ->pluck('season_id')
+                ->toArray();
+            
+            // Delete seasons that are not in the request
+            $tvSerie->seasons()
+                ->when(!empty($requestSeasonIds), function($query) use ($requestSeasonIds) {
+                    return $query->whereNotIn('season_id', $requestSeasonIds);
+                }, function($query) {
+                    // If no season IDs in request, delete all existing seasons
+                    return $query;
+                })
+                ->delete();
+            
             foreach ($request->seasons as $seasonIndex => $seasonData) {
                 // Check if season has an ID for update or create new
                 if (isset($seasonData['season_id'])) {
