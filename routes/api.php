@@ -52,6 +52,8 @@ Route::prefix('v1')->group(function () {
         Route::put('/update-profile', [UserController::class, 'updateOwnProfile']);
         Route::post('/credits', [CreditController::class, 'store']);
         Route::get('/credits/balance', [CreditController::class, 'getBalance']);
+        Route::post('/credits/consume', [CreditController::class, 'consumeCredits']);
+        Route::get('/credits/can-play', [CreditController::class, 'canPlay']);
     });
 
 

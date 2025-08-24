@@ -26,13 +26,13 @@ class CreditController extends Controller
     }
 
     /**
-     * Get current user's credit balance
+     * Get current user's credit balance (summing all credit records)
      */
     public function getBalance()
     {
-        $credit = Credit::where('user_id', Auth::id())->first();
+        $credits = Credit::where('user_id', Auth::id())->get();
         
-        if (!$credit) {
+        if ($credits->isEmpty()) {
             return response()->json([
                 'remaining_credits' => 0,
                 'total_credits' => 0,
@@ -41,11 +41,16 @@ class CreditController extends Controller
             ]);
         }
 
+        // Somma tutti i crediti dell'utente
+        $totalCredits = $credits->sum('total_credits');
+        $spentCredits = $credits->sum('spent_credits');
+        $remainingCredits = $credits->sum('remaining_credits');
+        
         return response()->json([
-            'remaining_credits' => $credit->remaining_credits,
-            'total_credits' => $credit->total_credits,
-            'spent_credits' => $credit->spent_credits,
-            'credit_id' => $credit->credit_id
+            'remaining_credits' => $remainingCredits,
+            'total_credits' => $totalCredits,
+            'spent_credits' => $spentCredits,
+            'credit_records' => $credits->count()
         ]);
     }
 
@@ -76,6 +81,94 @@ class CreditController extends Controller
         $this->authorize('view', $credit);
 
         return new CreditResource($credit);
+    }
+
+    /**
+     * Consume credits for video playback
+     */
+    public function consumeCredits()
+    {
+        $user = Auth::user();
+        
+        // Admin has unlimited access
+        if ($user->role->role_name === 'admin') {
+            return ResponseMessages::success([
+                'message' => 'Admin has unlimited access',
+                'can_play' => true,
+                'remaining_credits' => 'unlimited'
+            ], 200);
+        }
+
+        $creditCost = 20; // Cost per video
+        
+        // Calcola il totale dei crediti disponibili
+        $credits = Credit::where('user_id', Auth::id())->get();
+        $totalRemainingCredits = $credits->sum('remaining_credits');
+        
+        // Check if user has enough credits
+        if ($credits->isEmpty() || $totalRemainingCredits < $creditCost) {
+            return ResponseMessages::error([
+                'message' => 'Crediti insufficienti per riprodurre il video',
+                'can_play' => false,
+                'remaining_credits' => $totalRemainingCredits,
+                'required_credits' => $creditCost
+            ], 402); // Payment Required
+        }
+
+        // Consume credits from the first record that has enough credits
+        $creditToUse = $credits->first(function($credit) use ($creditCost) {
+            return $credit->remaining_credits >= $creditCost;
+        });
+        
+        // If no single record has enough credits, use the first record and update as needed
+        if (!$creditToUse) {
+            $creditToUse = $credits->first();
+        }
+        
+        $creditToUse->spent_credits += $creditCost;
+        $creditToUse->remaining_credits -= $creditCost;
+        $creditToUse->update_date = now();
+        $creditToUse->save();
+
+        // Ricalcola il totale dei crediti rimanenti dopo il consumo
+        $updatedTotalRemainingCredits = Credit::where('user_id', Auth::id())->sum('remaining_credits');
+        
+        return ResponseMessages::success([
+            'message' => 'Crediti consumati con successo',
+            'can_play' => true,
+            'consumed_credits' => $creditCost,
+            'remaining_credits' => $updatedTotalRemainingCredits,
+            'credit_records' => $credits->count()
+        ], 200);
+    }
+
+    /**
+     * Check if user can play video without consuming credits
+     */
+    public function canPlay()
+    {
+        $user = Auth::user();
+        
+        // Admin has unlimited access
+        if ($user->role->role_name === 'admin') {
+            return ResponseMessages::success([
+                'can_play' => true,
+                'remaining_credits' => 'unlimited'
+            ], 200);
+        }
+
+        $creditCost = 20;
+        $credits = Credit::where('user_id', Auth::id())->get();
+        $totalRemainingCredits = $credits->sum('remaining_credits');
+        
+        $canPlay = !$credits->isEmpty() && $totalRemainingCredits >= $creditCost;
+        
+        return ResponseMessages::success([
+            'can_play' => $canPlay,
+            'remaining_credits' => $totalRemainingCredits,
+            'required_credits' => $creditCost,
+            'credit_records' => $credits->count()
+        ], 200);
     }
 
     /**
