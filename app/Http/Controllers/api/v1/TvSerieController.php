@@ -36,7 +36,7 @@ class TvSerieController extends Controller
                 $query->wherePivot('type', 'poster')->limit(1);
             }]);
     
-        // User can see only published and coming soon TV series but not draft
+        // User can see only published and coming soon TV series but not draft, ongoing or ended
         if (Auth::user()->role->role_name === 'user') {
             $query->whereIn('status', ['published', 'coming soon']);
         }
