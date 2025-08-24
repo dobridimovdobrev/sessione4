@@ -6,12 +6,24 @@ use App\Models\Credit;
 use App\Helpers\ResponseMessages;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Http\Resources\api\v1\CreditResource;
 use App\Http\Requests\api\v1\CreditStoreRequest;
 use App\Http\Resources\api\v1\CreditCollection;
+use Illuminate\Support\Facades\Log;
 
 class CreditController extends Controller
 {
+    /**
+     * Costo standard per ogni tipo di media
+     */
+    protected $creditCosts = [
+        'movie' => 20,
+        'tvseries' => 20,
+        'episode' => 20,
+        'trailer' => 20
+    ];
+
     /**
      * Display the credits for the authenticated user.
      */
@@ -85,21 +97,43 @@ class CreditController extends Controller
 
     /**
      * Consume credits for video playback
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function consumeCredits()
+    public function consumeCredits(Request $request)
     {
         $user = Auth::user();
+        
+        // Validate request
+        $request->validate([
+            'media_type' => 'required|string|in:movie,tvseries,episode,trailer',
+            'media_id' => 'required|integer'
+        ]);
+        
+        $mediaType = $request->input('media_type');
+        $mediaId = $request->input('media_id');
+        
+        // Log the request for debugging
+        Log::info('Credit consumption request', [
+            'user_id' => Auth::id(),
+            'media_type' => $mediaType,
+            'media_id' => $mediaId
+        ]);
         
         // Admin has unlimited access
         if ($user->role->role_name === 'admin') {
             return ResponseMessages::success([
                 'message' => 'Admin has unlimited access',
                 'can_play' => true,
-                'remaining_credits' => 'unlimited'
+                'remaining_credits' => 'unlimited',
+                'media_type' => $mediaType,
+                'media_id' => $mediaId
             ], 200);
         }
 
-        $creditCost = 20; // Cost per video
+        // Get credit cost based on media type
+        $creditCost = $this->getCreditCost($mediaType);
         
         // Calcola il totale dei crediti disponibili
         $credits = Credit::where('user_id', Auth::id())->get();
@@ -108,10 +142,12 @@ class CreditController extends Controller
         // Check if user has enough credits
         if ($credits->isEmpty() || $totalRemainingCredits < $creditCost) {
             return ResponseMessages::error([
-                'message' => 'Crediti insufficienti per riprodurre il video',
+                'message' => 'Crediti insufficienti per riprodurre il contenuto',
                 'can_play' => false,
                 'remaining_credits' => $totalRemainingCredits,
-                'required_credits' => $creditCost
+                'required_credits' => $creditCost,
+                'media_type' => $mediaType,
+                'media_id' => $mediaId
             ], 402); // Payment Required
         }
 
@@ -138,26 +174,51 @@ class CreditController extends Controller
             'can_play' => true,
             'consumed_credits' => $creditCost,
             'remaining_credits' => $updatedTotalRemainingCredits,
-            'credit_records' => $credits->count()
+            'credit_records' => $credits->count(),
+            'media_type' => $mediaType,
+            'media_id' => $mediaId
         ], 200);
     }
 
     /**
      * Check if user can play video without consuming credits
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function canPlay()
+    public function canPlay(Request $request)
     {
         $user = Auth::user();
+        
+        // Validate request
+        $request->validate([
+            'media_type' => 'required|string|in:movie,tvseries,episode,trailer',
+            'media_id' => 'required|integer'
+        ]);
+        
+        $mediaType = $request->input('media_type');
+        $mediaId = $request->input('media_id');
+        
+        // Log the request for debugging
+        Log::info('Credit check request', [
+            'user_id' => Auth::id(),
+            'media_type' => $mediaType,
+            'media_id' => $mediaId
+        ]);
         
         // Admin has unlimited access
         if ($user->role->role_name === 'admin') {
             return ResponseMessages::success([
                 'can_play' => true,
-                'remaining_credits' => 'unlimited'
+                'remaining_credits' => 'unlimited',
+                'media_type' => $mediaType,
+                'media_id' => $mediaId
             ], 200);
         }
 
-        $creditCost = 20;
+        // Get credit cost based on media type
+        $creditCost = $this->getCreditCost($mediaType);
+        
         $credits = Credit::where('user_id', Auth::id())->get();
         $totalRemainingCredits = $credits->sum('remaining_credits');
         
@@ -167,7 +228,9 @@ class CreditController extends Controller
             'can_play' => $canPlay,
             'remaining_credits' => $totalRemainingCredits,
             'required_credits' => $creditCost,
-            'credit_records' => $credits->count()
+            'credit_records' => $credits->count(),
+            'media_type' => $mediaType,
+            'media_id' => $mediaId
         ], 200);
     }
 
@@ -181,5 +244,16 @@ class CreditController extends Controller
         $credit->delete();
 
         return ResponseMessages::success('Credits record deleted successfully', 204);
+    }
+    
+    /**
+     * Get credit cost based on media type
+     * 
+     * @param string $mediaType
+     * @return int
+     */
+    protected function getCreditCost($mediaType)
+    {
+        return $this->creditCosts[$mediaType] ?? 20; // Default to 20 if not specified
     }
 }
