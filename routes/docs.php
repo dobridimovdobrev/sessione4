@@ -70,3 +70,8 @@ Route::get('/angular-integration', function () {
 });
 
 // Add more documentation routes here
+
+// TV Series API Update Documentation
+Route::get('/tv-series-api-update', function () {
+    return view('docs.tv-series-api-update');
+});

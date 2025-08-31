@@ -152,7 +152,12 @@ class TvSerieController extends Controller
             }
         }
 
-        return ResponseMessages::success(['message' => 'TV Series created successfully', 'tv_series' => new TvSeriesResource($tvSeries)], 201);
+        // Restituisci la risposta con la chiave 'data' per compatibilità con il frontend Angular
+        return response()->json([
+            'status' => 'success',
+            'message' => 'TV Series created successfully',
+            'data' => new TvSeriesResource($tvSeries)
+        ], 201);
     }
 
     /**
@@ -328,9 +333,11 @@ class TvSerieController extends Controller
             'seasons.episodes.videoFiles'
         ]);
 
-        return ResponseMessages::success([
-            'message' => 'Complete TV Series created successfully', 
-            'tv_series' => new TvSeriesResource($tvSeries)
+        // Restituisci la risposta con la chiave 'data' per compatibilità con il frontend Angular
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Complete TV Series created successfully',
+            'data' => new TvSeriesResource($tvSeries)
         ], 201);
     }
 
@@ -584,9 +591,11 @@ class TvSerieController extends Controller
             'seasons.episodes.videoFiles'
         ]);
 
-        return ResponseMessages::success([
-            'message' => 'TV Series updated successfully', 
-            'tv_series' => new TvSeriesResource($tvSerie)
+        // Restituisci la risposta con la chiave 'data' per compatibilità con il frontend Angular
+        return response()->json([
+            'status' => 'success',
+            'message' => 'TV Series updated successfully',
+            'data' => new TvSeriesResource($tvSerie)
         ], 200);
     }
 
@@ -708,7 +717,12 @@ class TvSerieController extends Controller
             $tvSerie->persons()->sync($request->persons);
         }
         
-        return ResponseMessages::success(['message' => 'TV Series successfully updated', 'tv_series' => new TvSeriesResource($tvSerie)], 200);
+        // Restituisci la risposta con la chiave 'data' per compatibilità con il frontend Angular
+        return response()->json([
+            'status' => 'success',
+            'message' => 'TV Series successfully updated',
+            'data' => new TvSeriesResource($tvSerie)
+        ], 200);
     }
 
     /**
