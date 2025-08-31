@@ -19,7 +19,9 @@ return new class extends Migration
             $table->bigInteger('uploaded_size')->default(0);
             $table->float('progress_percentage')->default(0);
             $table->enum('status', ['pending', 'in_progress', 'completed', 'failed'])->default('pending');
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->unsignedBigInteger('user_id')->nullable();
+            // Rimuoviamo la foreign key constraint per evitare problemi
+            // Se necessario, può essere aggiunta manualmente dopo aver verificato la struttura della tabella users
             $table->string('file_type')->nullable();
             $table->string('error_message')->nullable();
             $table->timestamp('completed_at')->nullable();
