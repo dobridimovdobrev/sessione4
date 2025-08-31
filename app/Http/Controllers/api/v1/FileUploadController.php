@@ -5,9 +5,11 @@ namespace App\Http\Controllers\api\v1;
 use App\Models\ImageFile;
 use App\Models\VideoFile;
 use App\Models\Trailer;
+use App\Models\UploadProgress;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseMessages;
 use App\Helpers\FileUploadHelper;
+use App\Helpers\UploadProgressHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\api\v1\ImageFileResource;
@@ -19,6 +21,7 @@ class FileUploadController extends Controller
     /**
      * Upload image file for frontend Angular
      * Supports multiple image types: poster, backdrop, still, persons
+     * Supports progress tracking for Angular progress bars
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -47,8 +50,11 @@ class FileUploadController extends Controller
             $file = $request->file('image');
             $type = $request->input('type');
             
-            // Upload file using helper
-            $fileData = FileUploadHelper::uploadImage($file, $type);
+            // Generate upload ID for tracking progress
+            $uploadId = FileUploadHelper::generateUploadId($file, 'image');
+            
+            // Upload file using helper with tracking
+            $fileData = FileUploadHelper::uploadImage($file, $type, $uploadId);
             
             // Create image record
             $imageFile = ImageFile::create([
@@ -68,7 +74,8 @@ class FileUploadController extends Controller
                 'message' => 'Image uploaded successfully',
                 'image' => new ImageFileResource($imageFile),
                 'full_url' => $imageFile->full_url, // Direct URL for Angular
-                'available_sizes' => $this->getAvailableSizes($type)
+                'available_sizes' => $this->getAvailableSizes($type),
+                'upload_id' => $uploadId // Return upload ID for progress tracking
             ], 201);
 
         } catch (\Exception $e) {
@@ -82,6 +89,7 @@ class FileUploadController extends Controller
     /**
      * Upload video file for frontend Angular
      * Supports multiple video formats
+     * Supports progress tracking for Angular progress bars
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -107,8 +115,11 @@ class FileUploadController extends Controller
         try {
             $file = $request->file('video');
             
-            // Upload file using helper
-            $fileData = FileUploadHelper::uploadVideo($file);
+            // Generate upload ID for tracking progress
+            $uploadId = FileUploadHelper::generateUploadId($file, 'video');
+            
+            // Upload file using helper with tracking
+            $fileData = FileUploadHelper::uploadVideo($file, $uploadId);
             
             // Create video record
             $videoFile = VideoFile::create([
@@ -122,7 +133,8 @@ class FileUploadController extends Controller
                 'message' => 'Video uploaded successfully',
                 'video' => new VideoFileResource($videoFile),
                 'stream_url' => url('/api/v1/stream-video/' . basename($fileData['url'])), // Direct streaming URL for Angular
-                'public_stream_url' => url('/api/v1/public-video/' . basename($fileData['url'])) // Public streaming URL
+                'public_stream_url' => url('/api/v1/public-video/' . basename($fileData['url'])), // Public streaming URL
+                'upload_id' => $uploadId ?? null // Return upload ID for progress tracking
             ], 201);
 
         } catch (\Exception $e) {
@@ -136,20 +148,41 @@ class FileUploadController extends Controller
     /**
      * Get upload progress (for large files)
      * Useful for Angular progress bars
+     * Returns real-time progress information from the database
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function getUploadProgress(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'upload_id' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseMessages::error([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        
         $uploadId = $request->input('upload_id');
         
-        // This would require additional implementation for real progress tracking
-        // For now, return a basic response
+        // Get progress from the helper
+        $progressData = FileUploadHelper::getUploadProgress($uploadId);
+        
+        if (!$progressData['success']) {
+            return ResponseMessages::error([
+                'message' => $progressData['message'] ?? 'Upload not found',
+                'upload_id' => $uploadId
+            ], 404);
+        }
+        
         return ResponseMessages::success([
             'upload_id' => $uploadId,
-            'progress' => 100, // Placeholder
-            'status' => 'completed'
+            'progress' => $progressData['progress'],
+            'status' => $progressData['status'],
+            'error' => $progressData['error'] ?? null
         ], 200);
     }
 
@@ -175,6 +208,7 @@ class FileUploadController extends Controller
     /**
      * Upload trailer file for frontend Angular
      * Saves to trailers table instead of video_files
+     * Supports progress tracking for Angular progress bars
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -201,8 +235,11 @@ class FileUploadController extends Controller
         try {
             $file = $request->file('video');
             
-            // Upload file using helper
-            $fileData = FileUploadHelper::uploadVideo($file);
+            // Generate upload ID for tracking progress
+            $uploadId = FileUploadHelper::generateUploadId($file, 'trailer');
+            
+            // Upload file using helper with tracking
+            $fileData = FileUploadHelper::uploadVideo($file, $uploadId);
             
             // Create trailer record in trailers table
             $trailer = Trailer::create([
@@ -218,7 +255,8 @@ class FileUploadController extends Controller
                 'trailer_id' => $trailer->trailer_id,
                 'stream_url' => url('/api/v1/stream-video/' . basename($fileData['url'])),
                 'public_stream_url' => url('/api/v1/public-video/' . basename($fileData['url'])),
-                'type' => 'local' // Always local for uploaded trailers
+                'type' => 'local', // Always local for uploaded trailers
+                'upload_id' => $uploadId ?? null // Return upload ID for progress tracking
             ], 201);
 
         } catch (\Exception $e) {
